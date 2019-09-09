@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
+using UrRobot;
+using myObjects;
 
 namespace CS_coffeeMakerV3
 {
@@ -11,8 +14,7 @@ namespace CS_coffeeMakerV3
         private static robotControl UR;
         private static StreamWriter txt;
         private static string fileName;
-        //public static tmp aaa;
-        public Action(robotControl _UR, string file)
+        public Actions(robotControl _UR, string file)
         {
             UR = _UR;
             fileName = file;
@@ -43,9 +45,9 @@ namespace CS_coffeeMakerV3
             for (int i = 0; i < subact.Count(); i++)
                 txt.WriteLine(subact.infotxt[i]);
         }
-        public void start(Object[] cups)
+        public void start(Objects[] cups)
         {
-            foreach (Object cup in cups)
+            foreach (Objects cup in cups)
             {
                 cup.saveNowPos();
             }
@@ -53,7 +55,7 @@ namespace CS_coffeeMakerV3
     }
     class Subact
     {
-        public static subactInfo Pick(Object cup)
+        public static subactInfo Pick(Objects cup)
         {
             subactInfo rtn = new subactInfo();
             URCoordinates up = new URCoordinates(cup.gripPos());
@@ -102,7 +104,7 @@ namespace CS_coffeeMakerV3
 
             return rtn;
         }
-        public static subactInfo Place(Object cup, URCoordinates Wpoint)
+        public static subactInfo Place(Objects cup, URCoordinates Wpoint)
         {
             cup.setNowPos(Wpoint);
 
@@ -142,7 +144,7 @@ namespace CS_coffeeMakerV3
             rtn.infotxt.Add("1000");
             return rtn;
         }
-        public static subactInfo Pour(Object toCup)
+        public static subactInfo Pour(Objects toCup)
         {
             subactInfo rtn = new subactInfo();
             URCoordinates up = new URCoordinates(toCup.gripPos());
@@ -179,7 +181,7 @@ namespace CS_coffeeMakerV3
             rtn.AddFile("Path//Scoop.path");
             return rtn;
         }
-        public static subactInfo Stir(Object toCup)
+        public static subactInfo Stir(Objects toCup)
         {
             subactInfo rtn = new subactInfo();
             URCoordinates up = new URCoordinates(toCup.gripPos());
@@ -208,7 +210,7 @@ namespace CS_coffeeMakerV3
             rtn.infotxt.Add(up.ToPos());
             return rtn;
         }
-        public static subactInfo AddaSpoon(Object toCup)
+        public static subactInfo AddaSpoon(Objects toCup)
         {
             subactInfo rtn = new subactInfo();
             URCoordinates up = new URCoordinates(toCup.gripPos());
@@ -271,5 +273,4 @@ namespace CS_coffeeMakerV3
             DripTray = 0
         }
     }
-}
 }
