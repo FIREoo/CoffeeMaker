@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29306.81
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wpf_coffeeMaker", "Wpf_coffeeMaker\Wpf_coffeeMaker.csproj", "{933FE5BE-F254-4857-8EBE-8DCA9EA22CF1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{933FE5BE-F254-4857-8EBE-8DCA9EA22CF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{933FE5BE-F254-4857-8EBE-8DCA9EA22CF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{933FE5BE-F254-4857-8EBE-8DCA9EA22CF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{933FE5BE-F254-4857-8EBE-8DCA9EA22CF1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A605E155-B1D6-4D67-8139-A21C048F85CA}
+	EndGlobalSection
+EndGlobal
