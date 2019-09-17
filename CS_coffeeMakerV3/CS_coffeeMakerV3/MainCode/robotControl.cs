@@ -8,9 +8,10 @@ using System.Net.Sockets;
 using System.Threading;
 using System.IO;
 
-namespace CS_coffeeMakerV3.MainCode
+
+namespace UrRobot
 {
-    enum mode
+    public enum mode
     {
         End = -1,
         stop = 0,
@@ -23,7 +24,7 @@ namespace CS_coffeeMakerV3.MainCode
         jog = 10,
         moveByFile = 99
     }
-    class robotControl
+    public class robotControl
     {
         public mode cmd = mode.stop;
         public static bool serverOn = false;
@@ -33,7 +34,7 @@ namespace CS_coffeeMakerV3.MainCode
         }
 
         public delegate void UREventHandler(object sender, LinkArgs e);
-        public event UREventHandler URstate_Handler;
+        public event UREventHandler stateChange;
 
         //file
         static string ReadingFile = "";
@@ -431,11 +432,11 @@ namespace CS_coffeeMakerV3.MainCode
         }
         protected virtual void OnLinkState(LinkArgs e)
         {
-            if (URstate_Handler != null)
-                URstate_Handler(this, e);
+            if (stateChange != null)
+                stateChange(this, e);
         }
     }
-    class URCoordinates//CSYS
+    public class URCoordinates//CSYS //Coordinate Systems
     {
         public float X = 0;//meters
         public float Y = 0;//meters
@@ -478,5 +479,18 @@ namespace CS_coffeeMakerV3.MainCode
             state = s;
         }
         public string state { get; set; }
+    }
+
+    static class ex
+    {
+        static public int toInt(this string str)
+        {
+            if (str == "-∞")
+                return int.MinValue;
+            if (str == "∞")
+                return int.MaxValue;
+
+            return int.Parse(str);
+        }
     }
 }
