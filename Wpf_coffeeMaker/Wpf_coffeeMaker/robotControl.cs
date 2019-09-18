@@ -36,13 +36,24 @@ namespace UrRobot
         public delegate void UREventHandler(object sender, LinkArgs e);
         public event UREventHandler stateChange;
 
+        //path
+        public string folder_Pos { get; } = "Pos";
+        public string folder_Path { get; } = "Path";
+
         //file
         static string ReadingFile = "";
         public StreamWriter txt_record;
 
         string sMsg = string.Empty;
-        public string Msg { get { return sMsg; } }
+        private string Msg { get { return sMsg; } }
         static byte rq_pos = 0;
+
+        public robotControl()
+        {
+            //creat folder if isn't exis
+            System.IO.Directory.CreateDirectory("Pos");
+            System.IO.Directory.CreateDirectory("Path");
+        }
 
         private void theServer(TcpListener tcp, ref mode cmd)
         {
@@ -385,7 +396,7 @@ namespace UrRobot
             }
             UR_Client.Dispose();
             tcp.Stop();
-            OnLinkState(new LinkArgs("disconnect"));
+            OnLinkState(new LinkArgs("Disconnect"));
             serverOn = false;
         }
         public void ServerOn(string ip, int port)
@@ -406,6 +417,9 @@ namespace UrRobot
 
         public void goToPos(URCoordinates goC, bool waitDone = false)
         {
+            if (!serverOn)
+            { Console.WriteLine("尚未連線"); return; }
+
             StreamWriter txt;
             txt = new StreamWriter("Pos//GoTo.pos", false);
             txt.WriteLine("position");
@@ -422,14 +436,52 @@ namespace UrRobot
 
         public void goToFilePos(string file)
         {
+            if (!serverOn) { Console.WriteLine("尚未連線"); return; }
+
             ReadingFile = $"Pos//{file}";
+            if (!File.Exists(ReadingFile))
+            { Console.WriteLine("檔案不存在"); return; }
+
             cmd = mode.moveByFile;
         }
         public void goFilePath(string file)
         {
-            ReadingFile = $"Path//{file}"; ;
+            if (!serverOn) { Console.WriteLine("尚未連線"); return; }
+
+            ReadingFile = $"Path//{file}";
+            if (!File.Exists(ReadingFile))
+            { Console.WriteLine("檔案不存在"); return; }
+
             cmd = mode.moveByFile;
         }
+
+        #region  //---Record---//
+        //record each axis angle only
+        bool isRecord = false;
+        public void Record_start(string fileName)
+        {
+            if (!serverOn) { Console.WriteLine("尚未連線"); return; }
+
+            isRecord = true;
+            txt_record = new StreamWriter($"Path//{fileName}.path", false);
+            cmd = mode.recordj;
+        }
+        public void Record_write()
+        {
+            if (!isRecord)
+            { Console.WriteLine("沒有在Record mode底下"); return; }
+
+            txt_record.WriteLine(Msg);
+        }
+        public void Record_stop()
+        {
+            cmd = mode.stop;
+            txt_record.Flush();
+            txt_record.Close();
+            isRecord = false;
+        }
+        #endregion
+
         protected virtual void OnLinkState(LinkArgs e)
         {
             if (stateChange != null)

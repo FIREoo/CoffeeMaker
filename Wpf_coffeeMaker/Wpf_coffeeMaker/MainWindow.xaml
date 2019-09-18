@@ -23,7 +23,7 @@
             <TextBlock x:Name="TB_Pcup_msg" HorizontalAlignment="Left" Margin="10,468,0,0" TextWrapping="Wrap" Text="Msg" VerticalAlignment="Top" FontSize="18"/>
             <Button x:Name="Btn_resetTimeTick" Content="Reset" HorizontalAlignment="Left" Margin="10,562,0,0" VerticalAlignment="Top" Width="76" Click="Btn_resetTimeTick_Click" Height="26"/>
         </Grid>
-        <ListView x:Name="LV_actionBase" ItemsSource="{Binding listOfAction}" HorizontalAlignment="Left" Height="606" Margin="10,10,0,0" VerticalAlignment="Top" Width="246" FontSize="22">
+        <ListView x:Name="LV_actionBase" ItemsSource="{Binding listOfAction}" HorizontalAlignment="Left" Height="717" Margin="10,10,0,0" VerticalAlignment="Top" Width="246" FontSize="22">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -37,7 +37,17 @@
             </ListView.View>
 
         </ListView>
-        <Button Content="Start Server" HorizontalAlignment="Left" Margin="319,651,0,0" VerticalAlignment="Top" Width="106" FontSize="16" Height="45"/>
+        <Button x:Name="Btn_UrConnect" Content="Start Server" HorizontalAlignment="Left" Margin="319,656,0,0" VerticalAlignment="Top" Width="106" FontSize="16" Height="45" Click="Button_startServer_Click"/>
+        <Button Content="Button" HorizontalAlignment="Left" Margin="445,651,0,0" VerticalAlignment="Top" Width="105" Height="60" Click="Button_goPosHome_Click"/>
+        <Button Content="Record mode" HorizontalAlignment="Left" Margin="445,753,0,0" VerticalAlignment="Top" Width="105" Height="74" Click="Button_recordMode_Click"/>
+        <Button Content="Write Pos" HorizontalAlignment="Left" Margin="555,753,0,0" VerticalAlignment="Top" Width="105" Height="74" Click="Button_recordWrite_Click"/>
+        <Button Content="End Record" HorizontalAlignment="Left" Margin="665,753,0,0" VerticalAlignment="Top" Width="105" Height="74" Click="Button_recordEnd_Click"/>
+        <ComboBox x:Name="Cb_Path" HorizontalAlignment="Left" Margin="800,664,0,0" VerticalAlignment="Top" Width="120" DropDownOpened="Cb_Path_DropDownOpened" FontSize="16" Height="47"/>
+        <Button x:Name="Btn_goPath" Content="Go Path" HorizontalAlignment="Left" Margin="925,664,0,0" VerticalAlignment="Top" Width="75" Height="47" FontSize="16" Click="Btn_goPath_Click"/>
+        <Ellipse x:Name="cir_UrState_off" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="15" Margin="319,706,0,0" Stroke="Black" VerticalAlignment="Top" Width="15"/>
+        <Ellipse x:Name="cir_UrState_connecting" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="15" Margin="339,706,0,0" Stroke="Black" VerticalAlignment="Top" Width="15"/>
+        <Ellipse x:Name="cir_UrState_on" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="15" Margin="359,706,0,0" Stroke="Black" VerticalAlignment="Top" Width="15"/>
+        <Button Content="Start Action" HorizontalAlignment="Left" Margin="10,732,0,0" VerticalAlignment="Top" Width="137" Height="37" Click="Button_startAction_Click" FontSize="16"/>
 
     </Grid>
 </Window>

@@ -25,10 +25,16 @@ using PointF = System.Drawing.PointF;
 using Point = System.Drawing.Point;
 using Rectangle = System.Drawing.Rectangle;
 using Image = System.Windows.Controls.Image;
+using Stream = Intel.RealSense.Stream;
+using SolidColorBrush = System.Windows.Media.SolidColorBrush;
+using Color = System.Windows.Media.Color;
+using Colors = System.Windows.Media.Colors;
 using Alturos.Yolo;
 using Alturos.Yolo.Model;
 using myObjects;
 using myEmguLibrary;
+using UrRobot;
+using System.IO;
 
 namespace Wpf_coffeeMaker
 {
@@ -59,6 +65,26 @@ namespace Wpf_coffeeMaker
         public static Objects machine = new Objects();
         public static Objects handing = new Objects();
 
+        #region //---UI---//
+        private void setConnectCircle(int S)
+        {
+            cir_UrState_off.Fill = new SolidColorBrush(Colors.LightGray);
+            cir_UrState_connecting.Fill = new SolidColorBrush(Colors.LightGray);
+            cir_UrState_on.Fill = new SolidColorBrush(Colors.LightGray );
+            if (S == 1)
+            {
+                cir_UrState_off.Fill = new SolidColorBrush(Color.FromArgb(255, 230, 50, 50));
+            }
+            else if (S == 2)
+            {
+                cir_UrState_connecting.Fill = new SolidColorBrush(Color.FromArgb(255, 220, 220, 20));
+            }
+            else if (S == 3)
+            {
+                cir_UrState_on.Fill = new SolidColorBrush(Color.FromArgb(255, 40, 210, 40));
+            }
+        }
+        #endregion //---UI---//
 
         public MainWindow()
         {
@@ -79,6 +105,8 @@ namespace Wpf_coffeeMaker
 
             matrix = CvInvoke.GetPerspectiveTransform(src, dst);
             creatObject();
+
+            UR.stateChange += OnUrStateChange;
         }
         private void creatObject()
         {
@@ -86,11 +114,11 @@ namespace Wpf_coffeeMaker
 
             cups[0] = new Objects();
             cups[0].Name = "blue cup";
-            cups[0].color = Color.FromArgb(153, 217, 234);
+            //cups[0].color = Color.FromArgb(153, 217, 234);
 
             cups[1] = new Objects();
             cups[1].Name = "pink cup";
-            cups[1].color = Color.FromArgb(255, 180, 200);
+            // cups[1].color = Color.FromArgb(255, 180, 200);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -297,13 +325,13 @@ namespace Wpf_coffeeMaker
 
                                 if (name == "blue cup")//index 0
                                 {
-                                    process_actionOfCups(cups[0], mat_cup, TB_Bcup_msg, TB_Bcup_state, objPos,10,40);
+                                    process_actionOfCups(cups[0], mat_cup, TB_Bcup_msg, TB_Bcup_state, objPos, 10, 40);
                                     //this.Dispatcher.Invoke((Action)(() => { TB_Bcup.Text = $"({posMap[center.X, center.Y, 0].ToString("0.000")},{posMap[center.X, center.Y, 1].ToString("0.000")},{posMap[center.X, center.Y, 2].ToString("0.000")})"; }));
                                     CvInvoke.Circle(color_resize, center, 10, new MCvScalar(200, 200, 20), -1);
                                 }
                                 else if (name == "pink cup")//index 1
                                 {
-                                    process_actionOfCups(cups[1], mat_cup, TB_Pcup_msg, TB_Pcup_state, objPos,60,90);
+                                    process_actionOfCups(cups[1], mat_cup, TB_Pcup_msg, TB_Pcup_state, objPos, 60, 90);
                                     //this.Dispatcher.Invoke((Action)(() => { TB_Pcup.Text = $"({posMap[center.X, center.Y, 0].ToString("0.000")},{posMap[center.X, center.Y, 1].ToString("0.000")},{posMap[center.X, center.Y, 2].ToString("0.000")})"; }));
                                     CvInvoke.Circle(color_resize, center, 10, new MCvScalar(200, 200, 20), -1);
                                 }
@@ -361,9 +389,10 @@ namespace Wpf_coffeeMaker
                 handing = detectObject;
             }
 
-            this.Dispatcher.Invoke((Action)(() => {
-            label_s.Text = s.ToString();
-            label_msg.Text = ($"{ (detectObject.getX_m() * 1000).ToString("0.0")},{(detectObject.getY_m() * 1000).ToString("0.0")},{(detectObject.getZ_m() * 1000).ToString("0.0")}mm");
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                label_s.Text = s.ToString();
+                label_msg.Text = ($"{ (detectObject.getX_m() * 1000).ToString("0.0")},{(detectObject.getY_m() * 1000).ToString("0.0")},{(detectObject.getZ_m() * 1000).ToString("0.0")}mm");
             }));
 
         }
@@ -379,9 +408,13 @@ namespace Wpf_coffeeMaker
                 }
             });
         }
-
-
-
+        private void Btn_resetTimeTick_Click(object sender, RoutedEventArgs e)
+        {
+            handing = new Objects();
+            LV_actionBase.Items.Clear();
+            MyInvoke.setToZero(ref mat_cup);
+            timeTick = 0;
+        }
         private void Rb_imgShow_Checked(object sender, RoutedEventArgs e)
         {
             // _tokenSource.Cancel();
@@ -395,30 +428,74 @@ namespace Wpf_coffeeMaker
             }
 
         }
-        List<ActionBaseList> listOfAction = new List<ActionBaseList>();
+
+
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            //_tokenSource = new CancellationTokenSource();
-            //CameraStart();
-
-            //Mat mat_cup = new Mat(100, 500, DepthType.Cv8U, 3);
-            //MyInvoke.setToZero(ref mat_cup);
-            //CvInvoke.Line(mat_cup, new Point(50, 50), new Point(300, 50), new MCvScalar(50, 200, 200), 3);
-            //img_cupState.Source = BitmapSourceConvert.ToBitmapSource(mat_cup);
-
-            //listOfAction.Add(new ActionBaseList("pick","cup A"));
-            //listOfAction.Add(new ActionBaseList("pick", "cup B"));
-
             LV_actionBase.Items.Add(new ActionBaseList("pick", "cup B"));
+        }
+
+        robotControl UR = new robotControl();
+        private void Button_startServer_Click(object sender, RoutedEventArgs e)
+        {
+            UR.ServerOn("192.168.1.100", 888);
+        }
+        private void OnUrStateChange(object sender, LinkArgs e)
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                if (e.state == "Connect")
+                    setConnectCircle(3);
+                else if (e.state == "Disconnect")
+                    setConnectCircle(1);
+                else if (e.state == "Wait Connect")
+                    setConnectCircle(2);
+            }));
+
 
         }
 
-        private void Btn_resetTimeTick_Click(object sender, RoutedEventArgs e)
+        private void Button_goPosHome_Click(object sender, RoutedEventArgs e)
         {
-            handing = new Objects();
-            LV_actionBase.Items.Clear();
-            MyInvoke.setToZero(ref mat_cup);
-            timeTick = 0;
+            UR.goToPos(new URCoordinates());
+        }
+
+        #region //---Record---//
+        private void Button_recordMode_Click(object sender, RoutedEventArgs e)
+        {
+            UR.Record_start("t");
+        }
+
+        private void Button_recordWrite_Click(object sender, RoutedEventArgs e)
+        {
+            UR.Record_write();
+        }
+        private void Button_recordEnd_Click(object sender, RoutedEventArgs e)
+        {
+            UR.Record_stop();
+        }
+        #endregion //---Record---//
+
+
+        private void Cb_Path_DropDownOpened(object sender, EventArgs e)
+        {
+            DirectoryInfo PathFolder = new DirectoryInfo(UR.folder_Path);
+            FileInfo[] ActFiles = PathFolder.GetFiles("*.path");
+            foreach (FileInfo file in ActFiles)
+            {
+                Cb_Path.Items.Add(file.Name);
+            }
+        }
+
+        private void Btn_goPath_Click(object sender, RoutedEventArgs e)
+        {
+            UR.goFilePath(Cb_Path.SelectedValue.ToString());
+        }
+
+        private void Button_startAction_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }//class
     public static class BitmapSourceConvert
@@ -446,7 +523,7 @@ namespace Wpf_coffeeMaker
 
     public class ActionBaseList
     {
-        public ActionBaseList(string action,string detial)
+        public ActionBaseList(string action, string detial)
         {
             Action = action;
             Detial = detial;
