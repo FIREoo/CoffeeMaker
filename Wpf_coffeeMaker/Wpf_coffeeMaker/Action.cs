@@ -182,7 +182,7 @@ namespace myActionBase
             rtn.infotxt.Add(debug.ToPos());
             rtn.infotxt.Add(up.ToPos());
 
-            now.X -= 0.05f;
+            now.X -= 0.08f;
             rtn.infotxt.Add(now.ToPos());
 
             rtn.infotxt.Add("Rmovej");

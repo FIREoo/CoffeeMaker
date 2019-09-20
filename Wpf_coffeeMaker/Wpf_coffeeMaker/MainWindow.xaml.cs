@@ -143,8 +143,6 @@ namespace Wpf_coffeeMaker
             UR.stateChange += OnUrStateChange;
 
             actionBase = new ActionBase("demoAct.path");
-
-
         }
         private void creatObject()
         {
@@ -152,11 +150,11 @@ namespace Wpf_coffeeMaker
 
             cups[0] = new Objects();
             cups[0].Name = "blue cup";
-            //cups[0].color = Color.FromArgb(153, 217, 234);
+            cups[0].color = System.Windows.Media.Color.FromArgb(255, 103, 167, 184);
 
             cups[1] = new Objects();
             cups[1].Name = "pink cup";
-            // cups[1].color = Color.FromArgb(255, 180, 200);
+            cups[1].color = System.Windows.Media.Color.FromArgb(255, 205, 130, 150);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -322,7 +320,6 @@ namespace Wpf_coffeeMaker
                     detectionSystemDetail = $"({yoloWrapper.EnvironmentReport.GraphicDeviceName})";
                 Console.WriteLine($"Detection System:{yoloWrapper.DetectionSystem}{detectionSystemDetail}");
 
-
                 while (!token.IsCancellationRequested)
                 {
                     using (var frames = pipeline.WaitForFrames())
@@ -370,14 +367,14 @@ namespace Wpf_coffeeMaker
 
                                 if (name == "blue cup")//index 0
                                 {
-                                  //  CvInvoke.PutText(color_resize, "B", new Point(x, y), FontFace.HersheySimplex, 1.2, new MCvScalar(80, 150, 220), 2);
-                                    CvInvoke.PutText(color_resize, item.Confidence.ToString("0.0"), new Point(x, y), FontFace.HersheySimplex, 1.2, new MCvScalar(80, 150, 220), 3);
-                                    CvInvoke.Rectangle(color_resize, new Rectangle(x, y, W, H), new MCvScalar(80, 150, 220), 3);
-
                                     //evil color check
                                     MCvScalar clr = MyInvoke.GetColorM(color_resize, center.Y - 5, center.X);
                                     if (clr.V0 > clr.V2)//R>B  //YOLO搞錯
                                         continue;
+
+                                    //  CvInvoke.PutText(color_resize, "B", new Point(x, y), FontFace.HersheySimplex, 1.2, new MCvScalar(80, 150, 220), 2);
+                                    CvInvoke.PutText(color_resize, item.Confidence.ToString("0.0"), new Point(x, y), FontFace.HersheySimplex, 1.2, new MCvScalar(80, 150, 220), 3);
+                                    CvInvoke.Rectangle(color_resize, new Rectangle(x, y, W, H), new MCvScalar(80, 150, 220), 3);
 
                                     process_actionOfCups(cups[0], mat_cup, TB_Bcup_msg, TB_Bcup_state, objPos, 10, 40);
                                     //this.Dispatcher.Invoke((Action)(() => { TB_Bcup.Text = $"({posMap[center.X, center.Y, 0].ToString("0.000")},{posMap[center.X, center.Y, 1].ToString("0.000")},{posMap[center.X, center.Y, 2].ToString("0.000")})"; }));
@@ -385,15 +382,14 @@ namespace Wpf_coffeeMaker
                                 }
                                 else if (name == "pink cup")//index 1
                                 {
-                                   // CvInvoke.PutText(color_resize, "P", new Point(x, y), FontFace.HersheySimplex, 1.2, new MCvScalar(250, 80, 80), 2);
-                                    CvInvoke.PutText(color_resize, item.Confidence.ToString("0.0"), new Point(x, y), FontFace.HersheySimplex, 1.2, new MCvScalar(250, 80, 80), 3);
-                                    CvInvoke.Rectangle(color_resize, new Rectangle(x, y, W, H), new MCvScalar(250, 80, 80), 3);
-
                                     //evil color check
                                     MCvScalar clr = MyInvoke.GetColorM(color_resize, center.Y - 5, center.X);
                                     if (clr.V0 < clr.V2)//R<B  //YOLO搞錯
                                         continue;
-                                
+
+                                    // CvInvoke.PutText(color_resize, "P", new Point(x, y), FontFace.HersheySimplex, 1.2, new MCvScalar(250, 80, 80), 2);
+                                    CvInvoke.PutText(color_resize, item.Confidence.ToString("0.0"), new Point(x, y), FontFace.HersheySimplex, 1.2, new MCvScalar(250, 80, 80), 3);
+                                    CvInvoke.Rectangle(color_resize, new Rectangle(x, y, W, H), new MCvScalar(250, 80, 80), 3);
 
                                     process_actionOfCups(cups[1], mat_cup, TB_Pcup_msg, TB_Pcup_state, objPos, 60, 90);
                                     //this.Dispatcher.Invoke((Action)(() => { TB_Pcup.Text = $"({posMap[center.X, center.Y, 0].ToString("0.000")},{posMap[center.X, center.Y, 1].ToString("0.000")},{posMap[center.X, center.Y, 2].ToString("0.000")})"; }));
@@ -446,16 +442,16 @@ namespace Wpf_coffeeMaker
                         {//所以這個時候handing是前一個拿起的東西(已經被放下的那個)
                             this.Dispatcher.Invoke((Action)(() =>
                             {
-                                ActionList.Add(new ActionBaseList("Place", handing.Name));
+                                ActionList.Add(new ActionBaseList("Place", handing.Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(handing.color)));
                                 LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
                                 if (handing.Distanse(dripTrayPos) < dripTrayD)//代表在drip tray上
                                 {
-                                    ActionList.Add(new ActionBaseList("     to", subactInfo.place.DripTray.ToString()));
+                                    ActionList.Add(new ActionBaseList("     to", subactInfo.place.DripTray.ToString(), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black)));
                                     LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
                                 }
                                 else
                                 {
-                                    ActionList.Add(new ActionBaseList("     to", (handing.getNowPos()).ToString("mm", "3(", "0")));
+                                    ActionList.Add(new ActionBaseList("     to", (handing.getNowPos()).ToString("mm", "3(", "0"), new SolidColorBrush(Colors.Black), new SolidColorBrush(handing.color)));
                                     LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
                                 }
                             }));
@@ -465,12 +461,12 @@ namespace Wpf_coffeeMaker
                         {
                             if (detectObject.Distanse(dripTrayPos) < dripTrayD)//代表在drip tray上
                             {
-                                ActionList.Add(new ActionBaseList("Pick up", subactInfo.place.DripTray.ToString()));
+                                ActionList.Add(new ActionBaseList("Pick up", subactInfo.place.DripTray.ToString(), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black)));
                                 LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
                             }
                             else
                             {
-                                ActionList.Add(new ActionBaseList("Pick up", detectObject.Name));
+                                ActionList.Add(new ActionBaseList("Pick up", detectObject.Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(detectObject.color)));
                                 LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
                             }
                         }));
@@ -546,9 +542,21 @@ namespace Wpf_coffeeMaker
         private void CheckBox_transfer_Click(object sender, RoutedEventArgs e)
         {
             if (CheckBox_wantTrans.IsChecked == true)
+            {
                 wantTrans = true;
+                Tb_CSYS1.Text = "Tool";
+                Tb_CSYS2.Text = "Tool";
+                Tb_CSYS1.Foreground = new SolidColorBrush(Color.FromRgb(120, 35, 0));
+                Tb_CSYS2.Foreground = new SolidColorBrush(Color.FromRgb(120, 35, 0));
+            }
             else
+            {
                 wantTrans = false;
+                Tb_CSYS1.Text = "Cam";
+                Tb_CSYS2.Text = "Cam";
+                Tb_CSYS1.Foreground = new SolidColorBrush(Color.FromRgb(0, 35, 120));
+                Tb_CSYS2.Foreground = new SolidColorBrush(Color.FromRgb(0, 35, 120));
+            }
         }
         private void Button_setBcupTrans_Click(object sender, RoutedEventArgs e)
         {
@@ -734,16 +742,16 @@ namespace Wpf_coffeeMaker
                 return;
             }
 
-            ActionList.Add(new ActionBaseList("Place", handing.Name));
+            ActionList.Add(new ActionBaseList("Place", handing.Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(handing.color)));
             LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
             if (handing.Distanse(dripTrayPos) < dripTrayD)//代表在drip tray上
             {
-                ActionList.Add(new ActionBaseList("     to", subactInfo.place.DripTray.ToString()));
+                ActionList.Add(new ActionBaseList("     to", subactInfo.place.DripTray.ToString(), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black)));
                 LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
             }
             else
             {
-                ActionList.Add(new ActionBaseList("     to", (handing.getNowPos()).ToString("mm", "3(", "0")));
+                ActionList.Add(new ActionBaseList("     to", (handing.getNowPos()).ToString("mm", "3(", "0"), new SolidColorBrush(Colors.Black), new SolidColorBrush(handing.color)));
                 LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
             }
             Rect_actionBaseTopColor.Fill = new SolidColorBrush(Colors.Transparent);
@@ -832,16 +840,16 @@ namespace Wpf_coffeeMaker
                     return;
                 if (handing == cups[0])
                 {
-                    ActionList.Add(new ActionBaseList(Subact.Name.Pour, cups[0].Name));
+                    ActionList.Add(new ActionBaseList(Subact.Name.Pour, cups[0].Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(cups[0].color)));
                     LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-                    ActionList.Add(new ActionBaseList("    to", cups[1].Name));
+                    ActionList.Add(new ActionBaseList("    to", cups[1].Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(cups[1].color)));
                     LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
                 }
                 else if (handing == cups[1])
                 {
-                    ActionList.Add(new ActionBaseList(Subact.Name.Pour, cups[1].Name));
+                    ActionList.Add(new ActionBaseList(Subact.Name.Pour, cups[1].Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(cups[1].color)));
                     LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-                    ActionList.Add(new ActionBaseList("    to", cups[0].Name));
+                    ActionList.Add(new ActionBaseList("    to", cups[0].Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(cups[0].color)));
                     LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
                 }
                 nowAct = "Pour";
@@ -857,20 +865,20 @@ namespace Wpf_coffeeMaker
                     return;
                 if (nowAct == "Toggle")
                     return;
-                ActionList.Add(new ActionBaseList("Place", handing.Name));
+                ActionList.Add(new ActionBaseList("Place", handing.Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(handing.color)));
                 LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
                 if (handing.Distanse(dripTrayPos) < 0.02)//代表在drip tray上
                 {
-                    ActionList.Add(new ActionBaseList("     to", subactInfo.place.DripTray.ToString()));
+                    ActionList.Add(new ActionBaseList("     to", subactInfo.place.DripTray.ToString(), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black)));
                     LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
                 }
                 else
                 {
-                    ActionList.Add(new ActionBaseList("     to", (handing.getNowPos()).ToString("mm", "3(", "0")));
+                    ActionList.Add(new ActionBaseList("     to", (handing.getNowPos()).ToString("mm", "3(", "0"), new SolidColorBrush(Colors.Black), new SolidColorBrush(handing.color)));
                     LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
                 }
                 handing = machine;
-                ActionList.Add(new ActionBaseList(Subact.Name.Trigger, ""));
+                ActionList.Add(new ActionBaseList(Subact.Name.Trigger, "", new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black)));
                 LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
                 nowAct = "Toggle";
 
@@ -923,7 +931,8 @@ namespace Wpf_coffeeMaker
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-
+            ListViewItem lbi = LV_actionBase.ItemContainerGenerator.ContainerFromIndex(3) as ListViewItem;
+            lbi.Foreground = new SolidColorBrush(Colors.Red);
         }
 
     }//class
@@ -952,13 +961,17 @@ namespace Wpf_coffeeMaker
 
     public class ActionBaseList
     {
-        public ActionBaseList(string action, string detial)
+        public ActionBaseList(string action, string detial, SolidColorBrush C1, SolidColorBrush C2)
         {
             Action = action;
             Detial = detial;
+            Color1 = (C1);
+            Color2 = (C2);
         }
         public string Action { get; set; }
         public string Detial { get; set; }
+        public SolidColorBrush Color1 { get; set; } = new SolidColorBrush(Colors.Black);
+        public SolidColorBrush Color2 { get; set; } = new SolidColorBrush(Colors.Black);
     }
 
     public static class MatExtension

@@ -13,11 +13,11 @@
             <RadioButton x:Name="Rb_color" Content="Color" HorizontalAlignment="Left" Margin="67,1,0,0" VerticalAlignment="Top" Checked="Rb_imgShow_Checked" FontSize="18" IsChecked="True"/>
             <TextBlock x:Name="TB_Bcup" HorizontalAlignment="Left" Margin="11,419,0,0" TextWrapping="Wrap" Text="Blue Cup" VerticalAlignment="Top" FontSize="18" FontWeight="Bold"/>
             <TextBlock x:Name="TB_Pcup" HorizontalAlignment="Left" Margin="11,480,0,0" TextWrapping="Wrap" Text="Pink Cup" VerticalAlignment="Top" FontSize="18" FontWeight="Bold"/>
-            <Image x:Name="img_cupState" HorizontalAlignment="Left" Height="100" Margin="237,431,0,0" VerticalAlignment="Top" Width="500"/>
+            <Image x:Name="img_cupState" HorizontalAlignment="Left" Height="100" Margin="267,431,0,0" VerticalAlignment="Top" Width="500"/>
             <TextBlock x:Name="TB_Bcup_state" HorizontalAlignment="Left" Margin="99,419,0,0" TextWrapping="Wrap" Text="State" VerticalAlignment="Top" FontSize="18"/>
-            <TextBlock x:Name="TB_Bcup_msg" HorizontalAlignment="Left" Margin="11,447,0,0" TextWrapping="Wrap" Text="Msg" VerticalAlignment="Top" FontSize="18"/>
+            <TextBlock x:Name="TB_Bcup_msg" HorizontalAlignment="Left" Margin="57,447,0,0" TextWrapping="Wrap" Text="Msg" VerticalAlignment="Top" FontSize="18"/>
             <TextBlock x:Name="TB_Pcup_state" HorizontalAlignment="Left" Margin="99,480,0,0" TextWrapping="Wrap" Text="State" VerticalAlignment="Top" FontSize="18"/>
-            <TextBlock x:Name="TB_Pcup_msg" HorizontalAlignment="Left" Margin="11,508,0,0" TextWrapping="Wrap" Text="Msg" VerticalAlignment="Top" FontSize="18"/>
+            <TextBlock x:Name="TB_Pcup_msg" HorizontalAlignment="Left" Margin="57,508,0,0" TextWrapping="Wrap" Text="Msg" VerticalAlignment="Top" FontSize="18"/>
             <CheckBox x:Name="CheckBox_wantTrans" Content="Set transfer" HorizontalAlignment="Left" Margin="11,536,0,0" VerticalAlignment="Top" FontSize="16" Click="CheckBox_transfer_Click"/>
             <Button Content="End Demo" HorizontalAlignment="Left" Margin="135,565,0,0" VerticalAlignment="Top" Width="112" Height="54" FontSize="16" Click="Button_endDemo_Click"/>
             <GroupBox Header="Action" HorizontalAlignment="Left" Height="145" Margin="655,56,0,0" VerticalAlignment="Top" Width="137" FontSize="20">
@@ -33,6 +33,8 @@
             </GroupBox>
             <Button Content="Connect Action" HorizontalAlignment="Left" Margin="670,17,0,0" VerticalAlignment="Top" Width="100" Height="30" Click="Button_askActionRecognition_Click"/>
             <Ellipse x:Name="cir_connectAct" Fill="Salmon" HorizontalAlignment="Left" Height="21" Margin="756,10,0,0" Stroke="Black" VerticalAlignment="Top" Width="21" RenderTransformOrigin="0.5,0.5"/>
+            <TextBlock x:Name="Tb_CSYS1" HorizontalAlignment="Left" Margin="11,447,0,0" TextWrapping="Wrap" Text="Cam" VerticalAlignment="Top" FontSize="18" FontWeight="Bold" Foreground="#FF002378"/>
+            <TextBlock x:Name="Tb_CSYS2" HorizontalAlignment="Left" Margin="10,508,0,0" TextWrapping="Wrap" Text="Cam" VerticalAlignment="Top" FontSize="18" FontWeight="Bold" Foreground="#FF002378"/>
         </Grid>
         <ListView x:Name="LV_actionBase" ItemsSource="{Binding listOfAction}" HorizontalAlignment="Left" Height="717" Margin="10,10,0,0" VerticalAlignment="Top" Width="291" FontSize="22">
             <ListView.ItemContainerStyle>
@@ -42,8 +44,27 @@
             </ListView.ItemContainerStyle>
             <ListView.View>
                 <GridView>
-                    <GridViewColumn DisplayMemberBinding="{Binding Action}" Header="Action" Width="100"/>
-                    <GridViewColumn DisplayMemberBinding="{Binding Detial}" Header="Detial" Width="180"/>
+                    
+                    <GridViewColumn  Header="Action" Width="100" >
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Grid Background="Transparent">
+                                    <TextBlock Text="{Binding Action}" Foreground="{Binding Color1}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    
+                    <GridViewColumn Header="Detial" Width="180">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Grid Background="Transparent">
+                                    <TextBlock Text="{Binding Detial}" Foreground="{Binding Color2}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    
                 </GridView>
             </ListView.View>
 
@@ -96,7 +117,7 @@
 
 
         </Grid>
-        <Button Content="Button" HorizontalAlignment="Left" Margin="980,686,0,0" VerticalAlignment="Top" Width="76" FontSize="18" Click="Button_Click" Background="#FF5294E4"/>
+        <Button Content="Button" HorizontalAlignment="Left" Margin="980,686,0,0" VerticalAlignment="Top" Width="76" FontSize="18" Click="Button_Click" Background="#FF3F73B2"/>
 
     </Grid>
 </Window>

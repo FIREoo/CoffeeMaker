@@ -15,7 +15,7 @@ namespace myObjects
             move = 1
         }
         public string Name = "";
-        public System.Drawing.Color color = new System.Drawing.Color();
+        public System.Windows.Media.Color color;
         private int fileterSize { get; set; } = 6;
         private List<float> x = new List<float>();//unit M
         private List<float> y = new List<float>();//unit M
