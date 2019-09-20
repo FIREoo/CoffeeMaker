@@ -33,6 +33,10 @@ namespace myObjects
         {
             nowPos = new URCoordinates(getX_m(), getY_m(), getZ_m(), 0, 0, 0);
         }
+        public URCoordinates getNowPos()
+        {
+            return new URCoordinates(getX_m(), getY_m(), getZ_m(), 0, 0, 0);
+        }
         public void setNowPos(URCoordinates urc)
         {
             nowPos = new URCoordinates(urc);
@@ -132,6 +136,17 @@ namespace myObjects
             double dy = (lasty - avgy) * (lasty - avgy);
             double dz = (lastz - avgz) * (lastz - avgz);
             return (float)Math.Pow((dx + dy + dz), 0.5d);
+        }
+        public float Distanse(URCoordinates pos)
+        {
+            float avgx = avg(x, 0, fileterSize);
+            float avgy = avg(y, 0, fileterSize);
+            float avgz = avg(z, 0, fileterSize);
+            double dx = (pos.X - avgx) * (pos.X - avgx);
+            double dy = (pos.Y - avgy) * (pos.Y - avgy);
+            double dz = (pos.Z - avgz) * (pos.Z - avgz);
+            return (float)Math.Pow((dx + dy + dz), 0.5d);
+
         }
         public states S = states.stop;
 

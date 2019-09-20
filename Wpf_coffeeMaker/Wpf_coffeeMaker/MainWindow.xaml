@@ -5,25 +5,38 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Wpf_coffeeMaker"
         mc:Ignorable="d"
-        Title="MainWindow" Height="1000" Width="1497" Loaded="Window_Loaded">
+        Title="MainWindow" Height="905" Width="1497" Loaded="Window_Loaded">
     <Grid>
         <Image x:Name="Image_show" HorizontalAlignment="Left" Height="135" Margin="577,48,0,0" VerticalAlignment="Top" Width="184"/>
         <Image x:Name="Image_show2" HorizontalAlignment="Left" Height="153" Margin="835,48,0,0" VerticalAlignment="Top" Width="165"/>
-        <Grid HorizontalAlignment="Left" Height="641" Margin="319,5,0,0" VerticalAlignment="Top" Width="1042" Background="#FFBDBDBD">
+        <Grid HorizontalAlignment="Left" Height="641" Margin="319,9,0,0" VerticalAlignment="Top" Width="1042" Background="#FFBDBDBD">
             <Image x:Name="Img_main" HorizontalAlignment="Left" Height="360" Margin="10,10,0,0" VerticalAlignment="Top" Width="640"/>
-            <RadioButton x:Name="Rb_mix" Content="Mix" HorizontalAlignment="Left" Margin="650,65,0,0" VerticalAlignment="Top" IsChecked="True" Checked="Rb_imgShow_Checked" FontSize="18"/>
-            <Button Content="Button" HorizontalAlignment="Left" Margin="650,23,0,0" VerticalAlignment="Top" Width="75" FontSize="18" Click="Button_Click"/>
-            <RadioButton x:Name="Rb_color" Content="Color" HorizontalAlignment="Left" Margin="650,92,0,0" VerticalAlignment="Top" Checked="Rb_imgShow_Checked" FontSize="18" IsChecked="True"/>
-            <TextBlock x:Name="TB_Bcup" HorizontalAlignment="Left" Margin="10,379,0,0" TextWrapping="Wrap" Text="Blue Cup" VerticalAlignment="Top" FontSize="18" FontWeight="Bold"/>
-            <TextBlock x:Name="TB_Pcup" HorizontalAlignment="Left" Margin="10,440,0,0" TextWrapping="Wrap" Text="Pink Cup" VerticalAlignment="Top" FontSize="18" FontWeight="Bold"/>
-            <Image x:Name="img_cupState" HorizontalAlignment="Left" Height="100" Margin="251,388,0,0" VerticalAlignment="Top" Width="500"/>
-            <TextBlock x:Name="TB_Bcup_state" HorizontalAlignment="Left" Margin="98,379,0,0" TextWrapping="Wrap" Text="State" VerticalAlignment="Top" FontSize="18"/>
-            <TextBlock x:Name="TB_Bcup_msg" HorizontalAlignment="Left" Margin="10,407,0,0" TextWrapping="Wrap" Text="Msg" VerticalAlignment="Top" FontSize="18"/>
-            <TextBlock x:Name="TB_Pcup_state" HorizontalAlignment="Left" Margin="98,440,0,0" TextWrapping="Wrap" Text="State" VerticalAlignment="Top" FontSize="18"/>
-            <TextBlock x:Name="TB_Pcup_msg" HorizontalAlignment="Left" Margin="10,468,0,0" TextWrapping="Wrap" Text="Msg" VerticalAlignment="Top" FontSize="18"/>
-            <Button x:Name="Btn_resetTimeTick" Content="Reset" HorizontalAlignment="Left" Margin="10,562,0,0" VerticalAlignment="Top" Width="76" Click="Btn_resetTimeTick_Click" Height="26"/>
+            <RadioButton x:Name="Rb_mix" Content="Mix" HorizontalAlignment="Left" Margin="660,58,0,0" VerticalAlignment="Top" IsChecked="True" Checked="Rb_imgShow_Checked" FontSize="18"/>
+            <Button Content="Button" HorizontalAlignment="Left" Margin="660,23,0,0" VerticalAlignment="Top" Width="75" FontSize="18" Click="Button_Click"/>
+            <RadioButton x:Name="Rb_color" Content="Color" HorizontalAlignment="Left" Margin="660,85,0,0" VerticalAlignment="Top" Checked="Rb_imgShow_Checked" FontSize="18" IsChecked="True"/>
+            <TextBlock x:Name="TB_Bcup" HorizontalAlignment="Left" Margin="11,419,0,0" TextWrapping="Wrap" Text="Blue Cup" VerticalAlignment="Top" FontSize="18" FontWeight="Bold"/>
+            <TextBlock x:Name="TB_Pcup" HorizontalAlignment="Left" Margin="11,480,0,0" TextWrapping="Wrap" Text="Pink Cup" VerticalAlignment="Top" FontSize="18" FontWeight="Bold"/>
+            <Image x:Name="img_cupState" HorizontalAlignment="Left" Height="100" Margin="252,428,0,0" VerticalAlignment="Top" Width="500"/>
+            <TextBlock x:Name="TB_Bcup_state" HorizontalAlignment="Left" Margin="99,419,0,0" TextWrapping="Wrap" Text="State" VerticalAlignment="Top" FontSize="18"/>
+            <TextBlock x:Name="TB_Bcup_msg" HorizontalAlignment="Left" Margin="11,447,0,0" TextWrapping="Wrap" Text="Msg" VerticalAlignment="Top" FontSize="18"/>
+            <TextBlock x:Name="TB_Pcup_state" HorizontalAlignment="Left" Margin="99,480,0,0" TextWrapping="Wrap" Text="State" VerticalAlignment="Top" FontSize="18"/>
+            <TextBlock x:Name="TB_Pcup_msg" HorizontalAlignment="Left" Margin="11,508,0,0" TextWrapping="Wrap" Text="Msg" VerticalAlignment="Top" FontSize="18"/>
+            <TextBox x:Name="Tb_camX" HorizontalAlignment="Left" Height="23" Margin="790,27,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="0" VerticalAlignment="Top" Width="73"/>
+            <TextBox x:Name="Tb_camZ" HorizontalAlignment="Left" Height="23" Margin="946,27,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="0" VerticalAlignment="Top" Width="73"/>
+            <TextBox x:Name="Tb_camY" HorizontalAlignment="Left" Height="23" Margin="868,27,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="0" VerticalAlignment="Top" Width="73"/>
+            <TextBox x:Name="Tb_worldX" HorizontalAlignment="Left" Height="23" Margin="790,66,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="-297" VerticalAlignment="Top" Width="73"/>
+            <TextBox x:Name="Tb_worldZ" HorizontalAlignment="Left" Height="23" Margin="946,66,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="43" VerticalAlignment="Top" Width="73"/>
+            <TextBox x:Name="Tb_worldY" HorizontalAlignment="Left" Height="23" Margin="868,66,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="297" VerticalAlignment="Top" Width="73"/>
+            <Button Content="set transfer" HorizontalAlignment="Left" Margin="790,94,0,0" VerticalAlignment="Top" Width="229" Height="36" Click="Button_setTrans_Click"/>
+            <CheckBox x:Name="CheckBox_wantTrans" Content="Set transfer" HorizontalAlignment="Left" Margin="11,536,0,0" VerticalAlignment="Top" FontSize="16" Click="CheckBox_transfer_Click"/>
+            <Button Content="B" HorizontalAlignment="Left" Margin="761,29,0,0" VerticalAlignment="Top" Width="24" Click="Button_setBcupTrans_Click"/>
+            <Button Content="End Demo" HorizontalAlignment="Left" Margin="135,565,0,0" VerticalAlignment="Top" Width="112" Height="54" FontSize="16" Click="Button_endDemo_Click"/>
+            <Button Content="set line offset" HorizontalAlignment="Left" Margin="790,206,0,0" VerticalAlignment="Top" Width="73" Height="39" Click="Button_setLineOffset_Click"/>
+            <Button Content="Ask Action recognition" HorizontalAlignment="Left" Margin="799,488,0,0" VerticalAlignment="Top" Width="151" Height="77" Click="Button_askActionRecognition_Click"/>
+            <Button Content="Save to txt" HorizontalAlignment="Left" Margin="944,135,0,0" VerticalAlignment="Top" Width="75" Click="Button_saveValue_Click" Height="36"/>
+            <Button Content="Load txt" HorizontalAlignment="Left" Margin="946,176,0,0" VerticalAlignment="Top" Width="73" Click="Button_loadValue_Click" Height="34"/>
         </Grid>
-        <ListView x:Name="LV_actionBase" ItemsSource="{Binding listOfAction}" HorizontalAlignment="Left" Height="717" Margin="10,10,0,0" VerticalAlignment="Top" Width="246" FontSize="22">
+        <ListView x:Name="LV_actionBase" ItemsSource="{Binding listOfAction}" HorizontalAlignment="Left" Height="717" Margin="10,10,0,0" VerticalAlignment="Top" Width="291" FontSize="22">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -32,22 +45,35 @@
             <ListView.View>
                 <GridView>
                     <GridViewColumn DisplayMemberBinding="{Binding Action}" Header="Action" Width="100"/>
-                    <GridViewColumn DisplayMemberBinding="{Binding Detial}" Header="Detial" Width="130"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Detial}" Header="Detial" Width="180"/>
                 </GridView>
             </ListView.View>
 
         </ListView>
         <Button x:Name="Btn_UrConnect" Content="Start Server" HorizontalAlignment="Left" Margin="319,656,0,0" VerticalAlignment="Top" Width="106" FontSize="16" Height="45" Click="Button_startServer_Click"/>
-        <Button Content="Button" HorizontalAlignment="Left" Margin="445,651,0,0" VerticalAlignment="Top" Width="105" Height="60" Click="Button_goPosHome_Click"/>
-        <Button Content="Record mode" HorizontalAlignment="Left" Margin="445,753,0,0" VerticalAlignment="Top" Width="105" Height="74" Click="Button_recordMode_Click"/>
-        <Button Content="Write Pos" HorizontalAlignment="Left" Margin="555,753,0,0" VerticalAlignment="Top" Width="105" Height="74" Click="Button_recordWrite_Click"/>
-        <Button Content="End Record" HorizontalAlignment="Left" Margin="665,753,0,0" VerticalAlignment="Top" Width="105" Height="74" Click="Button_recordEnd_Click"/>
-        <ComboBox x:Name="Cb_Path" HorizontalAlignment="Left" Margin="800,664,0,0" VerticalAlignment="Top" Width="120" DropDownOpened="Cb_Path_DropDownOpened" FontSize="16" Height="47"/>
-        <Button x:Name="Btn_goPath" Content="Go Path" HorizontalAlignment="Left" Margin="925,664,0,0" VerticalAlignment="Top" Width="75" Height="47" FontSize="16" Click="Btn_goPath_Click"/>
-        <Ellipse x:Name="cir_UrState_off" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="15" Margin="319,706,0,0" Stroke="Black" VerticalAlignment="Top" Width="15"/>
+        <Button Content="go Home" HorizontalAlignment="Left" Margin="505,656,0,0" VerticalAlignment="Top" Width="105" Height="47" Click="Button_goPosHome_Click"/>
+        <Button Content="Record mode" HorizontalAlignment="Left" Margin="472,725,0,0" VerticalAlignment="Top" Width="105" Height="35" Click="Button_recordMode_Click"/>
+        <Button Content="Write Pos" HorizontalAlignment="Left" Margin="582,725,0,0" VerticalAlignment="Top" Width="105" Height="35" Click="Button_recordWrite_Click"/>
+        <Button Content="End Record" HorizontalAlignment="Left" Margin="692,725,0,0" VerticalAlignment="Top" Width="105" Height="35" Click="Button_recordEnd_Click"/>
+        <ComboBox x:Name="Cb_Path" HorizontalAlignment="Left" Margin="615,656,0,0" VerticalAlignment="Top" Width="182" VerticalContentAlignment="Center" DropDownOpened="Cb_Path_DropDownOpened" FontSize="16" Height="47"/>
+        <Button x:Name="Btn_goPath" Content="Go Path" HorizontalAlignment="Left" Margin="802,656,0,0" VerticalAlignment="Top" Width="75" Height="47" FontSize="16" Click="Btn_goPath_Click"/>
+        <Ellipse x:Name="cir_UrState_off" Fill="#FFE63232" HorizontalAlignment="Left" Height="15" Margin="319,706,0,0" Stroke="Black" VerticalAlignment="Top" Width="15"/>
         <Ellipse x:Name="cir_UrState_connecting" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="15" Margin="339,706,0,0" Stroke="Black" VerticalAlignment="Top" Width="15"/>
         <Ellipse x:Name="cir_UrState_on" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="15" Margin="359,706,0,0" Stroke="Black" VerticalAlignment="Top" Width="15"/>
-        <Button Content="Start Action" HorizontalAlignment="Left" Margin="10,732,0,0" VerticalAlignment="Top" Width="137" Height="37" Click="Button_startAction_Click" FontSize="16"/>
+        <Button Content="Creat Action" HorizontalAlignment="Left" Margin="10,732,0,0" VerticalAlignment="Top" Width="291" Height="53" Click="Button_creatAction_Click" FontSize="16"/>
+        <Button Content="Grip" HorizontalAlignment="Left" Margin="582,765,0,0" VerticalAlignment="Top" Width="75" Height="28" Click="Button_grip_Click"/>
+        <TextBox x:Name="Tb_gripVal" HorizontalAlignment="Left" Height="28" Margin="657,765,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="0" VerticalAlignment="Top" Width="30"/>
+        <Rectangle x:Name="Rect_actionBaseTopColor" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="10" Margin="10,0,0,0" Stroke="Black" VerticalAlignment="Top" Width="291"/>
+        <Button Content="Start Demo" HorizontalAlignment="Left" Margin="329,574,0,0" VerticalAlignment="Top" Width="120" Height="54" FontSize="16" Click="Button_startRecord_Click"/>
+        <Button Content="dis" HorizontalAlignment="Left" Margin="432,656,0,0" VerticalAlignment="Top" Width="32" Height="46" Click="Button_disconnect_Click"/>
+        <TextBox x:Name="Tb_recordName" HorizontalAlignment="Left" Height="35" Margin="320,725,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="recordPath" VerticalAlignment="Top" Width="148" FontSize="16"/>
+        <Button Content="Grip" HorizontalAlignment="Left" Margin="582,798,0,0" VerticalAlignment="Top" Width="75" Height="28" Click="Button_grip2_Click"/>
+        <TextBox x:Name="Tb_gripVal2" HorizontalAlignment="Left" Height="28" Margin="657,798,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="31" VerticalAlignment="Top" Width="30"/>
+        <TextBox x:Name="Tb_gripVal3" HorizontalAlignment="Left" Height="28" Margin="657,831,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="100" VerticalAlignment="Top" Width="30"/>
+        <Button Content="Grip" HorizontalAlignment="Left" Margin="582,831,0,0" VerticalAlignment="Top" Width="75" Height="28" Click="Button_grip3_Click"/>
+        <Button Content="set drip tray" HorizontalAlignment="Left" Margin="1113,145,0,0" VerticalAlignment="Top" Width="89" Height="38" Click="Button_setDripTrayPos_Click"/>
+        <Button Content="cmd add&#xD;&#xA;Pour" HorizontalAlignment="Left" Margin="1113,581,0,0" VerticalAlignment="Top" Width="75" Height="59" Click="Button_addPour_Click"/>
+        <Button Content="cmd add&#xA;Toggle" HorizontalAlignment="Left" Margin="1193,581,0,0" VerticalAlignment="Top" Width="75" Height="59" Click="Button_addToggle_Click"/>
 
     </Grid>
 </Window>

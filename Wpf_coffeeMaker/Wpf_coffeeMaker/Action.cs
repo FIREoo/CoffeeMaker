@@ -1,52 +1,61 @@
-﻿using System;
+﻿using myObjects;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
+using System.Linq;
 using UrRobot;
-using myObjects;
 
-namespace CS_coffeeMakerV3
+namespace myActionBase
 {
-    class Actions
+    class ActionBase
     {
-        private static robotControl UR;
+        //private static robotControl UR;
         private static StreamWriter txt;
         private static string fileName;
-        public Actions(robotControl _UR, string file)
+        public ActionBase(string file)
         {
-            UR = _UR;
+            //UR = _UR;
             fileName = file;
-            txt = new StreamWriter($"Path//{file}", false);
+
+            //need file
+            //--Path//outDripTray.path
+
         }
-        public void end()
+        public void saveFile()
         {
             txt.Flush();
             txt.Close();
         }
-        public bool execute()
+        //public bool execute()
+        //{
+        //    try
+        //    {
+        //        txt.Flush();
+        //        txt.Close();
+        //    }
+        //    catch { }
+
+        //    if (UR.isServerRunning == false)
+        //        return false;
+
+        //    UR.goFilePath(fileName);
+        //    return true;
+        //}
+        public bool add(subactInfo subact)
         {
             try
             {
-                txt.Flush();
-                txt.Close();
+                for (int i = 0; i < subact.Count(); i++)
+                    txt.WriteLine(subact.infotxt[i]);
+                return true;
             }
-            catch { }
-            if (UR.serverRunning == false)
+            catch //應該是檔案沒被開啟會錯誤(通常是在已經saveFile了
             {
                 return false;
             }
-            UR.goFilePath(fileName);
-            return true;
-        }
-        public void add(subactInfo subact)
-        {
-            for (int i = 0; i < subact.Count(); i++)
-                txt.WriteLine(subact.infotxt[i]);
         }
         public void start(Objects[] cups)
         {
+            txt = new StreamWriter($"Path//{fileName}", false);
             foreach (Objects cup in cups)
             {
                 cup.saveNowPos();
@@ -58,11 +67,12 @@ namespace CS_coffeeMakerV3
         public static subactInfo Pick(Objects cup)
         {
             subactInfo rtn = new subactInfo();
-            URCoordinates up = new URCoordinates(cup.gripPos());
+            URCoordinates grip = new URCoordinates(cup.gripPos());
+            URCoordinates up = new URCoordinates(grip);
+            up.Y -= 0.1f;
             URCoordinates debug = new URCoordinates(up);
-            URCoordinates down = new URCoordinates(up);
+            debug.Y -= 0.02f;//在高一點以Rxyz有問題
 
-            debug.Y -= 0.02f;//上升
             rtn.infotxt.Add("position");
             rtn.infotxt.Add(debug.ToPos());
             rtn.infotxt.Add(up.ToPos());
@@ -73,17 +83,15 @@ namespace CS_coffeeMakerV3
             rtn.infotxt.Add("sleep");
             rtn.infotxt.Add("1000");
 
-            down.Y += 0.07f;//下降
             rtn.infotxt.Add("position");
-            rtn.infotxt.Add(down.ToPos());
+            rtn.infotxt.Add(grip.ToPos());
 
             rtn.infotxt.Add("gripper");
-            rtn.infotxt.Add("35");
+            rtn.infotxt.Add("31");
 
             rtn.infotxt.Add("sleep");
             rtn.infotxt.Add("1000");
 
-            up.Y -= 0.02f;//上升
             rtn.infotxt.Add("position");
             rtn.infotxt.Add(up.ToPos());
             return rtn;
@@ -97,11 +105,26 @@ namespace CS_coffeeMakerV3
             rtn.infotxt.Add("1000");
             if (ThePlace == subactInfo.place.DripTray)
             {
-                string[] file = System.IO.File.ReadAllLines($"Path//outDripTray.path");
-                foreach (string line in file)
-                    rtn.infotxt.Add(line);
+                rtn.AddFile($"Path//outDripTray.path");
             }
 
+            return rtn;
+        }
+        public static subactInfo Pick(subactInfo.thing TheObject)
+        {
+            subactInfo rtn = new subactInfo();
+            rtn.infotxt.Add("gripper");
+            rtn.infotxt.Add("0");
+            rtn.infotxt.Add("sleep");
+            rtn.infotxt.Add("1000");
+            if (TheObject == subactInfo.thing.Capsule)
+            {
+                rtn.AddFile($"Path//moveCapsule.path");
+            }
+            if (TheObject == subactInfo.thing.Case)
+            {
+               // rtn.AddFile($"Path//moveCase.path");
+            }
             return rtn;
         }
         public static subactInfo Place(Objects cup, URCoordinates Wpoint)
@@ -109,16 +132,16 @@ namespace CS_coffeeMakerV3
             cup.setNowPos(Wpoint);
 
             subactInfo rtn = new subactInfo();
-            URCoordinates up = new URCoordinates(cup.gripPos());
+            URCoordinates grip = new URCoordinates(cup.gripPos());
+            URCoordinates up = new URCoordinates(grip);
+            up.Y -= 0.1f;
             URCoordinates debug = new URCoordinates(up);
-            URCoordinates down = new URCoordinates(up);
-            down.Y += 0.07f;//下降
+            debug.Y -= 0.02f;//在高一點以Rxyz有問題
 
-            debug.Y -= 0.02f;//上升
             rtn.infotxt.Add("position");
             rtn.infotxt.Add(debug.ToPos());
             rtn.infotxt.Add(up.ToPos());
-            rtn.infotxt.Add(down.ToPos());
+            rtn.infotxt.Add(grip.ToPos());
             rtn.infotxt.Add("gripper");
             rtn.infotxt.Add("0");
 
@@ -147,35 +170,25 @@ namespace CS_coffeeMakerV3
         public static subactInfo Pour(Objects toCup)
         {
             subactInfo rtn = new subactInfo();
-            URCoordinates up = new URCoordinates(toCup.gripPos());
-            up.Y -= 0.03f;//上升
+            URCoordinates grip = new URCoordinates(toCup.gripPos());
+            URCoordinates up = new URCoordinates(grip);
+            up.Y -= 0.1f;
             URCoordinates debug = new URCoordinates(up);
-            debug.Y -= 0.01f;//上升
+            debug.Y -= 0.02f;//在高一點以Rxyz有問題
+
             URCoordinates now = new URCoordinates(up);
+
             rtn.infotxt.Add("position");
             rtn.infotxt.Add(debug.ToPos());
             rtn.infotxt.Add(up.ToPos());
-            now.X -= 0.09f;
+
+            now.X -= 0.05f;
             rtn.infotxt.Add(now.ToPos());
 
-            now.Rx -= 1.0f;
-            now.Ry += 1.0f;
-            rtn.infotxt.Add(now.ToPos());
-            now.X += 0.04f;
-            rtn.infotxt.Add(now.ToPos());
+            rtn.infotxt.Add("Rmovej");
+            rtn.infotxt.Add("[0,0,0,0,0,-2]");
 
-            now.Rx -= 0.57f;
-            now.Ry += 0.57f;
-            rtn.infotxt.Add(now.ToPos());
-            now.X += 0.02f;
-            rtn.infotxt.Add(now.ToPos());
-
-            now.Rx -= 1.13f;
-            now.Ry += 1.13f;
-            rtn.infotxt.Add(now.ToPos());
-
-            up.Y -= 0.02f;//上升
-            rtn.infotxt.Add(up.ToPos());
+            rtn.infotxt.Add("position");
             rtn.infotxt.Add(debug.ToPos());
             return rtn;
         }
@@ -183,6 +196,12 @@ namespace CS_coffeeMakerV3
         {
             subactInfo rtn = new subactInfo();
             rtn.AddFile("Path//trigger.path");
+            return rtn;
+        }
+        public static subactInfo PutBoxIn()
+        {
+            subactInfo rtn = new subactInfo();
+            rtn.AddFile("Path//putBoxIn.path");
             return rtn;
         }
         public static subactInfo Scoop()
@@ -254,10 +273,11 @@ namespace CS_coffeeMakerV3
         }
         public static class Name
         {
-            public static string Pick = "Pick";
+            public static string Pick  = "Pick up";
             public static string Place = "Place";
             public static string Pour = "Pour";
             public static string Trigger = "Touggle";
+            public static string PutBoxIn = "Put case into";
             public static string Scoop = "Ladle";
             public static string AddaSpoon = "Add";
             public static string Stir = "Stir";
@@ -281,6 +301,11 @@ namespace CS_coffeeMakerV3
         public enum place
         {
             DripTray = 0
+        }
+        public enum thing
+        {
+            Capsule = 0,
+            Case = 1
         }
     }
 }

@@ -282,7 +282,7 @@ namespace UrRobot
                     }
                     else if (cmd == mode.recordj)
                     {
-                        txt_record.WriteLine("joint");
+                     //   txt_record.WriteLine("joint");
                         while (cmd == mode.recordj)
                         {
                             _sendMsg("recordj", ref cmd);//record joint模式
@@ -305,7 +305,7 @@ namespace UrRobot
                         txt_record.Flush();
                         txt_record.Close();
                     }
-                    else if (cmd == mode.jog)
+                    else if (cmd == mode.jog)//未完成
                     {
                         _sendMsg("jog", ref cmd);//record pos模式
 
@@ -319,28 +319,28 @@ namespace UrRobot
 
                         while (cmd != mode.stop) ;
                     }
-                    else if (cmd == mode.gripper)
+                    else if (cmd == mode.gripper)//grip完  結束
                     {
                         _sendMsg("gripper", ref cmd);//gripper模式
 
                         sMsg = _waitRead(ref cmd); if (sMsg == "End") break;
                         Console.WriteLine("Robot : " + sMsg);//應該會是獲得 gripper
 
-                        byte[] pcount = new byte[3] { rq_pos, 0, 150 };
+                        byte[] pcount = new byte[3] { rq_pos, 0, 255 };//這個255不知道是什麼 原本是150
                         stream.Write(pcount, 0, 3);//pos force speed
 
                         sMsg = _waitRead(ref cmd); if (sMsg == "End") break;
                         Console.WriteLine("Robot : " + sMsg);//應該會是獲得"work done" 
                         cmd = mode.stop;
                     }
-                    else if (cmd == mode.grip)
+                    else if (cmd == mode.grip)//grip完  recordj //目前沒用
                     {
                         _sendMsg("gripper", ref cmd);//gripper模式
 
                         sMsg = _waitRead(ref cmd); if (sMsg == "End") break;
                         Console.WriteLine("Robot : " + sMsg);//應該會是獲得 gripper
 
-                        byte[] pcount = new byte[3] { rq_pos, 0, 150 };
+                        byte[] pcount = new byte[3] { rq_pos, 0, 255 };
                         stream.Write(pcount, 0, 3);//pos force speed
 
                         sMsg = _waitRead(ref cmd); if (sMsg == "End") break;
@@ -464,9 +464,10 @@ namespace UrRobot
 
             isRecord = true;
             txt_record = new StreamWriter($"Path//{fileName}.path", false);
+            txt_record.WriteLine("joint");
             cmd = mode.recordj;
         }
-        public void Record_write()
+        public void Record_writePos()
         {
             if (!isRecord)
             { Console.WriteLine("沒有在Record mode底下"); return; }
@@ -481,6 +482,25 @@ namespace UrRobot
             isRecord = false;
         }
         #endregion
+
+        public void goGrip(byte val)
+        {
+            if (isRecord)//如果正在錄製
+            {
+                txt_record.WriteLine("gripper");
+                txt_record.WriteLine((int)val);
+            }
+
+            rq_pos = val;
+            cmd = mode.gripper;
+
+            if (isRecord)//如果正在錄製//u要繼續能動
+            {
+                txt_record.WriteLine("joint");
+                cmd = mode.recordj;
+            }
+        }
+
 
         protected virtual void OnLinkState(LinkArgs e)
         {
@@ -497,6 +517,16 @@ namespace UrRobot
         public float Ry = 0;
         public float Rz = 0;
         public byte Grip = 0;
+        /// <summary>
+        /// Unit meter
+        /// </summary>
+        /// <param name="_x"></param>
+        /// <param name="_y"></param>
+        /// <param name="_z"></param>
+        /// <param name="_Rx"></param>
+        /// <param name="_Ry"></param>
+        /// <param name="_Rz"></param>
+        /// <param name="_G"></param>
         public URCoordinates(float _x = 0, float _y = 0, float _z = 0, float _Rx = 0, float _Ry = 0, float _Rz = 0, byte _G = 0)
         {
             X = _x;
@@ -521,6 +551,31 @@ namespace UrRobot
             if (withp)
                 return $"p[{X},{Y},{Z},{Rx},{Ry},{Rz}]";
             return $"[{X},{Y},{Z},{Rx},{Ry},{Rz}]";
+        }
+        public string ToString(string unit = "m", string type = "[",string format = null)
+        {
+            if(unit == "mm")
+            {
+                X *= 1000f;
+                Y *= 1000f;
+                Z *= 1000f;
+            }
+            string x = X.ToString(format);
+            string y = Y.ToString(format);
+            string z =Z.ToString(format);
+            string rx = Rx.ToString(format);
+            string ry = Ry.ToString(format);
+            string rz = Rz.ToString(format);
+            if (type == "[")
+                return $"[{x},{y},{z},{rx},{ry},{rz}]";
+            else if(type == "(")
+                return $"({x},{y},{z},{rx},{ry},{rz})";
+            else if (type == "3(")
+                return $"({x},{y},{z})";
+            else if (type == "3[")
+                return $"[{x},{y},{z}]";
+            else
+                return $"[{x},{y},{z},{rx},{ry},{rz}]";
         }
 
     }
