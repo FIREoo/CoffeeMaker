@@ -77,7 +77,7 @@ namespace myTCP
         //宣告 Tcp 用戶端物件
         TcpClient myTcpClient;
         private bool isConect = false;
-        public void creatClient(string IP, int port)
+        public bool creatClient(string IP, int port)
         {
 
             string hostName = IP;
@@ -90,12 +90,13 @@ namespace myTCP
                 myTcpClient.Connect(hostName, connectPort);
                 Console.WriteLine("連線成功 !!\n");
                 isConect = true;
+                return true;
             }
             catch
             {
                 Console.WriteLine
                            ("主機 {0} 通訊埠 {1} 無法連接  !!", hostName, connectPort);
-                return;
+                return false;
             }
         }
         public void client_sendMyData(List<float[]> dataList)
@@ -133,11 +134,11 @@ namespace myTCP
             //將字串轉 byte 陣列，使用 ASCII 編碼
             Byte[] myBytes = Encoding.ASCII.GetBytes(str);
 
-            Console.WriteLine("建立網路資料流 !!");
+           // Console.WriteLine("建立網路資料流 !!");
             //建立網路資料流
             myNetworkStream = myTcpClient.GetStream();
 
-            Console.WriteLine("將字串寫入資料流");
+            //Console.WriteLine("將字串寫入資料流");
             //將字串寫入資料流
             myNetworkStream.Write(myBytes, 0, myBytes.Length);
         }

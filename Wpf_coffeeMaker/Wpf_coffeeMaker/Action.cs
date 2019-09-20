@@ -276,7 +276,7 @@ namespace myActionBase
             public static string Pick  = "Pick up";
             public static string Place = "Place";
             public static string Pour = "Pour";
-            public static string Trigger = "Touggle";
+            public static string Trigger = "Toggle";
             public static string PutBoxIn = "Put case into";
             public static string Scoop = "Ladle";
             public static string AddaSpoon = "Add";

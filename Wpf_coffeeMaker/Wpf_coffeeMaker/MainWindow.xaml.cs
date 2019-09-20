@@ -88,6 +88,36 @@ namespace Wpf_coffeeMaker
                 cir_UrState_on.Fill = new SolidColorBrush(Color.FromArgb(255, 40, 210, 40));
             }
         }
+        bool setColor = true;
+        private void setActiionCircle(string str)
+        {
+            cir_pour.Fill = new SolidColorBrush(Colors.LightGray);
+            cir_toggle.Fill = new SolidColorBrush(Colors.LightGray);
+            if (str == "Pour")
+            {
+                cir_back.Fill = new SolidColorBrush(Colors.LightGray);
+                cir_pour.Fill = new SolidColorBrush(Color.FromArgb(255, 140, 90, 200));
+            }
+            else if (str == "Toggle")
+            {
+                cir_back.Fill = new SolidColorBrush(Colors.LightGray);
+                cir_toggle.Fill = new SolidColorBrush(Color.FromArgb(255, 200, 170, 60));
+            }
+            else if (str == "Background")
+            {
+                if (setColor)
+                    cir_back.Fill = new SolidColorBrush(Color.FromArgb(255, 60, 60, 60));
+                else
+                    cir_back.Fill = new SolidColorBrush(Colors.DimGray);
+
+                setColor = !setColor;
+            }
+            else
+            {
+                cir_pour.Fill = new SolidColorBrush(Colors.LightGray);
+                cir_toggle.Fill = new SolidColorBrush(Colors.LightGray);
+            }
+        }
         #endregion //---UI---//
 
         public MainWindow()
@@ -166,7 +196,6 @@ namespace Wpf_coffeeMaker
             // Start frame processing
             StartProcessingBlock(processingBlock, pp, updateColor, pipeline);
         }
-
         private void SetupFilters(out Colorizer colorizer, out DecimationFilter decimate, out SpatialFilter spatial, out TemporalFilter temp, out HoleFillingFilter holeFill, out Align align_to)
         {
             // Colorizer is used to visualize depth data
@@ -242,6 +271,7 @@ namespace Wpf_coffeeMaker
             return processingBlock;
         }
 
+
         private void StartProcessingBlock(CustomProcessingBlock processingBlock, PipelineProfile pp, Action<VideoFrame> updateColor, Pipeline pipeline)
         {
             float[,,] posMap = new float[1280, 720, 3];
@@ -313,9 +343,6 @@ namespace Wpf_coffeeMaker
 
                             foreach (YoloItem item in items)
                             {
-                                if (item.Confidence < 0.35)//沒信心的東西就跳過，避免偵測到其他東西
-                                    continue;
-
                                 string name = item.Type;
                                 int x = item.X;
                                 int y = item.Y;
@@ -323,21 +350,51 @@ namespace Wpf_coffeeMaker
                                 int W = item.Width;
                                 Point center = item.Center();
 
-                                CvInvoke.PutText(color_resize, name, new Point(x, y), FontFace.HersheySimplex, 1, new MCvScalar(50, 230, 230));
-                                CvInvoke.PutText(color_resize, item.Confidence.ToString("0.0"), new Point(x, y - 20), FontFace.HersheySimplex, 0.5, new MCvScalar(50, 230, 230));
-                                CvInvoke.Rectangle(color_resize, new Rectangle(x, y, W, H), new MCvScalar(50, 230, 230), 3);
+                                int evilLine = 420;
+                                //640
+                                int evilLinex1 = 500;
+                                int evilLinex2 = 700;
+                                CvInvoke.Line(color_resize, new Point(0, evilLine), new Point(1280, evilLine), new MCvScalar(100, 100, 250), 2);//以上代表可能在咖啡機
+                                CvInvoke.Line(color_resize, new Point(evilLinex1, 0), new Point(evilLinex1, evilLine), new MCvScalar(100, 100, 250), 2);//
+                                CvInvoke.Line(color_resize, new Point(evilLinex2, 0), new Point(evilLinex2, evilLine), new MCvScalar(100, 100, 250), 2);//
+
+                                if (y > evilLine || x < evilLinex1 || x > evilLinex2)//代不再咖啡機附近
+                                    if (item.Confidence < 0.6)//沒信心的東西就跳過，避免偵測到其他東西
+                                        continue;
+
 
                                 float[] objPos = new float[] { posMap[center.X, center.Y, 0], posMap[center.X, center.Y, 1], posMap[center.X, center.Y, 2] };
 
+                                if (objPos[0] == 0 || objPos[1] == 0 || objPos[2] == 0)//不然會影響平均
+                                    continue;
 
                                 if (name == "blue cup")//index 0
                                 {
+                                  //  CvInvoke.PutText(color_resize, "B", new Point(x, y), FontFace.HersheySimplex, 1.2, new MCvScalar(80, 150, 220), 2);
+                                    CvInvoke.PutText(color_resize, item.Confidence.ToString("0.0"), new Point(x, y), FontFace.HersheySimplex, 1.2, new MCvScalar(80, 150, 220), 3);
+                                    CvInvoke.Rectangle(color_resize, new Rectangle(x, y, W, H), new MCvScalar(80, 150, 220), 3);
+
+                                    //evil color check
+                                    MCvScalar clr = MyInvoke.GetColorM(color_resize, center.Y - 5, center.X);
+                                    if (clr.V0 > clr.V2)//R>B  //YOLO搞錯
+                                        continue;
+
                                     process_actionOfCups(cups[0], mat_cup, TB_Bcup_msg, TB_Bcup_state, objPos, 10, 40);
                                     //this.Dispatcher.Invoke((Action)(() => { TB_Bcup.Text = $"({posMap[center.X, center.Y, 0].ToString("0.000")},{posMap[center.X, center.Y, 1].ToString("0.000")},{posMap[center.X, center.Y, 2].ToString("0.000")})"; }));
                                     CvInvoke.Circle(color_resize, center, 10, new MCvScalar(200, 200, 20), -1);
                                 }
                                 else if (name == "pink cup")//index 1
                                 {
+                                   // CvInvoke.PutText(color_resize, "P", new Point(x, y), FontFace.HersheySimplex, 1.2, new MCvScalar(250, 80, 80), 2);
+                                    CvInvoke.PutText(color_resize, item.Confidence.ToString("0.0"), new Point(x, y), FontFace.HersheySimplex, 1.2, new MCvScalar(250, 80, 80), 3);
+                                    CvInvoke.Rectangle(color_resize, new Rectangle(x, y, W, H), new MCvScalar(250, 80, 80), 3);
+
+                                    //evil color check
+                                    MCvScalar clr = MyInvoke.GetColorM(color_resize, center.Y - 5, center.X);
+                                    if (clr.V0 < clr.V2)//R<B  //YOLO搞錯
+                                        continue;
+                                
+
                                     process_actionOfCups(cups[1], mat_cup, TB_Pcup_msg, TB_Pcup_state, objPos, 60, 90);
                                     //this.Dispatcher.Invoke((Action)(() => { TB_Pcup.Text = $"({posMap[center.X, center.Y, 0].ToString("0.000")},{posMap[center.X, center.Y, 1].ToString("0.000")},{posMap[center.X, center.Y, 2].ToString("0.000")})"; }));
                                     CvInvoke.Circle(color_resize, center, 10, new MCvScalar(200, 200, 20), -1);
@@ -361,6 +418,7 @@ namespace Wpf_coffeeMaker
                 }
             }, token);
         }
+        float dripTrayD = 0.05f;
         void process_actionOfCups(Objects detectObject, Mat mat, TextBlock label_msg, TextBlock label_s, float[] pos, int drawY1, int drawY2)
         {
             if (wantTrans == true)
@@ -390,7 +448,7 @@ namespace Wpf_coffeeMaker
                             {
                                 ActionList.Add(new ActionBaseList("Place", handing.Name));
                                 LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-                                if (handing.Distanse(dripTrayPos) < 0.02)//代表在drip tray上
+                                if (handing.Distanse(dripTrayPos) < dripTrayD)//代表在drip tray上
                                 {
                                     ActionList.Add(new ActionBaseList("     to", subactInfo.place.DripTray.ToString()));
                                     LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
@@ -405,7 +463,7 @@ namespace Wpf_coffeeMaker
                         }
                         this.Dispatcher.Invoke((Action)(() =>
                         {
-                            if (detectObject.Distanse(dripTrayPos) < 0.02)//代表在drip tray上
+                            if (detectObject.Distanse(dripTrayPos) < dripTrayD)//代表在drip tray上
                             {
                                 ActionList.Add(new ActionBaseList("Pick up", subactInfo.place.DripTray.ToString()));
                                 LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
@@ -429,6 +487,7 @@ namespace Wpf_coffeeMaker
             }));
 
         }
+
 
         static Action<VideoFrame> UpdateImage(Image img)
         {
@@ -455,6 +514,7 @@ namespace Wpf_coffeeMaker
             }
         }
 
+
         #region //---座標轉換---//
         static float[] TrVal = new float[3];
         float[] camToWorkSpace(float[] camPos)
@@ -470,7 +530,7 @@ namespace Wpf_coffeeMaker
             rtn[1] = camPos[1] + TrVal[1];
             rtn[2] = -camPos[0] + TrVal[0];
 
-            rtn[0] = rtn[0] + ((baseZ - rtn[2]) * (1f / 240f));
+            rtn[0] = rtn[0] + ((baseZ - rtn[2]) * (Zoffset));
 
             return rtn;
         }
@@ -480,7 +540,7 @@ namespace Wpf_coffeeMaker
             TrVal[0] = float.Parse(Tb_camX.Text) / 1000f + float.Parse(Tb_worldZ.Text) / 1000f;
             TrVal[1] = -float.Parse(Tb_camY.Text) / 1000f + float.Parse(Tb_worldY.Text) / 1000f;
             TrVal[2] = -float.Parse(Tb_camZ.Text) / 1000f + float.Parse(Tb_worldX.Text) / 1000f;
-
+            cir_setTrans.Fill = new SolidColorBrush(Colors.DarkSeaGreen);
         }
         static bool wantTrans = false;
         private void CheckBox_transfer_Click(object sender, RoutedEventArgs e)
@@ -503,6 +563,142 @@ namespace Wpf_coffeeMaker
         }
         #endregion //---座標轉換---//
 
+        #region //---參數設定---//
+        URCoordinates dripTrayPos = null;
+        private void Button_setDripTrayPos_Click(object sender, RoutedEventArgs e)
+        {
+            if (CheckBox_wantTrans.IsChecked == false)
+            {
+                MessageBox.Show("請使用世界座標系");
+                return;
+            }
+
+            dripTrayPos = new URCoordinates(cups[0].getX_m(), cups[0].getY_m(), cups[0].getZ_m(), 0, 0, 0);
+            cir_setDrip.Fill = new SolidColorBrush(Colors.DarkSeaGreen);
+        }
+        private void Button_saveValue_Click(object sender, RoutedEventArgs e)
+        {
+            StreamWriter saveTxt;
+            saveTxt = new StreamWriter($"value.txt", false);
+            saveTxt.WriteLine(TrVal[0]);
+            saveTxt.WriteLine(TrVal[1]);
+            saveTxt.WriteLine(TrVal[2]);
+            saveTxt.WriteLine(dripTrayPos.X);
+            saveTxt.WriteLine(dripTrayPos.Y);
+            saveTxt.WriteLine(dripTrayPos.Z);
+            saveTxt.WriteLine(Zoffset);
+            saveTxt.Flush();
+            saveTxt.Close();
+        }
+        private void Button_loadValue_Click(object sender, RoutedEventArgs e)
+        {
+            dripTrayPos = new URCoordinates();
+            string[] file = System.IO.File.ReadAllLines("value.txt");
+            TrVal[0] = float.Parse(file[0]);
+            TrVal[1] = float.Parse(file[1]);
+            TrVal[2] = float.Parse(file[2]);
+            dripTrayPos.X = float.Parse(file[3]);
+            dripTrayPos.Y = float.Parse(file[4]);
+            dripTrayPos.Z = float.Parse(file[5]);
+            Zoffset = float.Parse(file[6]);
+
+            cir_setTrans.Fill = new SolidColorBrush(Colors.DarkSeaGreen);
+            cir_setDrip.Fill = new SolidColorBrush(Colors.DarkSeaGreen);
+            cir_setZoff.Fill = new SolidColorBrush(Colors.DarkSeaGreen);
+        }
+
+        float baseZ = 0;
+        float Zoffset = 0;
+        private void Button_setLineOffset_Click(object sender, RoutedEventArgs e)
+        {
+            if (CheckBox_wantTrans.IsChecked == false)
+            {
+                MessageBox.Show("請使用世界座標系");
+                return;
+            }
+            Zoffset = float.Parse(Tb_Zoff1.Text) / float.Parse(Tb_Zoff2.Text);
+            cir_setZoff.Fill = new SolidColorBrush(Colors.DarkSeaGreen);
+        }
+        #endregion  //---參數設定---//
+
+        //UR
+        #region  //---UR server---//
+        robotControl UR = new robotControl();
+        private void Button_startServer_Click(object sender, RoutedEventArgs e)
+        {
+            UR.ServerOn("192.168.1.100", 888);
+        }
+        private void Button_disconnect_Click(object sender, RoutedEventArgs e)
+        {
+            UR.ServerOff();
+        }
+        private void OnUrStateChange(object sender, LinkArgs e)
+        {
+            this.Dispatcher.Invoke((Action)(() =>
+            {
+                if (e.state == "Connect")
+                    setConnectCircle(3);
+                else if (e.state == "Disconnect")
+                    setConnectCircle(1);
+                else if (e.state == "Wait Connect")
+                    setConnectCircle(2);
+            }));
+
+
+        }
+        #endregion //---UR server---//
+
+        #region //---Record---//
+        private void Button_recordMode_Click(object sender, RoutedEventArgs e)
+        {
+            UR.Record_start(Tb_recordName.Text);
+        }
+
+        private void Button_recordWrite_Click(object sender, RoutedEventArgs e)
+        {
+            UR.Record_writePos();
+        }
+        private void Button_recordEnd_Click(object sender, RoutedEventArgs e)
+        {
+            UR.Record_stop();
+        }
+
+        private void Button_grip_Click(object sender, RoutedEventArgs e)
+        {
+            UR.goGrip((byte)int.Parse(Tb_gripVal.Text));
+        }
+        private void Button_grip2_Click(object sender, RoutedEventArgs e)
+        {
+            UR.goGrip((byte)int.Parse(Tb_gripVal2.Text));
+        }
+        private void Button_grip3_Click(object sender, RoutedEventArgs e)
+        {
+            UR.goGrip((byte)int.Parse(Tb_gripVal3.Text));
+        }
+        #endregion //---Record---//
+
+        #region //---Play path---//
+        private void Button_goPosHome_Click(object sender, RoutedEventArgs e)
+        {
+            UR.goToFilePos("Home.pos");
+        }
+        private void Cb_Path_DropDownOpened(object sender, EventArgs e)
+        {
+            Cb_Path.Items.Clear();
+            DirectoryInfo PathFolder = new DirectoryInfo(UR.folder_Path);
+            FileInfo[] ActFiles = PathFolder.GetFiles("*.path");
+            foreach (FileInfo file in ActFiles)
+            {
+                Cb_Path.Items.Add(file.Name);
+            }
+        }
+        private void Btn_goPath_Click(object sender, RoutedEventArgs e)
+        {
+            UR.goFilePath(Cb_Path.SelectedValue.ToString());
+        }
+        #endregion //---Play path---//
+
+        //action base
         #region //--- Action base Control---//
         List<ActionBaseList> ActionList = new List<ActionBaseList>();
         static bool startDemo = false;
@@ -518,6 +714,8 @@ namespace Wpf_coffeeMaker
                 MessageBox.Show("請設定Drip Tray位置");
                 return;
             }
+            evil_toggleOnce = false;
+            cir_toggleOnce.Fill = new SolidColorBrush(Colors.Gray);
 
             handing = new Objects();
             LV_actionBase.Items.Clear();
@@ -538,7 +736,7 @@ namespace Wpf_coffeeMaker
 
             ActionList.Add(new ActionBaseList("Place", handing.Name));
             LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-            if (handing.Distanse(dripTrayPos) < 0.02)//代表在drip tray上
+            if (handing.Distanse(dripTrayPos) < dripTrayD)//代表在drip tray上
             {
                 ActionList.Add(new ActionBaseList("     to", subactInfo.place.DripTray.ToString()));
                 LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
@@ -625,204 +823,109 @@ namespace Wpf_coffeeMaker
         }
         #endregion //--- Action base Control---//
 
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            Console.WriteLine(subactInfo.place.DripTray.ToString());
-        }
-
-        //---UR---//
-        robotControl UR = new robotControl();
-        private void Button_startServer_Click(object sender, RoutedEventArgs e)
-        {
-            UR.ServerOn("192.168.1.100", 888);
-        }
-        private void Button_disconnect_Click(object sender, RoutedEventArgs e)
-        {
-            UR.ServerOff();
-        }
-        private void OnUrStateChange(object sender, LinkArgs e)
-        {
-            this.Dispatcher.Invoke((Action)(() =>
-            {
-                if (e.state == "Connect")
-                    setConnectCircle(3);
-                else if (e.state == "Disconnect")
-                    setConnectCircle(1);
-                else if (e.state == "Wait Connect")
-                    setConnectCircle(2);
-            }));
-
-
-        }
-
-
-
-        #region //---Record---//
-        private void Button_recordMode_Click(object sender, RoutedEventArgs e)
-        {
-            UR.Record_start(Tb_recordName.Text);
-        }
-
-        private void Button_recordWrite_Click(object sender, RoutedEventArgs e)
-        {
-            UR.Record_writePos();
-        }
-        private void Button_recordEnd_Click(object sender, RoutedEventArgs e)
-        {
-            UR.Record_stop();
-        }
-
-        private void Button_grip_Click(object sender, RoutedEventArgs e)
-        {
-            UR.goGrip((byte)int.Parse(Tb_gripVal.Text));
-        }
-        private void Button_grip2_Click(object sender, RoutedEventArgs e)
-        {
-            UR.goGrip((byte)int.Parse(Tb_gripVal2.Text));
-        }
-        private void Button_grip3_Click(object sender, RoutedEventArgs e)
-        {
-            UR.goGrip((byte)int.Parse(Tb_gripVal3.Text));
-        }
-        #endregion //---Record---//
-
-        #region //---Play path---//
-        private void Button_goPosHome_Click(object sender, RoutedEventArgs e)
-        {
-            UR.goToFilePos("Home.pos");
-        }
-        private void Cb_Path_DropDownOpened(object sender, EventArgs e)
-        {
-            Cb_Path.Items.Clear();
-            DirectoryInfo PathFolder = new DirectoryInfo(UR.folder_Path);
-            FileInfo[] ActFiles = PathFolder.GetFiles("*.path");
-            foreach (FileInfo file in ActFiles)
-            {
-                Cb_Path.Items.Add(file.Name);
-            }
-        }
-        private void Btn_goPath_Click(object sender, RoutedEventArgs e)
-        {
-            UR.goFilePath(Cb_Path.SelectedValue.ToString());
-        }
-        #endregion //---Play path---//
-
-        //---UR---//
-
-        URCoordinates dripTrayPos = null;
-        private void Button_setDripTrayPos_Click(object sender, RoutedEventArgs e)
-        {
-            if (CheckBox_wantTrans.IsChecked == false)
-            {
-                MessageBox.Show("請使用世界座標系");
-                return;
-            }
-
-            dripTrayPos = new URCoordinates(cups[0].getX_m(), cups[0].getY_m(), cups[0].getZ_m(), 0, 0, 0);
-        }
-
-        float baseZ = 0;
-        float Zoffset = 0;
-        private void Button_setLineOffset_Click(object sender, RoutedEventArgs e)
-        {
-            if (CheckBox_wantTrans.IsChecked == false)
-            {
-                MessageBox.Show("請使用世界座標系");
-                return;
-            }
-
-            //原點 blue cup
-            //往 pink cup
-            baseZ = cups[0].getZ_m();
-
-            float Dx = cups[1].getX_m() - cups[0].getX_m();
-            float Dz = cups[0].getZ_m() - cups[1].getZ_m();
-            Zoffset = 1f / 240f;
-
-        }
-
-
+        #region //---Connect Python Action recognition---//
         private void Button_addPour_Click(object sender, RoutedEventArgs e)
         {
-            if (handing == cups[0])
+            if (startDemo == true)
             {
-                ActionList.Add(new ActionBaseList(Subact.Name.Pour, cups[0].Name));
-                LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-                ActionList.Add(new ActionBaseList("    to", cups[1].Name));
-                LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
+                if (nowAct == "Pour")
+                    return;
+                if (handing == cups[0])
+                {
+                    ActionList.Add(new ActionBaseList(Subact.Name.Pour, cups[0].Name));
+                    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
+                    ActionList.Add(new ActionBaseList("    to", cups[1].Name));
+                    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
+                }
+                else if (handing == cups[1])
+                {
+                    ActionList.Add(new ActionBaseList(Subact.Name.Pour, cups[1].Name));
+                    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
+                    ActionList.Add(new ActionBaseList("    to", cups[0].Name));
+                    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
+                }
+                nowAct = "Pour";
             }
-            else if (handing == cups[1])
-            {
-                ActionList.Add(new ActionBaseList(Subact.Name.Pour, cups[1].Name));
-                LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-                ActionList.Add(new ActionBaseList("    to", cups[0].Name));
-                LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-            }
+
         }
+        bool evil_toggleOnce = false;
         private void Button_addToggle_Click(object sender, RoutedEventArgs e)
         {
+            if (startDemo == true)
+            {
+                if (evil_toggleOnce == true)
+                    return;
+                if (nowAct == "Toggle")
+                    return;
+                ActionList.Add(new ActionBaseList("Place", handing.Name));
+                LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
+                if (handing.Distanse(dripTrayPos) < 0.02)//代表在drip tray上
+                {
+                    ActionList.Add(new ActionBaseList("     to", subactInfo.place.DripTray.ToString()));
+                    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
+                }
+                else
+                {
+                    ActionList.Add(new ActionBaseList("     to", (handing.getNowPos()).ToString("mm", "3(", "0")));
+                    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
+                }
+                handing = machine;
+                ActionList.Add(new ActionBaseList(Subact.Name.Trigger, ""));
+                LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
+                nowAct = "Toggle";
 
-            ActionList.Add(new ActionBaseList("Place", handing.Name));
-            LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-            if (handing.Distanse(dripTrayPos) < 0.02)//代表在drip tray上
-            {
-                ActionList.Add(new ActionBaseList("     to", subactInfo.place.DripTray.ToString()));
-                LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
+                evil_toggleOnce = true;
+                cir_toggleOnce.Fill = new SolidColorBrush(Colors.Salmon);
             }
-            else
-            {
-                ActionList.Add(new ActionBaseList("     to", (handing.getNowPos()).ToString("mm", "3(", "0")));
-                LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-            }
-            handing = machine;
-            ActionList.Add(new ActionBaseList(Subact.Name.Trigger, ""));
-            LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
+
         }
+        string nowAct = "Background";
         private void Button_askActionRecognition_Click(object sender, RoutedEventArgs e)
         {
             ezTCP TCP = new ezTCP();
-            TCP.creatClient("192.168.1.100", 777);
+            setActiionCircle("");
             Task.Run(() =>
             {
+                if (!TCP.creatClient("192.168.1.102", 777))
+                    return;
+
+                this.Dispatcher.Invoke((Action)(() => { cir_connectAct.Fill = new SolidColorBrush(Colors.DarkSeaGreen); }));
                 while (true)
                 {
-                    TCP.client_SendData("hey");
-                    string msg = TCP.client_ReadData();
-                    if (msg == "Pour")
-                        this.Dispatcher.Invoke((Action)(() => { Button_addPour_Click(null, null); }));
-                    else if (msg == "Touggle")
-                        this.Dispatcher.Invoke((Action)(() => { Button_addToggle_Click(null, null); }));
+                    try
+                    {
+                        TCP.client_SendData("hey");
+                        string msg = TCP.client_ReadData();
+                        if (msg == "")
+                            break;
+
+                        if (msg == "Pour")
+                            this.Dispatcher.Invoke((Action)(() => { Button_addPour_Click(null, null); setActiionCircle("Pour"); }));
+                        else if (msg == "Toggle")
+                            this.Dispatcher.Invoke((Action)(() => { Button_addToggle_Click(null, null); setActiionCircle("Toggle"); }));
+                        else if (msg == "Background")
+                            this.Dispatcher.Invoke((Action)(() => { nowAct = "Background"; setActiionCircle("Background"); }));
+
+                        Thread.Sleep(0);
+                    }
+                    catch
+                    {
+                        break;
+                    }
+
                 }
+                Console.WriteLine("client 中斷");
+                this.Dispatcher.Invoke((Action)(() => { cir_connectAct.Fill = new SolidColorBrush(Colors.Salmon); setActiionCircle(""); }));
             });
 
         }
+        #endregion //---Connect Python Action recognition---//
 
-        private void Button_saveValue_Click(object sender, RoutedEventArgs e)
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
-            StreamWriter saveTxt;
-            saveTxt = new StreamWriter($"value.txt", false);
-            saveTxt.WriteLine(TrVal[0]);
-            saveTxt.WriteLine(TrVal[1]);
-            saveTxt.WriteLine(TrVal[2]);
-            saveTxt.WriteLine(dripTrayPos.X);
-            saveTxt.WriteLine(dripTrayPos.Y);
-            saveTxt.WriteLine(dripTrayPos.Z);
-            saveTxt.Flush();
-            saveTxt.Close();
+
         }
 
-        private void Button_loadValue_Click(object sender, RoutedEventArgs e)
-        {
-            dripTrayPos = new URCoordinates();
-            string[] file = System.IO.File.ReadAllLines("value.txt");
-            TrVal[0] = float.Parse(file[0]);
-            TrVal[1] = float.Parse(file[1]);
-            TrVal[2] = float.Parse(file[2]);
-            dripTrayPos.X = float.Parse(file[3]);
-            dripTrayPos.Y = float.Parse(file[4]);
-            dripTrayPos.Z = float.Parse(file[5]);
-        }
     }//class
     public static class BitmapSourceConvert
     {
@@ -856,6 +959,61 @@ namespace Wpf_coffeeMaker
         }
         public string Action { get; set; }
         public string Detial { get; set; }
+    }
+
+    public static class MatExtension
+    {
+        public static dynamic GetValue(this Mat mat, int row, int col)
+        {
+            var value = CreateElement(mat.Depth);
+            Marshal.Copy(mat.DataPointer + (row * mat.Cols + col) * mat.ElementSize, value, 0, 1);
+            return value[0];
+        }
+
+        public static void SetValue(this Mat mat, int row, int col, dynamic value)
+        {
+            var target = CreateElement(mat.Depth, value);
+            Marshal.Copy(target, 0, mat.DataPointer + (row * mat.Cols + col) * mat.ElementSize, 1);
+        }
+        private static dynamic CreateElement(DepthType depthType, dynamic value)
+        {
+            var element = CreateElement(depthType);
+            element[0] = value;
+            return element;
+        }
+
+        private static dynamic CreateElement(DepthType depthType)
+        {
+            if (depthType == DepthType.Cv8S)
+            {
+                return new sbyte[1];
+            }
+            if (depthType == DepthType.Cv8U)
+            {
+                return new byte[1];
+            }
+            if (depthType == DepthType.Cv16S)
+            {
+                return new short[1];
+            }
+            if (depthType == DepthType.Cv16U)
+            {
+                return new ushort[1];
+            }
+            if (depthType == DepthType.Cv32S)
+            {
+                return new int[1];
+            }
+            if (depthType == DepthType.Cv32F)
+            {
+                return new float[1];
+            }
+            if (depthType == DepthType.Cv64F)
+            {
+                return new double[1];
+            }
+            return new float[1];
+        }
     }
 
 }//namespace

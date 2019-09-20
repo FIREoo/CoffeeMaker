@@ -15,12 +15,12 @@ namespace myObjects
             move = 1
         }
         public string Name = "";
-        public System.Drawing.Color color =new System.Drawing.Color();
+        public System.Drawing.Color color = new System.Drawing.Color();
         private int fileterSize { get; set; } = 6;
         private List<float> x = new List<float>();//unit M
         private List<float> y = new List<float>();//unit M
         private List<float> z = new List<float>();//unit M
-        private float moveD { get; set; } = 0.02f;
+        private float moveD { get; set; } = 0.05f;
         private float lastx = 0;
         private float lasty = 0;
         private float lastz = 0;
@@ -50,7 +50,7 @@ namespace myObjects
         }
         public void setPos_m(float x_mm, float y_mm, float z_mm)
         {
-            setX_mm(x_mm*1000f);
+            setX_mm(x_mm * 1000f);
             setY_mm(y_mm * 1000f);
             setZ_mm(z_mm * 1000f);
         }
@@ -88,7 +88,9 @@ namespace myObjects
         public URCoordinates gripPos(int deg = 0)
         {
             if (deg == 0)
-                return new URCoordinates(nowPos.X + gripOffset_M_x, nowPos.Y + gripOffset_M_y, nowPos.Z + gripOffset_M_z, (float)(Math.PI), 0, 0);
+                //return new URCoordinates(nowPos.X + gripOffset_M_x, nowPos.Y + gripOffset_M_y, nowPos.Z + gripOffset_M_z, (float)(Math.PI), 0, 0);
+                return new URCoordinates(nowPos.X + gripOffset_M_x, 0.297f, nowPos.Z + gripOffset_M_z, (float)(Math.PI), 0, 0);//evil
+
             throw new System.ArgumentException("未完成", "現在只能水平");
         }
 

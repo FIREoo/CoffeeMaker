@@ -5,36 +5,34 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Wpf_coffeeMaker"
         mc:Ignorable="d"
-        Title="MainWindow" Height="905" Width="1497" Loaded="Window_Loaded">
+        Title="MainWindow" Height="905" Width="1521" Loaded="Window_Loaded">
     <Grid>
-        <Image x:Name="Image_show" HorizontalAlignment="Left" Height="135" Margin="577,48,0,0" VerticalAlignment="Top" Width="184"/>
-        <Image x:Name="Image_show2" HorizontalAlignment="Left" Height="153" Margin="835,48,0,0" VerticalAlignment="Top" Width="165"/>
-        <Grid HorizontalAlignment="Left" Height="641" Margin="319,9,0,0" VerticalAlignment="Top" Width="1042" Background="#FFBDBDBD">
-            <Image x:Name="Img_main" HorizontalAlignment="Left" Height="360" Margin="10,10,0,0" VerticalAlignment="Top" Width="640"/>
-            <RadioButton x:Name="Rb_mix" Content="Mix" HorizontalAlignment="Left" Margin="660,58,0,0" VerticalAlignment="Top" IsChecked="True" Checked="Rb_imgShow_Checked" FontSize="18"/>
-            <Button Content="Button" HorizontalAlignment="Left" Margin="660,23,0,0" VerticalAlignment="Top" Width="75" FontSize="18" Click="Button_Click"/>
-            <RadioButton x:Name="Rb_color" Content="Color" HorizontalAlignment="Left" Margin="660,85,0,0" VerticalAlignment="Top" Checked="Rb_imgShow_Checked" FontSize="18" IsChecked="True"/>
+        <Grid HorizontalAlignment="Left" Height="641" Margin="319,9,0,0" VerticalAlignment="Top" Width="870" Background="#FFBDBDBD">
+            <Image x:Name="Img_main" HorizontalAlignment="Left" Height="360" Margin="10,23,0,0" VerticalAlignment="Top" Width="640"/>
+            <RadioButton x:Name="Rb_mix" Content="Mix" HorizontalAlignment="Left" Margin="11,1,0,0" VerticalAlignment="Top" IsChecked="True" Checked="Rb_imgShow_Checked" FontSize="18"/>
+            <RadioButton x:Name="Rb_color" Content="Color" HorizontalAlignment="Left" Margin="67,1,0,0" VerticalAlignment="Top" Checked="Rb_imgShow_Checked" FontSize="18" IsChecked="True"/>
             <TextBlock x:Name="TB_Bcup" HorizontalAlignment="Left" Margin="11,419,0,0" TextWrapping="Wrap" Text="Blue Cup" VerticalAlignment="Top" FontSize="18" FontWeight="Bold"/>
             <TextBlock x:Name="TB_Pcup" HorizontalAlignment="Left" Margin="11,480,0,0" TextWrapping="Wrap" Text="Pink Cup" VerticalAlignment="Top" FontSize="18" FontWeight="Bold"/>
-            <Image x:Name="img_cupState" HorizontalAlignment="Left" Height="100" Margin="252,428,0,0" VerticalAlignment="Top" Width="500"/>
+            <Image x:Name="img_cupState" HorizontalAlignment="Left" Height="100" Margin="237,431,0,0" VerticalAlignment="Top" Width="500"/>
             <TextBlock x:Name="TB_Bcup_state" HorizontalAlignment="Left" Margin="99,419,0,0" TextWrapping="Wrap" Text="State" VerticalAlignment="Top" FontSize="18"/>
             <TextBlock x:Name="TB_Bcup_msg" HorizontalAlignment="Left" Margin="11,447,0,0" TextWrapping="Wrap" Text="Msg" VerticalAlignment="Top" FontSize="18"/>
             <TextBlock x:Name="TB_Pcup_state" HorizontalAlignment="Left" Margin="99,480,0,0" TextWrapping="Wrap" Text="State" VerticalAlignment="Top" FontSize="18"/>
             <TextBlock x:Name="TB_Pcup_msg" HorizontalAlignment="Left" Margin="11,508,0,0" TextWrapping="Wrap" Text="Msg" VerticalAlignment="Top" FontSize="18"/>
-            <TextBox x:Name="Tb_camX" HorizontalAlignment="Left" Height="23" Margin="790,27,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="0" VerticalAlignment="Top" Width="73"/>
-            <TextBox x:Name="Tb_camZ" HorizontalAlignment="Left" Height="23" Margin="946,27,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="0" VerticalAlignment="Top" Width="73"/>
-            <TextBox x:Name="Tb_camY" HorizontalAlignment="Left" Height="23" Margin="868,27,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="0" VerticalAlignment="Top" Width="73"/>
-            <TextBox x:Name="Tb_worldX" HorizontalAlignment="Left" Height="23" Margin="790,66,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="-297" VerticalAlignment="Top" Width="73"/>
-            <TextBox x:Name="Tb_worldZ" HorizontalAlignment="Left" Height="23" Margin="946,66,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="43" VerticalAlignment="Top" Width="73"/>
-            <TextBox x:Name="Tb_worldY" HorizontalAlignment="Left" Height="23" Margin="868,66,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="297" VerticalAlignment="Top" Width="73"/>
-            <Button Content="set transfer" HorizontalAlignment="Left" Margin="790,94,0,0" VerticalAlignment="Top" Width="229" Height="36" Click="Button_setTrans_Click"/>
             <CheckBox x:Name="CheckBox_wantTrans" Content="Set transfer" HorizontalAlignment="Left" Margin="11,536,0,0" VerticalAlignment="Top" FontSize="16" Click="CheckBox_transfer_Click"/>
-            <Button Content="B" HorizontalAlignment="Left" Margin="761,29,0,0" VerticalAlignment="Top" Width="24" Click="Button_setBcupTrans_Click"/>
             <Button Content="End Demo" HorizontalAlignment="Left" Margin="135,565,0,0" VerticalAlignment="Top" Width="112" Height="54" FontSize="16" Click="Button_endDemo_Click"/>
-            <Button Content="set line offset" HorizontalAlignment="Left" Margin="790,206,0,0" VerticalAlignment="Top" Width="73" Height="39" Click="Button_setLineOffset_Click"/>
-            <Button Content="Ask Action recognition" HorizontalAlignment="Left" Margin="799,488,0,0" VerticalAlignment="Top" Width="151" Height="77" Click="Button_askActionRecognition_Click"/>
-            <Button Content="Save to txt" HorizontalAlignment="Left" Margin="944,135,0,0" VerticalAlignment="Top" Width="75" Click="Button_saveValue_Click" Height="36"/>
-            <Button Content="Load txt" HorizontalAlignment="Left" Margin="946,176,0,0" VerticalAlignment="Top" Width="73" Click="Button_loadValue_Click" Height="34"/>
+            <GroupBox Header="Action" HorizontalAlignment="Left" Height="145" Margin="655,56,0,0" VerticalAlignment="Top" Width="137" FontSize="20">
+                <Grid Margin="1,-2,-1,-6">
+                    <TextBlock HorizontalAlignment="Left" Margin="41,7,0,0" TextWrapping="Wrap" Text="Pour" VerticalAlignment="Top" FontSize="20" RenderTransformOrigin="1.13,1.083"/>
+                    <Ellipse x:Name="cir_back" Fill="#FF3A3A3A" HorizontalAlignment="Left" Height="29" Margin="5,73,0,0" Stroke="Black" VerticalAlignment="Top" Width="29"/>
+                    <Ellipse x:Name="cir_pour" Fill="#FF8C5AC8" HorizontalAlignment="Left" Height="29" Margin="5,5,0,0" Stroke="Black" VerticalAlignment="Top" Width="29"/>
+                    <Ellipse x:Name="cir_toggle" Fill="#FFC8AA3C" HorizontalAlignment="Left" Height="29" Margin="5,39,0,0" Stroke="Black" VerticalAlignment="Top" Width="29"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="41,41,0,0" TextWrapping="Wrap" Text="Toggle" VerticalAlignment="Top" FontSize="20"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="41,75,0,0" TextWrapping="Wrap" Text="N/A" VerticalAlignment="Top" FontSize="20"/>
+                    <Ellipse x:Name="cir_toggleOnce" Fill="#FFBBBBBB" HorizontalAlignment="Left" Height="12" Margin="24,37,0,0" Stroke="Black" VerticalAlignment="Top" Width="12"/>
+                </Grid>
+            </GroupBox>
+            <Button Content="Connect Action" HorizontalAlignment="Left" Margin="670,17,0,0" VerticalAlignment="Top" Width="100" Height="30" Click="Button_askActionRecognition_Click"/>
+            <Ellipse x:Name="cir_connectAct" Fill="Salmon" HorizontalAlignment="Left" Height="21" Margin="756,10,0,0" Stroke="Black" VerticalAlignment="Top" Width="21" RenderTransformOrigin="0.5,0.5"/>
         </Grid>
         <ListView x:Name="LV_actionBase" ItemsSource="{Binding listOfAction}" HorizontalAlignment="Left" Height="717" Margin="10,10,0,0" VerticalAlignment="Top" Width="291" FontSize="22">
             <ListView.ItemContainerStyle>
@@ -71,9 +69,34 @@
         <TextBox x:Name="Tb_gripVal2" HorizontalAlignment="Left" Height="28" Margin="657,798,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="31" VerticalAlignment="Top" Width="30"/>
         <TextBox x:Name="Tb_gripVal3" HorizontalAlignment="Left" Height="28" Margin="657,831,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="100" VerticalAlignment="Top" Width="30"/>
         <Button Content="Grip" HorizontalAlignment="Left" Margin="582,831,0,0" VerticalAlignment="Top" Width="75" Height="28" Click="Button_grip3_Click"/>
-        <Button Content="set drip tray" HorizontalAlignment="Left" Margin="1113,145,0,0" VerticalAlignment="Top" Width="89" Height="38" Click="Button_setDripTrayPos_Click"/>
-        <Button Content="cmd add&#xD;&#xA;Pour" HorizontalAlignment="Left" Margin="1113,581,0,0" VerticalAlignment="Top" Width="75" Height="59" Click="Button_addPour_Click"/>
-        <Button Content="cmd add&#xA;Toggle" HorizontalAlignment="Left" Margin="1193,581,0,0" VerticalAlignment="Top" Width="75" Height="59" Click="Button_addToggle_Click"/>
+        <Button Content="cmd add&#xD;&#xA;Pour" HorizontalAlignment="Left" Margin="1199,357,0,0" VerticalAlignment="Top" Width="75" Height="59" Click="Button_addPour_Click"/>
+        <Button Content="cmd add&#xA;Toggle" HorizontalAlignment="Left" Margin="1279,357,0,0" VerticalAlignment="Top" Width="75" Height="59" Click="Button_addToggle_Click"/>
+        <Grid HorizontalAlignment="Left" Height="304" Margin="1199,10,0,0" VerticalAlignment="Top" Width="294" Background="#FFE2D0C3">
+            <Button Content="B" HorizontalAlignment="Left" Margin="12,32,0,0" VerticalAlignment="Top" Width="36" Click="Button_setBcupTrans_Click" Height="23"/>
+            <TextBox x:Name="Tb_camX" HorizontalAlignment="Left" Height="23" Margin="53,32,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="0" VerticalAlignment="Top" Width="74"/>
+            <TextBox x:Name="Tb_camZ" HorizontalAlignment="Left" Height="23" Margin="209,32,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="0" VerticalAlignment="Top" Width="74"/>
+            <TextBox x:Name="Tb_camY" HorizontalAlignment="Left" Height="23" Margin="131,32,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="0" VerticalAlignment="Top" Width="74"/>
+            <TextBox x:Name="Tb_worldX" HorizontalAlignment="Left" Height="23" Margin="53,60,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="-297" VerticalAlignment="Top" Width="74"/>
+            <TextBox x:Name="Tb_worldZ" HorizontalAlignment="Left" Height="23" Margin="209,60,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="43" VerticalAlignment="Top" Width="74"/>
+            <TextBox x:Name="Tb_worldY" HorizontalAlignment="Left" Height="23" Margin="131,60,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="297" VerticalAlignment="Top" Width="74"/>
+            <Button Content="set transfer" HorizontalAlignment="Left" Margin="54,97,0,0" VerticalAlignment="Top" Width="229" Height="36" Click="Button_setTrans_Click"/>
+            <Ellipse x:Name="cir_setTrans" Fill="Salmon" HorizontalAlignment="Left" Height="30" Margin="259,93,0,0" Stroke="Black" VerticalAlignment="Top" Width="30"/>
+            <Button Content="set drip tray" HorizontalAlignment="Left" Margin="54,146,0,0" VerticalAlignment="Top" Width="90" Height="38" Click="Button_setDripTrayPos_Click"/>
+            <Ellipse x:Name="cir_setDrip" Fill="Salmon" HorizontalAlignment="Left" Height="23" Margin="127,140,0,0" Stroke="Black" VerticalAlignment="Top" Width="23"/>
+            <Button Content="Save to txt" HorizontalAlignment="Left" Margin="45,270,0,0" VerticalAlignment="Top" Click="Button_saveValue_Click" Height="31" Width="74"/>
+            <Button Content="Load txt" HorizontalAlignment="Left" Margin="123,270,0,0" VerticalAlignment="Top" Click="Button_loadValue_Click" Height="31" Width="120"/>
+            <TextBox x:Name="Tb_Zoff1" HorizontalAlignment="Left" Height="22" Margin="53,220,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="10" VerticalAlignment="Top" Width="61"/>
+            <TextBox x:Name="Tb_Zoff2" HorizontalAlignment="Left" Height="22" Margin="124,220,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="240" VerticalAlignment="Top" Width="61"/>
+            <Button Content="Z 補償" HorizontalAlignment="Left" Margin="190,211,0,0" VerticalAlignment="Top" Width="74" Height="40" Click="Button_setLineOffset_Click"/>
+            <TextBlock HorizontalAlignment="Left" Margin="116,220,0,0" TextWrapping="Wrap" Text="/" VerticalAlignment="Top" FontSize="16" Height="22"/>
+            <TextBlock HorizontalAlignment="Left" Margin="116,198,0,0" TextWrapping="Wrap" Text="/" VerticalAlignment="Top" FontSize="16" Height="22"/>
+            <TextBlock HorizontalAlignment="Left" Margin="73,198,0,0" TextWrapping="Wrap" Text="ΔX" VerticalAlignment="Top" FontSize="16" Height="22"/>
+            <TextBlock HorizontalAlignment="Left" Margin="145,198,0,0" TextWrapping="Wrap" Text="ΔZ" VerticalAlignment="Top" FontSize="16" Height="22"/>
+            <Ellipse x:Name="cir_setZoff" Fill="Salmon" HorizontalAlignment="Left" Height="23" Margin="248,204,0,0" Stroke="Black" VerticalAlignment="Top" Width="23"/>
+
+
+        </Grid>
+        <Button Content="Button" HorizontalAlignment="Left" Margin="980,686,0,0" VerticalAlignment="Top" Width="76" FontSize="18" Click="Button_Click" Background="#FF5294E4"/>
 
     </Grid>
 </Window>
