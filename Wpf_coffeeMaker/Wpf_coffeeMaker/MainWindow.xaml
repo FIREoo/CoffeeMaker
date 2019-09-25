@@ -29,12 +29,15 @@
                     <TextBlock HorizontalAlignment="Left" Margin="41,41,0,0" TextWrapping="Wrap" Text="Toggle" VerticalAlignment="Top" FontSize="20"/>
                     <TextBlock HorizontalAlignment="Left" Margin="41,75,0,0" TextWrapping="Wrap" Text="N/A" VerticalAlignment="Top" FontSize="20"/>
                     <Ellipse x:Name="cir_toggleOnce" Fill="#FFBBBBBB" HorizontalAlignment="Left" Height="12" Margin="24,37,0,0" Stroke="Black" VerticalAlignment="Top" Width="12"/>
+                    <Ellipse x:Name="cir_pourOnce1" Fill="#FFBBBBBB" HorizontalAlignment="Left" Height="10" Margin="92,10,0,0" Stroke="Black" VerticalAlignment="Top" Width="10"/>
+                    <Ellipse x:Name="cir_pourOnce2" Fill="Black" HorizontalAlignment="Left" Height="10" Margin="92,21,0,0" Stroke="Black" VerticalAlignment="Top" Width="10" MouseDown="Cir_pourOnce2_MouseDown"/>
                 </Grid>
             </GroupBox>
             <Button Content="Connect Action" HorizontalAlignment="Left" Margin="670,17,0,0" VerticalAlignment="Top" Width="100" Height="30" Click="Button_askActionRecognition_Click"/>
-            <Ellipse x:Name="cir_connectAct" Fill="Salmon" HorizontalAlignment="Left" Height="21" Margin="756,10,0,0" Stroke="Black" VerticalAlignment="Top" Width="21" RenderTransformOrigin="0.5,0.5"/>
+            <Ellipse x:Name="cir_connectAct" Fill="IndianRed" HorizontalAlignment="Left" Height="21" Margin="756,10,0,0" Stroke="Black" VerticalAlignment="Top" Width="21" RenderTransformOrigin="0.5,0.5"/>
             <TextBlock x:Name="Tb_CSYS1" HorizontalAlignment="Left" Margin="11,447,0,0" TextWrapping="Wrap" Text="Cam" VerticalAlignment="Top" FontSize="18" FontWeight="Bold" Foreground="#FF002378"/>
             <TextBlock x:Name="Tb_CSYS2" HorizontalAlignment="Left" Margin="10,508,0,0" TextWrapping="Wrap" Text="Cam" VerticalAlignment="Top" FontSize="18" FontWeight="Bold" Foreground="#FF002378"/>
+            <CheckBox x:Name="CheckBox_ShowEvil" Content="evil Line" HorizontalAlignment="Left" Margin="137,3,0,0" VerticalAlignment="Top" FontSize="14" Click="CheckBox_ShowEvil_Click"/>
         </Grid>
         <ListView x:Name="LV_actionBase" ItemsSource="{Binding listOfAction}" HorizontalAlignment="Left" Height="717" Margin="10,10,0,0" VerticalAlignment="Top" Width="291" FontSize="22">
             <ListView.ItemContainerStyle>
@@ -44,7 +47,7 @@
             </ListView.ItemContainerStyle>
             <ListView.View>
                 <GridView>
-                    
+
                     <GridViewColumn  Header="Action" Width="100" >
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
@@ -54,7 +57,7 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    
+
                     <GridViewColumn Header="Detial" Width="180">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
@@ -64,7 +67,7 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    
+
                 </GridView>
             </ListView.View>
 
@@ -94,30 +97,31 @@
         <Button Content="cmd add&#xA;Toggle" HorizontalAlignment="Left" Margin="1279,357,0,0" VerticalAlignment="Top" Width="75" Height="59" Click="Button_addToggle_Click"/>
         <Grid HorizontalAlignment="Left" Height="304" Margin="1199,10,0,0" VerticalAlignment="Top" Width="294" Background="#FFE2D0C3">
             <Button Content="B" HorizontalAlignment="Left" Margin="12,32,0,0" VerticalAlignment="Top" Width="36" Click="Button_setBcupTrans_Click" Height="23"/>
-            <TextBox x:Name="Tb_camX" HorizontalAlignment="Left" Height="23" Margin="53,32,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="0" VerticalAlignment="Top" Width="74"/>
-            <TextBox x:Name="Tb_camZ" HorizontalAlignment="Left" Height="23" Margin="209,32,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="0" VerticalAlignment="Top" Width="74"/>
-            <TextBox x:Name="Tb_camY" HorizontalAlignment="Left" Height="23" Margin="131,32,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="0" VerticalAlignment="Top" Width="74"/>
-            <TextBox x:Name="Tb_worldX" HorizontalAlignment="Left" Height="23" Margin="53,60,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="-297" VerticalAlignment="Top" Width="74"/>
-            <TextBox x:Name="Tb_worldZ" HorizontalAlignment="Left" Height="23" Margin="209,60,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="43" VerticalAlignment="Top" Width="74"/>
-            <TextBox x:Name="Tb_worldY" HorizontalAlignment="Left" Height="23" Margin="131,60,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="297" VerticalAlignment="Top" Width="74"/>
-            <Button Content="set transfer" HorizontalAlignment="Left" Margin="54,97,0,0" VerticalAlignment="Top" Width="229" Height="36" Click="Button_setTrans_Click"/>
-            <Ellipse x:Name="cir_setTrans" Fill="Salmon" HorizontalAlignment="Left" Height="30" Margin="259,93,0,0" Stroke="Black" VerticalAlignment="Top" Width="30"/>
-            <Button Content="set drip tray" HorizontalAlignment="Left" Margin="54,146,0,0" VerticalAlignment="Top" Width="90" Height="38" Click="Button_setDripTrayPos_Click"/>
-            <Ellipse x:Name="cir_setDrip" Fill="Salmon" HorizontalAlignment="Left" Height="23" Margin="127,140,0,0" Stroke="Black" VerticalAlignment="Top" Width="23"/>
+            <TextBox x:Name="Tb_camX" HorizontalAlignment="Left" Height="23" Margin="53,32,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="0" VerticalAlignment="Top" Width="55"/>
+            <TextBox x:Name="Tb_camZ" HorizontalAlignment="Left" Height="23" Margin="170,32,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="0" VerticalAlignment="Top" Width="55"/>
+            <TextBox x:Name="Tb_camY" HorizontalAlignment="Left" Height="23" Margin="111,32,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="0" VerticalAlignment="Top" Width="56"/>
+            <TextBox x:Name="Tb_worldX" HorizontalAlignment="Left" Height="23" Margin="53,60,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="-302" VerticalAlignment="Top" Width="55"/>
+            <TextBox x:Name="Tb_worldZ" HorizontalAlignment="Left" Height="23" Margin="170,60,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="180" VerticalAlignment="Top" Width="55"/>
+            <TextBox x:Name="Tb_worldY" HorizontalAlignment="Left" Height="23" Margin="111,60,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="306" VerticalAlignment="Top" Width="56"/>
+            <Button Content="set transfer" HorizontalAlignment="Left" Margin="54,97,0,0" VerticalAlignment="Top" Width="171" Height="33" Click="Button_setTrans_Click"/>
+            <Ellipse x:Name="cir_setTrans" Fill="IndianRed" HorizontalAlignment="Left" Height="22" Margin="210,90,0,0" Stroke="Black" VerticalAlignment="Top" Width="22"/>
+            <Button Content="set drip tray" HorizontalAlignment="Left" Margin="54,140,0,0" VerticalAlignment="Top" Width="171" Height="33" Click="Button_setDripTrayPos_Click"/>
+            <Ellipse x:Name="cir_setDrip" Fill="IndianRed" HorizontalAlignment="Left" Height="22" Margin="210,133,0,0" Stroke="Black" VerticalAlignment="Top" Width="22"/>
             <Button Content="Save to txt" HorizontalAlignment="Left" Margin="45,270,0,0" VerticalAlignment="Top" Click="Button_saveValue_Click" Height="31" Width="74"/>
             <Button Content="Load txt" HorizontalAlignment="Left" Margin="123,270,0,0" VerticalAlignment="Top" Click="Button_loadValue_Click" Height="31" Width="120"/>
             <TextBox x:Name="Tb_Zoff1" HorizontalAlignment="Left" Height="22" Margin="53,220,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="10" VerticalAlignment="Top" Width="61"/>
-            <TextBox x:Name="Tb_Zoff2" HorizontalAlignment="Left" Height="22" Margin="124,220,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="240" VerticalAlignment="Top" Width="61"/>
+            <TextBox x:Name="Tb_Zoff2" HorizontalAlignment="Left" Height="22" Margin="124,220,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="350" VerticalAlignment="Top" Width="61"/>
             <Button Content="Z 補償" HorizontalAlignment="Left" Margin="190,211,0,0" VerticalAlignment="Top" Width="74" Height="40" Click="Button_setLineOffset_Click"/>
             <TextBlock HorizontalAlignment="Left" Margin="116,220,0,0" TextWrapping="Wrap" Text="/" VerticalAlignment="Top" FontSize="16" Height="22"/>
             <TextBlock HorizontalAlignment="Left" Margin="116,198,0,0" TextWrapping="Wrap" Text="/" VerticalAlignment="Top" FontSize="16" Height="22"/>
             <TextBlock HorizontalAlignment="Left" Margin="73,198,0,0" TextWrapping="Wrap" Text="ΔX" VerticalAlignment="Top" FontSize="16" Height="22"/>
             <TextBlock HorizontalAlignment="Left" Margin="145,198,0,0" TextWrapping="Wrap" Text="ΔZ" VerticalAlignment="Top" FontSize="16" Height="22"/>
-            <Ellipse x:Name="cir_setZoff" Fill="Salmon" HorizontalAlignment="Left" Height="23" Margin="248,204,0,0" Stroke="Black" VerticalAlignment="Top" Width="23"/>
+            <Ellipse x:Name="cir_setZoff" Fill="IndianRed" HorizontalAlignment="Left" Height="23" Margin="248,204,0,0" Stroke="Black" VerticalAlignment="Top" Width="23"/>
 
 
         </Grid>
-        <Button Content="Button" HorizontalAlignment="Left" Margin="980,686,0,0" VerticalAlignment="Top" Width="76" FontSize="18" Click="Button_Click" Background="#FF3F73B2"/>
+        <Button Content="Button" HorizontalAlignment="Left" Margin="1439,849,0,0" VerticalAlignment="Top" Width="76" FontSize="18" Click="Button_Click" Background="#FF3F73B2"/>
+        <Ellipse x:Name="cir_CreatAction" Fill="IndianRed" HorizontalAlignment="Left" Height="30" Margin="280,765,0,0" Stroke="Black" VerticalAlignment="Top" Width="30"/>
 
     </Grid>
 </Window>

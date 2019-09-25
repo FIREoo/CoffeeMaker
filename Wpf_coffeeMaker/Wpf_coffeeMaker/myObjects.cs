@@ -85,11 +85,14 @@ namespace myObjects
             return avg(z, 0, fileterSize);
         }
 
+
+        public float gripH { get; set; } = 0;
+
         public URCoordinates gripPos(int deg = 0)
         {
             if (deg == 0)
                 //return new URCoordinates(nowPos.X + gripOffset_M_x, nowPos.Y + gripOffset_M_y, nowPos.Z + gripOffset_M_z, (float)(Math.PI), 0, 0);
-                return new URCoordinates(nowPos.X + gripOffset_M_x, 0.297f, nowPos.Z + gripOffset_M_z, (float)(Math.PI), 0, 0);//evil
+                return new URCoordinates(nowPos.X + gripOffset_M_x, gripH, nowPos.Z + gripOffset_M_z, (float)(Math.PI), 0, 0);//evil
 
             throw new System.ArgumentException("未完成", "現在只能水平");
         }

@@ -70,6 +70,9 @@ namespace Wpf_coffeeMaker
         ActionBase actionBase;
 
         #region //---UI---//
+        SolidColorBrush Color_UnSet = new SolidColorBrush(Colors.IndianRed);
+        SolidColorBrush Color_Set = new SolidColorBrush(Colors.NavajoWhite);
+        SolidColorBrush Color_Saved=new SolidColorBrush(Colors.DarkSeaGreen);
         private void setConnectCircle(int S)
         {
             cir_UrState_off.Fill = new SolidColorBrush(Colors.LightGray);
@@ -118,7 +121,22 @@ namespace Wpf_coffeeMaker
                 cir_toggle.Fill = new SolidColorBrush(Colors.LightGray);
             }
         }
+        bool showEvilLine = true;
+        private void CheckBox_ShowEvil_Click(object sender, RoutedEventArgs e)
+        {
+            if (CheckBox_ShowEvil.IsChecked == true)
+                showEvilLine = true;
+            else
+                showEvilLine = false;
+        }
         #endregion //---UI---//
+        void mapToRsImg(float x, float y, out int X, out int Y)
+        {
+            PointF[] input = new[] { new PointF(x, y) };
+            PointF[] output = CvInvoke.PerspectiveTransform(input, matrix);
+            X = (int)output[0].X;
+            Y = (int)output[0].Y;
+        }
 
         public MainWindow()
         {
@@ -143,6 +161,8 @@ namespace Wpf_coffeeMaker
             UR.stateChange += OnUrStateChange;
 
             actionBase = new ActionBase("demoAct.path");
+
+
         }
         private void creatObject()
         {
@@ -151,10 +171,12 @@ namespace Wpf_coffeeMaker
             cups[0] = new Objects();
             cups[0].Name = "blue cup";
             cups[0].color = System.Windows.Media.Color.FromArgb(255, 103, 167, 184);
+            cups[0].gripH = 0.306f;
 
             cups[1] = new Objects();
             cups[1].Name = "pink cup";
             cups[1].color = System.Windows.Media.Color.FromArgb(255, 205, 130, 150);
+            cups[1].gripH = 0.306f;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -332,31 +354,45 @@ namespace Wpf_coffeeMaker
                             CvInvoke.WarpPerspective(color_orig, color_resize, matrix, new Size(1280, 720));
 
 
-                            CvInvoke.Imwrite("yolo1.png", color_resize);
-                            try { items = yoloWrapper.Detect(@"yolo1.png"); }
+                            //CvInvoke.Imwrite("yolo1.png", color_resize);
+                            //try { items = yoloWrapper.Detect(@"yolo1.png"); }
+                            //catch { break; }
+                            CvInvoke.Imwrite("yolo2.png", color_orig);
+                            try { items = yoloWrapper.Detect(@"yolo2.png"); }
                             catch { break; }
+
                             CvInvoke.CvtColor(color_resize, color_resize, ColorConversion.Bgr2Rgb);
                             processingBlock.ProcessFrames(frames);
 
                             foreach (YoloItem item in items)
                             {
                                 string name = item.Type;
-                                int x = item.X;
-                                int y = item.Y;
-                                int H = item.Height;
-                                int W = item.Width;
-                                Point center = item.Center();
+                                //int x = item.X;
+                                //int y = item.Y;
+                                mapToRsImg(item.X, item.Y, out int x, out int y);
+                                mapToRsImg(item.X + item.Width, item.Y + item.Height, out int x2, out int y2);
 
-                                int evilLine = 420;
-                                //640
-                                int evilLinex1 = 500;
-                                int evilLinex2 = 700;
-                                CvInvoke.Line(color_resize, new Point(0, evilLine), new Point(1280, evilLine), new MCvScalar(100, 100, 250), 2);//以上代表可能在咖啡機
-                                CvInvoke.Line(color_resize, new Point(evilLinex1, 0), new Point(evilLinex1, evilLine), new MCvScalar(100, 100, 250), 2);//
-                                CvInvoke.Line(color_resize, new Point(evilLinex2, 0), new Point(evilLinex2, evilLine), new MCvScalar(100, 100, 250), 2);//
+                                //int H = item.Height;
+                                //int W = item.Width;
+                                int H = y2 - y;
+                                int W = x2 - x;
+
+                                mapToRsImg(item.Center().X, item.Center().Y, out int Cx, out int Cy);
+                                //Point center = item.Center();
+                                Point center = new Point(Cx, Cy);
+
+                                int evilLine = 500;
+                                int evilLinex1 = 580;
+                                int evilLinex2 = 660;
+                                if (showEvilLine)
+                                {
+                                    CvInvoke.Line(color_resize, new Point(0, evilLine), new Point(1280, evilLine), new MCvScalar(100, 100, 250), 2);//以上代表可能在咖啡機
+                                    CvInvoke.Line(color_resize, new Point(evilLinex1, 0), new Point(evilLinex1, evilLine), new MCvScalar(100, 100, 250), 2);//
+                                    CvInvoke.Line(color_resize, new Point(evilLinex2, 0), new Point(evilLinex2, evilLine), new MCvScalar(100, 100, 250), 2);//
+                                }
 
                                 if (y > evilLine || x < evilLinex1 || x > evilLinex2)//代不再咖啡機附近
-                                    if (item.Confidence < 0.6)//沒信心的東西就跳過，避免偵測到其他東西
+                                    if (item.Confidence < 0.5)//沒信心的東西就跳過，避免偵測到其他東西
                                         continue;
 
 
@@ -526,7 +562,7 @@ namespace Wpf_coffeeMaker
             rtn[1] = camPos[1] + TrVal[1];
             rtn[2] = -camPos[0] + TrVal[0];
 
-            rtn[0] = rtn[0] + ((baseZ - rtn[2]) * (Zoffset));
+            rtn[0] = rtn[0] + ((baseWz - rtn[2]) * (WxOffset));
 
             return rtn;
         }
@@ -536,7 +572,8 @@ namespace Wpf_coffeeMaker
             TrVal[0] = float.Parse(Tb_camX.Text) / 1000f + float.Parse(Tb_worldZ.Text) / 1000f;
             TrVal[1] = -float.Parse(Tb_camY.Text) / 1000f + float.Parse(Tb_worldY.Text) / 1000f;
             TrVal[2] = -float.Parse(Tb_camZ.Text) / 1000f + float.Parse(Tb_worldX.Text) / 1000f;
-            cir_setTrans.Fill = new SolidColorBrush(Colors.DarkSeaGreen);
+            baseWz = float.Parse(Tb_worldZ.Text) / 1000f;
+            cir_setTrans.Fill = Color_Set;
         }
         static bool wantTrans = false;
         private void CheckBox_transfer_Click(object sender, RoutedEventArgs e)
@@ -582,21 +619,29 @@ namespace Wpf_coffeeMaker
             }
 
             dripTrayPos = new URCoordinates(cups[0].getX_m(), cups[0].getY_m(), cups[0].getZ_m(), 0, 0, 0);
-            cir_setDrip.Fill = new SolidColorBrush(Colors.DarkSeaGreen);
+            cir_setDrip.Fill = Color_Set;
         }
         private void Button_saveValue_Click(object sender, RoutedEventArgs e)
         {
+            if (TrVal[0] == 0)
+            { MessageBox.Show("沒有設定參數"); return; }
+
             StreamWriter saveTxt;
             saveTxt = new StreamWriter($"value.txt", false);
             saveTxt.WriteLine(TrVal[0]);
             saveTxt.WriteLine(TrVal[1]);
             saveTxt.WriteLine(TrVal[2]);
+            saveTxt.WriteLine(float.Parse(Tb_worldZ.Text) / 1000f);
             saveTxt.WriteLine(dripTrayPos.X);
             saveTxt.WriteLine(dripTrayPos.Y);
             saveTxt.WriteLine(dripTrayPos.Z);
-            saveTxt.WriteLine(Zoffset);
+            saveTxt.WriteLine(WxOffset);
             saveTxt.Flush();
             saveTxt.Close();
+
+            cir_setTrans.Fill = Color_Saved;
+            cir_setDrip.Fill = Color_Saved;
+            cir_setZoff.Fill = Color_Saved;
         }
         private void Button_loadValue_Click(object sender, RoutedEventArgs e)
         {
@@ -605,18 +650,19 @@ namespace Wpf_coffeeMaker
             TrVal[0] = float.Parse(file[0]);
             TrVal[1] = float.Parse(file[1]);
             TrVal[2] = float.Parse(file[2]);
-            dripTrayPos.X = float.Parse(file[3]);
-            dripTrayPos.Y = float.Parse(file[4]);
-            dripTrayPos.Z = float.Parse(file[5]);
-            Zoffset = float.Parse(file[6]);
+            baseWz = float.Parse(file[3]);
+            dripTrayPos.X = float.Parse(file[4]);
+            dripTrayPos.Y = float.Parse(file[5]);
+            dripTrayPos.Z = float.Parse(file[6]);
+            WxOffset = float.Parse(file[7]);
 
-            cir_setTrans.Fill = new SolidColorBrush(Colors.DarkSeaGreen);
-            cir_setDrip.Fill = new SolidColorBrush(Colors.DarkSeaGreen);
-            cir_setZoff.Fill = new SolidColorBrush(Colors.DarkSeaGreen);
+            cir_setTrans.Fill = Color_Saved;
+            cir_setDrip.Fill = Color_Saved;
+            cir_setZoff.Fill = Color_Saved;
         }
 
-        float baseZ = 0;
-        float Zoffset = 0;
+        float baseWz = 0;
+        float WxOffset = 0;
         private void Button_setLineOffset_Click(object sender, RoutedEventArgs e)
         {
             if (CheckBox_wantTrans.IsChecked == false)
@@ -624,8 +670,8 @@ namespace Wpf_coffeeMaker
                 MessageBox.Show("請使用世界座標系");
                 return;
             }
-            Zoffset = float.Parse(Tb_Zoff1.Text) / float.Parse(Tb_Zoff2.Text);
-            cir_setZoff.Fill = new SolidColorBrush(Colors.DarkSeaGreen);
+            WxOffset = float.Parse(Tb_Zoff1.Text) / float.Parse(Tb_Zoff2.Text);
+            cir_setZoff.Fill = Color_Set;
         }
         #endregion  //---參數設定---//
 
@@ -701,8 +747,17 @@ namespace Wpf_coffeeMaker
             }
         }
         private void Btn_goPath_Click(object sender, RoutedEventArgs e)
-        {
+        {        
+            //if(Cb_Path.SelectedValue.ToString() == actionBase.fileName)
+            //{
+            //    MessageBoxResult myResult = MessageBox.Show("要使用上一次的座標?", "Warning", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            //    if (myResult == MessageBoxResult.Yes)
+            //    { }
+            //    if (myResult == MessageBoxResult.No)
+            //    { return; }
+            //}
             UR.goFilePath(Cb_Path.SelectedValue.ToString());
+            cir_CreatAction.Fill = Color_Set;
         }
         #endregion //---Play path---//
 
@@ -724,6 +779,17 @@ namespace Wpf_coffeeMaker
             }
             evil_toggleOnce = false;
             cir_toggleOnce.Fill = new SolidColorBrush(Colors.Gray);
+            evil_pouCount = 0;
+            if (evil_pourMax == 1)
+            {
+                cir_pourOnce1.Fill = new SolidColorBrush(Colors.Transparent);
+                cir_pourOnce2.Fill = new SolidColorBrush(Colors.Black);
+            }
+            else if (evil_pourMax == 2)
+            {
+                cir_pourOnce1.Fill = new SolidColorBrush(Colors.Transparent);
+                cir_pourOnce2.Fill = new SolidColorBrush(Colors.Transparent);
+            }
 
             handing = new Objects();
             LV_actionBase.Items.Clear();
@@ -733,6 +799,8 @@ namespace Wpf_coffeeMaker
             ActionList.Clear();
             Rect_actionBaseTopColor.Fill = new SolidColorBrush(Color.FromArgb(200, 40, 210, 40));
             startDemo = true;
+
+            cir_CreatAction.Fill = Color_UnSet;
         }
         private void Button_endDemo_Click(object sender, RoutedEventArgs e)
         {
@@ -769,7 +837,6 @@ namespace Wpf_coffeeMaker
 
             for (int i = 0; i < ActionList.Count(); i++)
             {
-
                 if (ActionList[i].Action == Subact.Name.Pick)
                 {
                     if (ActionList[i].Detial == subactInfo.place.DripTray.ToString())
@@ -827,17 +894,22 @@ namespace Wpf_coffeeMaker
 
             }
             actionBase.saveFile();
-
+            cir_CreatAction.Fill = Color_Saved;
         }
         #endregion //--- Action base Control---//
 
         #region //---Connect Python Action recognition---//
+        int evil_pouCount = 0;
+        int evil_pourMax = 1;
         private void Button_addPour_Click(object sender, RoutedEventArgs e)
         {
             if (startDemo == true)
             {
+                if (evil_pouCount >= evil_pourMax)
+                    return;
                 if (nowAct == "Pour")
                     return;
+
                 if (handing == cups[0])
                 {
                     ActionList.Add(new ActionBaseList(Subact.Name.Pour, cups[0].Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(cups[0].color)));
@@ -852,10 +924,30 @@ namespace Wpf_coffeeMaker
                     ActionList.Add(new ActionBaseList("    to", cups[0].Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(cups[0].color)));
                     LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
                 }
+
+                evil_pouCount++;
+                if (evil_pouCount == 1)
+                    cir_pourOnce1.Fill = new SolidColorBrush(Colors.DarkOrchid);
+                else if (evil_pouCount == 2)
+                    cir_pourOnce2.Fill = new SolidColorBrush(Colors.DarkOrchid);
                 nowAct = "Pour";
             }
 
         }
+        private void Cir_pourOnce2_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (evil_pourMax == 1)
+            {
+                cir_pourOnce2.Fill = new SolidColorBrush(Colors.Transparent);
+                evil_pourMax = 2;
+            }
+            else if (evil_pourMax == 2)
+            {
+                cir_pourOnce2.Fill = new SolidColorBrush(Colors.Black);
+                evil_pourMax = 1;
+            }
+        }
+
         bool evil_toggleOnce = false;
         private void Button_addToggle_Click(object sender, RoutedEventArgs e)
         {
@@ -934,6 +1026,7 @@ namespace Wpf_coffeeMaker
             ListViewItem lbi = LV_actionBase.ItemContainerGenerator.ContainerFromIndex(3) as ListViewItem;
             lbi.Foreground = new SolidColorBrush(Colors.Red);
         }
+
 
     }//class
     public static class BitmapSourceConvert

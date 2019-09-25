@@ -10,7 +10,7 @@ namespace myActionBase
     {
         //private static robotControl UR;
         private static StreamWriter txt;
-        private static string fileName;
+        public string fileName { get; }
         public ActionBase(string file)
         {
             //UR = _UR;
