@@ -11,13 +11,6 @@
             <Image x:Name="Img_main" HorizontalAlignment="Left" Height="360" Margin="10,23,0,0" VerticalAlignment="Top" Width="640"/>
             <RadioButton x:Name="Rb_mix" Content="Mix" HorizontalAlignment="Left" Margin="11,1,0,0" VerticalAlignment="Top" IsChecked="True" Checked="Rb_imgShow_Checked" FontSize="18"/>
             <RadioButton x:Name="Rb_color" Content="Color" HorizontalAlignment="Left" Margin="67,1,0,0" VerticalAlignment="Top" Checked="Rb_imgShow_Checked" FontSize="18" IsChecked="True"/>
-            <TextBlock x:Name="TB_Bcup" HorizontalAlignment="Left" Margin="11,419,0,0" TextWrapping="Wrap" Text="Blue Cup" VerticalAlignment="Top" FontSize="18" FontWeight="Bold"/>
-            <TextBlock x:Name="TB_Pcup" HorizontalAlignment="Left" Margin="11,480,0,0" TextWrapping="Wrap" Text="Pink Cup" VerticalAlignment="Top" FontSize="18" FontWeight="Bold"/>
-            <Image x:Name="img_cupState" HorizontalAlignment="Left" Height="100" Margin="267,431,0,0" VerticalAlignment="Top" Width="500"/>
-            <TextBlock x:Name="TB_Bcup_state" HorizontalAlignment="Left" Margin="99,419,0,0" TextWrapping="Wrap" Text="State" VerticalAlignment="Top" FontSize="18"/>
-            <TextBlock x:Name="TB_Bcup_msg" HorizontalAlignment="Left" Margin="57,447,0,0" TextWrapping="Wrap" Text="Msg" VerticalAlignment="Top" FontSize="18"/>
-            <TextBlock x:Name="TB_Pcup_state" HorizontalAlignment="Left" Margin="99,480,0,0" TextWrapping="Wrap" Text="State" VerticalAlignment="Top" FontSize="18"/>
-            <TextBlock x:Name="TB_Pcup_msg" HorizontalAlignment="Left" Margin="57,508,0,0" TextWrapping="Wrap" Text="Msg" VerticalAlignment="Top" FontSize="18"/>
             <CheckBox x:Name="CheckBox_wantTrans" Content="Set transfer" HorizontalAlignment="Left" Margin="11,536,0,0" VerticalAlignment="Top" FontSize="16" Click="CheckBox_transfer_Click"/>
             <Button Content="End Demo" HorizontalAlignment="Left" Margin="135,565,0,0" VerticalAlignment="Top" Width="112" Height="54" FontSize="16" Click="Button_endDemo_Click"/>
             <GroupBox Header="Action" HorizontalAlignment="Left" Height="145" Margin="655,56,0,0" VerticalAlignment="Top" Width="137" FontSize="20">
@@ -33,8 +26,6 @@
             </GroupBox>
             <Button Content="Connect Action" HorizontalAlignment="Left" Margin="670,17,0,0" VerticalAlignment="Top" Width="100" Height="30" Click="Button_askActionRecognition_Click"/>
             <Ellipse x:Name="cir_connectAct" Fill="Salmon" HorizontalAlignment="Left" Height="21" Margin="756,10,0,0" Stroke="Black" VerticalAlignment="Top" Width="21" RenderTransformOrigin="0.5,0.5"/>
-            <TextBlock x:Name="Tb_CSYS1" HorizontalAlignment="Left" Margin="11,447,0,0" TextWrapping="Wrap" Text="Cam" VerticalAlignment="Top" FontSize="18" FontWeight="Bold" Foreground="#FF002378"/>
-            <TextBlock x:Name="Tb_CSYS2" HorizontalAlignment="Left" Margin="10,508,0,0" TextWrapping="Wrap" Text="Cam" VerticalAlignment="Top" FontSize="18" FontWeight="Bold" Foreground="#FF002378"/>
         </Grid>
         <ListView x:Name="LV_actionBase" ItemsSource="{Binding listOfAction}" HorizontalAlignment="Left" Height="717" Margin="10,10,0,0" VerticalAlignment="Top" Width="291" FontSize="22">
             <ListView.ItemContainerStyle>
@@ -44,7 +35,7 @@
             </ListView.ItemContainerStyle>
             <ListView.View>
                 <GridView>
-                    
+
                     <GridViewColumn  Header="Action" Width="100" >
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
@@ -54,7 +45,7 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    
+
                     <GridViewColumn Header="Detial" Width="180">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
@@ -64,34 +55,29 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    
+
                 </GridView>
             </ListView.View>
 
         </ListView>
-        <Button x:Name="Btn_UrConnect" Content="Start Server" HorizontalAlignment="Left" Margin="319,656,0,0" VerticalAlignment="Top" Width="106" FontSize="16" Height="45" Click="Button_startServer_Click"/>
         <Button Content="go Home" HorizontalAlignment="Left" Margin="505,656,0,0" VerticalAlignment="Top" Width="105" Height="47" Click="Button_goPosHome_Click"/>
         <Button Content="Record mode" HorizontalAlignment="Left" Margin="472,725,0,0" VerticalAlignment="Top" Width="105" Height="35" Click="Button_recordMode_Click"/>
         <Button Content="Write Pos" HorizontalAlignment="Left" Margin="582,725,0,0" VerticalAlignment="Top" Width="105" Height="35" Click="Button_recordWrite_Click"/>
         <Button Content="End Record" HorizontalAlignment="Left" Margin="692,725,0,0" VerticalAlignment="Top" Width="105" Height="35" Click="Button_recordEnd_Click"/>
         <ComboBox x:Name="Cb_Path" HorizontalAlignment="Left" Margin="615,656,0,0" VerticalAlignment="Top" Width="182" VerticalContentAlignment="Center" DropDownOpened="Cb_Path_DropDownOpened" FontSize="16" Height="47"/>
         <Button x:Name="Btn_goPath" Content="Go Path" HorizontalAlignment="Left" Margin="802,656,0,0" VerticalAlignment="Top" Width="75" Height="47" FontSize="16" Click="Btn_goPath_Click"/>
-        <Ellipse x:Name="cir_UrState_off" Fill="#FFE63232" HorizontalAlignment="Left" Height="15" Margin="319,706,0,0" Stroke="Black" VerticalAlignment="Top" Width="15"/>
-        <Ellipse x:Name="cir_UrState_connecting" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="15" Margin="339,706,0,0" Stroke="Black" VerticalAlignment="Top" Width="15"/>
-        <Ellipse x:Name="cir_UrState_on" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="15" Margin="359,706,0,0" Stroke="Black" VerticalAlignment="Top" Width="15"/>
         <Button Content="Creat Action" HorizontalAlignment="Left" Margin="10,732,0,0" VerticalAlignment="Top" Width="291" Height="53" Click="Button_creatAction_Click" FontSize="16"/>
         <Button Content="Grip" HorizontalAlignment="Left" Margin="582,765,0,0" VerticalAlignment="Top" Width="75" Height="28" Click="Button_grip_Click"/>
         <TextBox x:Name="Tb_gripVal" HorizontalAlignment="Left" Height="28" Margin="657,765,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="0" VerticalAlignment="Top" Width="30"/>
         <Rectangle x:Name="Rect_actionBaseTopColor" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="10" Margin="10,0,0,0" Stroke="Black" VerticalAlignment="Top" Width="291"/>
         <Button Content="Start Demo" HorizontalAlignment="Left" Margin="329,574,0,0" VerticalAlignment="Top" Width="120" Height="54" FontSize="16" Click="Button_startRecord_Click"/>
-        <Button Content="dis" HorizontalAlignment="Left" Margin="432,656,0,0" VerticalAlignment="Top" Width="32" Height="46" Click="Button_disconnect_Click"/>
         <TextBox x:Name="Tb_recordName" HorizontalAlignment="Left" Height="35" Margin="320,725,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="recordPath" VerticalAlignment="Top" Width="148" FontSize="16"/>
         <Button Content="Grip" HorizontalAlignment="Left" Margin="582,798,0,0" VerticalAlignment="Top" Width="75" Height="28" Click="Button_grip2_Click"/>
         <TextBox x:Name="Tb_gripVal2" HorizontalAlignment="Left" Height="28" Margin="657,798,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="31" VerticalAlignment="Top" Width="30"/>
         <TextBox x:Name="Tb_gripVal3" HorizontalAlignment="Left" Height="28" Margin="657,831,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="100" VerticalAlignment="Top" Width="30"/>
         <Button Content="Grip" HorizontalAlignment="Left" Margin="582,831,0,0" VerticalAlignment="Top" Width="75" Height="28" Click="Button_grip3_Click"/>
-        <Button Content="cmd add&#xD;&#xA;Pour" HorizontalAlignment="Left" Margin="1199,357,0,0" VerticalAlignment="Top" Width="75" Height="59" Click="Button_addPour_Click"/>
-        <Button Content="cmd add&#xA;Toggle" HorizontalAlignment="Left" Margin="1279,357,0,0" VerticalAlignment="Top" Width="75" Height="59" Click="Button_addToggle_Click"/>
+        <Button Content="cmd add&#xD;&#xA;Pour" HorizontalAlignment="Left" Margin="1199,333,0,0" VerticalAlignment="Top" Width="75" Height="59" Click="Button_addPour_Click"/>
+        <Button Content="cmd add&#xA;Toggle" HorizontalAlignment="Left" Margin="1279,333,0,0" VerticalAlignment="Top" Width="75" Height="59" Click="Button_addToggle_Click"/>
         <Grid HorizontalAlignment="Left" Height="304" Margin="1199,10,0,0" VerticalAlignment="Top" Width="294" Background="#FFE2D0C3">
             <Button Content="B" HorizontalAlignment="Left" Margin="12,32,0,0" VerticalAlignment="Top" Width="36" Click="Button_setBcupTrans_Click" Height="23"/>
             <TextBox x:Name="Tb_camX" HorizontalAlignment="Left" Height="23" Margin="53,32,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="0" VerticalAlignment="Top" Width="74"/>
@@ -118,6 +104,13 @@
 
         </Grid>
         <Button Content="Button" HorizontalAlignment="Left" Margin="980,686,0,0" VerticalAlignment="Top" Width="76" FontSize="18" Click="Button_Click" Background="#FF3F73B2"/>
+        <Grid HorizontalAlignment="Left" Height="416" Margin="1199,410,0,0" VerticalAlignment="Top" Width="245" Background="#FFC1D9ED">
+            <Button x:Name="Btn_UrConnect" Content="Start Server" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="106" FontSize="16" Height="45" Click="Button_startServer_Click"/>
+            <Button Content="dis" HorizontalAlignment="Left" Margin="121,10,0,0" VerticalAlignment="Top" Width="32" Height="46" Click="Button_disconnect_Click"/>
+            <Ellipse x:Name="cir_UrState_off" Fill="#FFE63232" HorizontalAlignment="Left" Height="15" Margin="21,60,0,0" Stroke="Black" VerticalAlignment="Top" Width="15"/>
+            <Ellipse x:Name="cir_UrState_connecting" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="15" Margin="41,60,0,0" Stroke="Black" VerticalAlignment="Top" Width="15"/>
+            <Ellipse x:Name="cir_UrState_on" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="15" Margin="61,60,0,0" Stroke="Black" VerticalAlignment="Top" Width="15"/>
+        </Grid>
 
     </Grid>
 </Window>
