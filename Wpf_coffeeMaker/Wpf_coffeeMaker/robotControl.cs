@@ -9,7 +9,7 @@ using System.Threading;
 using System.IO;
 
 
-namespace UrRobot
+namespace UrRobot_abort
 {
     public enum mode
     {

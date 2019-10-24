@@ -143,6 +143,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\CS_UrRobot\PC\CS_UrRobot\CS_UrRobot.csproj">
+      <Project>{e990c276-c9e3-471a-9c57-7dce2c6f0718}</Project>
+      <Name>CS_UrRobot</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\myEmguTools\myEmguLibrary\myEmguLibrary.csproj">
       <Project>{5c021eb8-70a5-4884-ad9f-c0f6ea75876c}</Project>
       <Name>myEmguLibrary</Name>

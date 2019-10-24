@@ -106,7 +106,7 @@
         <Button Content="Button" HorizontalAlignment="Left" Margin="980,686,0,0" VerticalAlignment="Top" Width="76" FontSize="18" Click="Button_Click" Background="#FF3F73B2"/>
         <Grid HorizontalAlignment="Left" Height="416" Margin="1199,410,0,0" VerticalAlignment="Top" Width="245" Background="#FFC1D9ED">
             <Button x:Name="Btn_UrConnect" Content="Start Server" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="106" FontSize="16" Height="45" Click="Button_startServer_Click"/>
-            <Button Content="dis" HorizontalAlignment="Left" Margin="121,10,0,0" VerticalAlignment="Top" Width="32" Height="46" Click="Button_disconnect_Click"/>
+            <Button Content="dis" HorizontalAlignment="Left" Margin="121,10,0,0" VerticalAlignment="Top" Width="32" Height="45" Click="Button_disconnect_Click"/>
             <Ellipse x:Name="cir_UrState_off" Fill="#FFE63232" HorizontalAlignment="Left" Height="15" Margin="21,60,0,0" Stroke="Black" VerticalAlignment="Top" Width="15"/>
             <Ellipse x:Name="cir_UrState_connecting" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="15" Margin="41,60,0,0" Stroke="Black" VerticalAlignment="Top" Width="15"/>
             <Ellipse x:Name="cir_UrState_on" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="15" Margin="61,60,0,0" Stroke="Black" VerticalAlignment="Top" Width="15"/>

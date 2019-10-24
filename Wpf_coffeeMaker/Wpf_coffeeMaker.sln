@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wpf_coffeeMaker", "Wpf_coff
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "myEmguLibrary", "..\myEmguTools\myEmguLibrary\myEmguLibrary.csproj", "{5C021EB8-70A5-4884-AD9F-C0F6EA75876C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CS_UrRobot", "..\CS_UrRobot\PC\CS_UrRobot\CS_UrRobot.csproj", "{E990C276-C9E3-471A-9C57-7DCE2C6F0718}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,14 @@ Global
 		{5C021EB8-70A5-4884-AD9F-C0F6EA75876C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5C021EB8-70A5-4884-AD9F-C0F6EA75876C}.Release|x64.ActiveCfg = Release|Any CPU
 		{5C021EB8-70A5-4884-AD9F-C0F6EA75876C}.Release|x64.Build.0 = Release|Any CPU
+		{E990C276-C9E3-471A-9C57-7DCE2C6F0718}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E990C276-C9E3-471A-9C57-7DCE2C6F0718}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E990C276-C9E3-471A-9C57-7DCE2C6F0718}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E990C276-C9E3-471A-9C57-7DCE2C6F0718}.Debug|x64.Build.0 = Debug|Any CPU
+		{E990C276-C9E3-471A-9C57-7DCE2C6F0718}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E990C276-C9E3-471A-9C57-7DCE2C6F0718}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E990C276-C9E3-471A-9C57-7DCE2C6F0718}.Release|x64.ActiveCfg = Release|Any CPU
+		{E990C276-C9E3-471A-9C57-7DCE2C6F0718}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
