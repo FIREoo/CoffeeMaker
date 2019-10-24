@@ -33,8 +33,7 @@ using Alturos.Yolo;
 using Alturos.Yolo.Model;
 using myObjects;
 using myEmguLibrary;
-using UrRobot.Socket;
-using UrRobot.Coordinates;
+using UrRobot;
 using System.IO;
 using myActionBase;
 using myTCP;
@@ -632,10 +631,10 @@ namespace Wpf_coffeeMaker
 
         //UR
         #region  //---UR server---//
-        UrSocketControl UR = new UrSocketControl();
+        robotControl UR = new robotControl();
         private void Button_startServer_Click(object sender, RoutedEventArgs e)
         {
-            UR.startServer("auto", 888);
+            UR.ServerOn("192.168.1.100", 888);
         }
         private void Button_disconnect_Click(object sender, RoutedEventArgs e)
         {
