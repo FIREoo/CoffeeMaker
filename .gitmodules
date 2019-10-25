@@ -3,4 +3,4 @@
 	url = https://github.com/FIREoo/myEmguTools.git
 [submodule "CS_UrRobot"]
 	path = CS_UrRobot
-	url = https://github.com/FIREoo/CS_UrRobot
+	url = https://github.com/FIREoo/CS_UrRobot.git
