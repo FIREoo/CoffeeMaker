@@ -7,12 +7,22 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="905" Width="1800" Loaded="Window_Loaded">
     <Grid Margin="0,0,4,0">
-        <Grid HorizontalAlignment="Left" Height="641" Margin="319,9,0,0" VerticalAlignment="Top" Width="870" Background="#FFBDBDBD">
-            <Image x:Name="Img_main" HorizontalAlignment="Left" Height="360" Margin="10,23,0,0" VerticalAlignment="Top" Width="640"/>
+        <Grid HorizontalAlignment="Left" Height="641" Margin="435,10,0,0" VerticalAlignment="Top" Width="870" Background="#FFBDBDBD">
+            <Grid Margin="11,41,219,240" Background="Black">
+                <Image x:Name="Img_main" HorizontalAlignment="Left" Height="360" VerticalAlignment="Top" Width="640"/>
+                <Grid.ContextMenu >
+                    <ContextMenu x:Name="cm" StaysOpen="true">
+                        <MenuItem Header="Open" Click="Button_startCamera_Click"/>
+                        <MenuItem Header="Recent Files">
+                            <MenuItem Header="ReadMe.txt"/>
+                            <MenuItem Header="Schedule.xls"/>
+                        </MenuItem>
+                    </ContextMenu>
+                </Grid.ContextMenu>
+
+            </Grid>
             <RadioButton x:Name="Rb_mix" Content="Mix" HorizontalAlignment="Left" Margin="11,1,0,0" VerticalAlignment="Top" IsChecked="True" Checked="Rb_imgShow_Checked" FontSize="18"/>
             <RadioButton x:Name="Rb_color" Content="Color" HorizontalAlignment="Left" Margin="67,1,0,0" VerticalAlignment="Top" Checked="Rb_imgShow_Checked" FontSize="18" IsChecked="True"/>
-            <CheckBox x:Name="CheckBox_wantTrans" Content="Set transfer" HorizontalAlignment="Left" Margin="11,536,0,0" VerticalAlignment="Top" FontSize="16" Click="CheckBox_transfer_Click"/>
-            <Button Content="End Demo" HorizontalAlignment="Left" Margin="135,565,0,0" VerticalAlignment="Top" Width="112" Height="54" FontSize="16" Click="Button_endDemo_Click"/>
             <GroupBox Header="Action" HorizontalAlignment="Left" Height="145" Margin="655,56,0,0" VerticalAlignment="Top" Width="137" FontSize="20">
                 <Grid Margin="1,-2,-1,-6">
                     <TextBlock HorizontalAlignment="Left" Margin="41,7,0,0" TextWrapping="Wrap" Text="Pour" VerticalAlignment="Top" FontSize="20" RenderTransformOrigin="1.13,1.083"/>
@@ -27,7 +37,7 @@
             <Button Content="Connect Action" HorizontalAlignment="Left" Margin="670,17,0,0" VerticalAlignment="Top" Width="100" Height="30" Click="Button_askActionRecognition_Click"/>
             <Ellipse x:Name="cir_connectAct" Fill="Salmon" HorizontalAlignment="Left" Height="21" Margin="756,10,0,0" Stroke="Black" VerticalAlignment="Top" Width="21" RenderTransformOrigin="0.5,0.5"/>
         </Grid>
-        <ListView x:Name="LV_actionBase" ItemsSource="{Binding listOfAction}" HorizontalAlignment="Left" Height="717" Margin="10,10,0,0" VerticalAlignment="Top" Width="291" FontSize="22">
+        <ListView x:Name="LV_actionBase" ItemsSource="{Binding listOfAction}" HorizontalAlignment="Left" Height="717" Margin="10,64,0,0" VerticalAlignment="Top" Width="407" FontSize="22">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -46,7 +56,7 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn Header="Detial" Width="180">
+                    <GridViewColumn Header="Target" Width="120">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <Grid Background="Transparent">
@@ -56,44 +66,25 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
+                    <GridViewColumn  Header="Destination" Width="180" >
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Grid Background="Transparent">
+                                    <TextBlock Text="{Binding Action}" Foreground="{Binding Color3}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                 </GridView>
             </ListView.View>
 
         </ListView>
-        <ComboBox x:Name="Cb_Path" HorizontalAlignment="Left" Margin="615,656,0,0" VerticalAlignment="Top" Width="182" VerticalContentAlignment="Center" DropDownOpened="Cb_Path_DropDownOpened" FontSize="16" Height="47"/>
-        <Button x:Name="Btn_goPath" Content="Go Path" HorizontalAlignment="Left" Margin="802,656,0,0" VerticalAlignment="Top" Width="75" Height="47" FontSize="16" Click="Btn_goPath_Click"/>
-        <Button Content="Creat Action" HorizontalAlignment="Left" Margin="10,732,0,0" VerticalAlignment="Top" Width="291" Height="53" Click="Button_creatAction_Click" FontSize="16"/>
-        <Rectangle x:Name="Rect_actionBaseTopColor" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="10" Margin="10,0,0,0" Stroke="Black" VerticalAlignment="Top" Width="291"/>
-        <Button Content="Start Demo" HorizontalAlignment="Left" Margin="329,574,0,0" VerticalAlignment="Top" Width="120" Height="54" FontSize="16" Click="Button_startRecord_Click"/>
-        <Button Content="cmd add&#xD;&#xA;Pour" HorizontalAlignment="Left" Margin="1199,333,0,0" VerticalAlignment="Top" Width="75" Height="59" Click="Button_addPour_Click"/>
-        <Button Content="cmd add&#xA;Toggle" HorizontalAlignment="Left" Margin="1279,333,0,0" VerticalAlignment="Top" Width="75" Height="59" Click="Button_addToggle_Click"/>
-        <Grid HorizontalAlignment="Left" Height="304" Margin="1199,10,0,0" VerticalAlignment="Top" Width="294" Background="#FFE2D0C3">
-            <Button Content="B" HorizontalAlignment="Left" Margin="12,32,0,0" VerticalAlignment="Top" Width="36" Click="Button_setBcupTrans_Click" Height="23"/>
-            <TextBox x:Name="Tb_camX" HorizontalAlignment="Left" Height="23" Margin="53,32,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="0" VerticalAlignment="Top" Width="74"/>
-            <TextBox x:Name="Tb_camZ" HorizontalAlignment="Left" Height="23" Margin="209,32,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="0" VerticalAlignment="Top" Width="74"/>
-            <TextBox x:Name="Tb_camY" HorizontalAlignment="Left" Height="23" Margin="131,32,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="0" VerticalAlignment="Top" Width="74"/>
-            <TextBox x:Name="Tb_worldX" HorizontalAlignment="Left" Height="23" Margin="53,60,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="-297" VerticalAlignment="Top" Width="74"/>
-            <TextBox x:Name="Tb_worldZ" HorizontalAlignment="Left" Height="23" Margin="209,60,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="43" VerticalAlignment="Top" Width="74"/>
-            <TextBox x:Name="Tb_worldY" HorizontalAlignment="Left" Height="23" Margin="131,60,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="297" VerticalAlignment="Top" Width="74"/>
-            <Button Content="set transfer" HorizontalAlignment="Left" Margin="54,97,0,0" VerticalAlignment="Top" Width="229" Height="36" Click="Button_setTrans_Click"/>
-            <Ellipse x:Name="cir_setTrans" Fill="Salmon" HorizontalAlignment="Left" Height="30" Margin="259,93,0,0" Stroke="Black" VerticalAlignment="Top" Width="30"/>
-            <Button Content="set drip tray" HorizontalAlignment="Left" Margin="54,146,0,0" VerticalAlignment="Top" Width="90" Height="38" Click="Button_setDripTrayPos_Click"/>
-            <Ellipse x:Name="cir_setDrip" Fill="Salmon" HorizontalAlignment="Left" Height="23" Margin="127,140,0,0" Stroke="Black" VerticalAlignment="Top" Width="23"/>
-            <Button Content="Save to txt" HorizontalAlignment="Left" Margin="45,270,0,0" VerticalAlignment="Top" Click="Button_saveValue_Click" Height="31" Width="74"/>
-            <Button Content="Load txt" HorizontalAlignment="Left" Margin="123,270,0,0" VerticalAlignment="Top" Click="Button_loadValue_Click" Height="31" Width="120"/>
-            <TextBox x:Name="Tb_Zoff1" HorizontalAlignment="Left" Height="22" Margin="53,220,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="10" VerticalAlignment="Top" Width="61"/>
-            <TextBox x:Name="Tb_Zoff2" HorizontalAlignment="Left" Height="22" Margin="124,220,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="240" VerticalAlignment="Top" Width="61"/>
-            <Button Content="Z 補償" HorizontalAlignment="Left" Margin="190,211,0,0" VerticalAlignment="Top" Width="74" Height="40" Click="Button_setLineOffset_Click"/>
-            <TextBlock HorizontalAlignment="Left" Margin="116,220,0,0" TextWrapping="Wrap" Text="/" VerticalAlignment="Top" FontSize="16" Height="22"/>
-            <TextBlock HorizontalAlignment="Left" Margin="116,198,0,0" TextWrapping="Wrap" Text="/" VerticalAlignment="Top" FontSize="16" Height="22"/>
-            <TextBlock HorizontalAlignment="Left" Margin="73,198,0,0" TextWrapping="Wrap" Text="ΔX" VerticalAlignment="Top" FontSize="16" Height="22"/>
-            <TextBlock HorizontalAlignment="Left" Margin="145,198,0,0" TextWrapping="Wrap" Text="ΔZ" VerticalAlignment="Top" FontSize="16" Height="22"/>
-            <Ellipse x:Name="cir_setZoff" Fill="Salmon" HorizontalAlignment="Left" Height="23" Margin="248,204,0,0" Stroke="Black" VerticalAlignment="Top" Width="23"/>
-
-
-        </Grid>
+        <Button Content="Creat Action" HorizontalAlignment="Left" Margin="10,813,0,0" VerticalAlignment="Top" Width="407" Height="53" Click="Button_creatAction_Click" FontSize="16"/>
+        <Button Content="Start Demo" HorizontalAlignment="Left" Margin="10,15,0,0" VerticalAlignment="Top" Width="407" Height="49" FontSize="16" Click="Button_startRecord_Click"/>
         <Button Content="Button" HorizontalAlignment="Left" Margin="980,686,0,0" VerticalAlignment="Top" Width="76" FontSize="18" Click="Button_Click" Background="#FF3F73B2"/>
-        <Grid HorizontalAlignment="Left" Height="416" Margin="1199,410,0,0" VerticalAlignment="Top" Width="245" Background="#FFC1D9ED">
+        <Rectangle x:Name="Rect_actionBaseTopColor" Fill="#00F4F4F5" HorizontalAlignment="Left" Height="10" Margin="10,54,0,0" Stroke="Black" VerticalAlignment="Top" Width="407" RadiusY="2.917" RadiusX="2.917"/>
+        <Button Content="End Demo" HorizontalAlignment="Left" Margin="10,781,0,0" VerticalAlignment="Top" Width="407" Height="32" FontSize="16" Click="Button_endDemo_Click"/>
+        <Grid HorizontalAlignment="Left" Height="416" Margin="1310,27,0,0" VerticalAlignment="Top" Width="274" Background="#FFC1D9ED">
             <Button x:Name="Btn_UrConnect" Content="Start Server" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="106" FontSize="16" Height="45" Click="Button_startServer_Click"/>
             <Button Content="dis" HorizontalAlignment="Left" Margin="121,10,0,0" VerticalAlignment="Top" Width="32" Height="45" Click="Button_disconnect_Click"/>
             <Ellipse x:Name="cir_UrState_off" Fill="#FFE63232" HorizontalAlignment="Left" Height="15" Margin="21,60,0,0" Stroke="Black" VerticalAlignment="Top" Width="15"/>
@@ -124,8 +115,11 @@
                     </Grid>
                 </TabItem>
             </TabControl>
-            <Button Content="go Home" HorizontalAlignment="Left" Margin="131,98,0,0" VerticalAlignment="Top" Width="104" Height="48" Click="Button_goPosHome_Click"/>
+            <Button Content="go Home" HorizontalAlignment="Left" Margin="192,32,0,0" VerticalAlignment="Top" Width="72" Height="48" Click="Button_goPosHome_Click"/>
+            <ComboBox x:Name="Cb_Path" HorizontalAlignment="Left" Margin="2,96,0,0" VerticalAlignment="Top" Width="182" VerticalContentAlignment="Center" DropDownOpened="Cb_Path_DropDownOpened" FontSize="16" Height="47"/>
+            <Button x:Name="Btn_goPath" Content="Go Path" HorizontalAlignment="Left" Margin="189,96,0,0" VerticalAlignment="Top" Width="75" Height="47" FontSize="16" Click="Btn_goPath_Click"/>
         </Grid>
+
 
     </Grid>
 </Window>

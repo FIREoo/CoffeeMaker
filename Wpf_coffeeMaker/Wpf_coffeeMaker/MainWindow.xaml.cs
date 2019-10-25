@@ -414,93 +414,20 @@ namespace Wpf_coffeeMaker
 
                             }//foreach cups 
                             timeTick++;
-                            this.Dispatcher.Invoke((Action)(() =>
-                            {
-                                // img_cupState.Source = BitmapSourceConvert.ToBitmapSource(mat_cup);
-                            }));
                             color_frame.CopyFrom(color_resize.DataPointer);
                             Dispatcher.Invoke(DispatcherPriority.Render, updateOriginColor, color_frame);
                         }
                         else if (showType == imgType.mix)//顯示 mix 圖
                         {
                             processingBlock.ProcessFrames(frames);
+                            
                         }
 
                     }
                 }
             }, token);
         }
-        float dripTrayD = 0.05f;
-        void process_actionOfCups(Objects detectObject, Mat mat, TextBlock label_msg, TextBlock label_s, float[] pos, int drawY1, int drawY2)
-        {
-            if (wantTrans == true)
-                pos = camToWorkSpace(pos);
-
-            detectObject.setPos_m(pos[0], pos[1], pos[2]);
-            Objects.states s = detectObject.State();
-
-            if (startDemo == true)
-            {
-                if (s == Objects.states.stop)
-                {
-                    CvInvoke.Line(mat, new Point(timeTick, drawY1), new Point(timeTick, drawY2), new MCvScalar(50, 50, 50));
-                }
-                else if (s == Objects.states.move)
-                {
-                    CvInvoke.Line(mat, new Point(timeTick, drawY1), new Point(timeTick, drawY2), new MCvScalar(50, 150, 150));
-                    if (handing == detectObject)//如果拿著的東西跟移動的東西一樣，代表繼續移動
-                    { }
-                    else//如果拿著的東西跟移動的東西"不"一樣，代表要新增東西
-                    {
-                        if (cups.All(cup => cup != handing))//代表前面不是杯子 這樣才會有place //第一次也會進入(因為handing會是null)
-                        { }
-                        else//代表前面有東西
-                        {//所以這個時候handing是前一個拿起的東西(已經被放下的那個)
-                            this.Dispatcher.Invoke((Action)(() =>
-                            {
-                                //ActionList.Add(new ActionBaseList("Place", handing.Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(handing.color)));
-                                //LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-                                //if (handing.Distanse(dripTrayPos) < dripTrayD)//代表在drip tray上
-                                //{
-                                //    ActionList.Add(new ActionBaseList("     to", subactInfo.place.DripTray.ToString(), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black)));
-                                //    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-                                //}
-                                //else
-                                //{
-                                //    ActionList.Add(new ActionBaseList("     to", (handing.getNowPos()).ToString("mm", "3(", "0"), new SolidColorBrush(Colors.Black), new SolidColorBrush(handing.color)));
-                                //    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-                                //}
-                            }));
-
-                        }
-                        this.Dispatcher.Invoke((Action)(() =>
-                        {
-                            //if (detectObject.Distanse(dripTrayPos) < dripTrayD)//代表在drip tray上
-                            //{
-                            //    ActionList.Add(new ActionBaseList("Pick up", subactInfo.place.DripTray.ToString(), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black)));
-                            //    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-                            //}
-                            //else
-                            //{
-                            //    ActionList.Add(new ActionBaseList("Pick up", detectObject.Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(detectObject.color)));
-                            //    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-                            //}
-                        }));
-                        // ActionBaseAdd("Pick up", detectObject.Name, color1: Color.FromArgb(255, 200, 14), color2: detectObject.color);
-                    }
-                    handing = detectObject;
-                }
-            }//startDemo == true
-
-            this.Dispatcher.Invoke((Action)(() =>
-            {
-                label_s.Text = s.ToString();
-                label_msg.Text = ($"{ (detectObject.getX_m() * 1000).ToString("0.0")},{(detectObject.getY_m() * 1000).ToString("0.0")},{(detectObject.getZ_m() * 1000).ToString("0.0")}mm");
-            }));
-
-        }
-
-
+    
         static Action<VideoFrame> UpdateImage(Image img)
         {
             var wbmp = img.Source as WriteableBitmap;
@@ -526,126 +453,20 @@ namespace Wpf_coffeeMaker
             }
         }
 
-
-        #region //---座標轉換---//
-        static float[] TrVal = new float[3];
-        float[] camToWorkSpace(float[] camPos)
+        #region //---griping mode---//
+        private void Button_startCamera_Click(object sender, RoutedEventArgs e)
         {
-            //Pc是目前cam座標
-            //Pw是目前world座標
-            //-Cx +Pcx+Pwz = Wz
-            //Cy -Pcy + Pwy = Wy
-            //Cz -Pcz +Pwx = Wx
-            float[] rtn = new float[3];
-
-            rtn[0] = camPos[2] + TrVal[2];
-            rtn[1] = camPos[1] + TrVal[1];
-            rtn[2] = -camPos[0] + TrVal[0];
-
-            rtn[0] = rtn[0] + ((baseZ - rtn[2]) * (Zoffset));
-
-            return rtn;
-        }
-
-        private void Button_setTrans_Click(object sender, RoutedEventArgs e)
-        {
-            TrVal[0] = float.Parse(Tb_camX.Text) / 1000f + float.Parse(Tb_worldZ.Text) / 1000f;
-            TrVal[1] = -float.Parse(Tb_camY.Text) / 1000f + float.Parse(Tb_worldY.Text) / 1000f;
-            TrVal[2] = -float.Parse(Tb_camZ.Text) / 1000f + float.Parse(Tb_worldX.Text) / 1000f;
-            cir_setTrans.Fill = new SolidColorBrush(Colors.DarkSeaGreen);
-        }
-        static bool wantTrans = false;
-        private void CheckBox_transfer_Click(object sender, RoutedEventArgs e)
-        {
-            /*
-            if (CheckBox_wantTrans.IsChecked == true)
+            try
             {
-                wantTrans = true;
-                Tb_CSYS1.Text = "Tool";
-                Tb_CSYS2.Text = "Tool";
-                Tb_CSYS1.Foreground = new SolidColorBrush(Color.FromRgb(120, 35, 0));
-                Tb_CSYS2.Foreground = new SolidColorBrush(Color.FromRgb(120, 35, 0));
+                CameraStart();
             }
-            else
+            catch (Exception ex)
             {
-                wantTrans = false;
-                Tb_CSYS1.Text = "Cam";
-                Tb_CSYS2.Text = "Cam";
-                Tb_CSYS1.Foreground = new SolidColorBrush(Color.FromRgb(0, 35, 120));
-                Tb_CSYS2.Foreground = new SolidColorBrush(Color.FromRgb(0, 35, 120));
+                MessageBox.Show(ex.Message);
             }
-            */
-        }
-        private void Button_setBcupTrans_Click(object sender, RoutedEventArgs e)
-        {
-            if (CheckBox_wantTrans.IsChecked == true)
-            {
-                MessageBox.Show("請使用攝影機座標系");
-                return;
-            }
-            Tb_camX.Text = (cups[0].getX_m() * 1000f).ToString("0.0");
-            Tb_camY.Text = (cups[0].getY_m() * 1000f).ToString("0.0");
-            Tb_camZ.Text = (cups[0].getZ_m() * 1000f).ToString("0.0");
-        }
-        #endregion //---座標轉換---//
-
-        #region //---參數設定---//
-        //URCoordinates dripTrayPos = null;
-        private void Button_setDripTrayPos_Click(object sender, RoutedEventArgs e)
-        {
-            if (CheckBox_wantTrans.IsChecked == false)
-            {
-                MessageBox.Show("請使用世界座標系");
-                return;
-            }
-
-            //dripTrayPos = new URCoordinates(cups[0].getX_m(), cups[0].getY_m(), cups[0].getZ_m(), 0, 0, 0);
-            cir_setDrip.Fill = new SolidColorBrush(Colors.DarkSeaGreen);
-        }
-        private void Button_saveValue_Click(object sender, RoutedEventArgs e)
-        {
-            StreamWriter saveTxt;
-            saveTxt = new StreamWriter($"value.txt", false);
-            //saveTxt.WriteLine(TrVal[0]);
-            //saveTxt.WriteLine(TrVal[1]);
-            //saveTxt.WriteLine(TrVal[2]);
-            //saveTxt.WriteLine(dripTrayPos.X);
-            //saveTxt.WriteLine(dripTrayPos.Y);
-            //saveTxt.WriteLine(dripTrayPos.Z);
-            //saveTxt.WriteLine(Zoffset);
-            //saveTxt.Flush();
-            //saveTxt.Close();
-        }
-        private void Button_loadValue_Click(object sender, RoutedEventArgs e)
-        {
-            //dripTrayPos = new URCoordinates();
-            //string[] file = System.IO.File.ReadAllLines("value.txt");
-            //TrVal[0] = float.Parse(file[0]);
-            //TrVal[1] = float.Parse(file[1]);
-            //TrVal[2] = float.Parse(file[2]);
-            //dripTrayPos.X = float.Parse(file[3]);
-            //dripTrayPos.Y = float.Parse(file[4]);
-            //dripTrayPos.Z = float.Parse(file[5]);
-            //Zoffset = float.Parse(file[6]);
-
-            //cir_setTrans.Fill = new SolidColorBrush(Colors.DarkSeaGreen);
-            //cir_setDrip.Fill = new SolidColorBrush(Colors.DarkSeaGreen);
-            //cir_setZoff.Fill = new SolidColorBrush(Colors.DarkSeaGreen);
         }
 
-        float baseZ = 0;
-        float Zoffset = 0;
-        private void Button_setLineOffset_Click(object sender, RoutedEventArgs e)
-        {
-            if (CheckBox_wantTrans.IsChecked == false)
-            {
-                MessageBox.Show("請使用世界座標系");
-                return;
-            }
-            Zoffset = float.Parse(Tb_Zoff1.Text) / float.Parse(Tb_Zoff2.Text);
-            cir_setZoff.Fill = new SolidColorBrush(Colors.DarkSeaGreen);
-        }
-        #endregion  //---參數設定---//
+        #endregion ---griping mode---
 
         //UR
         #region  //---UR server---//
@@ -755,16 +576,6 @@ namespace Wpf_coffeeMaker
         static bool startDemo = false;
         private void Button_startRecord_Click(object sender, RoutedEventArgs e)
         {
-            if (CheckBox_wantTrans.IsChecked == false)
-            {
-                MessageBox.Show("請使用世界座標系");
-                return;
-            }
-            //if (dripTrayPos == null)
-            //{
-            //    MessageBox.Show("請設定Drip Tray位置");
-            //    return;
-            //}
             evil_toggleOnce = false;
             cir_toggleOnce.Fill = new SolidColorBrush(Colors.Gray);
 
@@ -978,10 +789,6 @@ namespace Wpf_coffeeMaker
             lbi.Foreground = new SolidColorBrush(Colors.Red);
         }
 
-        private void Button_Click_1(object sender, RoutedEventArgs e)
-
-        {
-        }
     }//class
     public static class BitmapSourceConvert
     {
