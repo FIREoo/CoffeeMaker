@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UrRobot;
+using UrRobot.Coordinates;
 
 namespace myActionBase
 {
@@ -25,21 +25,7 @@ namespace myActionBase
             txt.Flush();
             txt.Close();
         }
-        //public bool execute()
-        //{
-        //    try
-        //    {
-        //        txt.Flush();
-        //        txt.Close();
-        //    }
-        //    catch { }
 
-        //    if (UR.isServerRunning == false)
-        //        return false;
-
-        //    UR.goFilePath(fileName);
-        //    return true;
-        //}
         public bool add(subactInfo subact)
         {
             try
@@ -69,31 +55,31 @@ namespace myActionBase
             subactInfo rtn = new subactInfo();
             URCoordinates grip = new URCoordinates(cup.gripPos());
             URCoordinates up = new URCoordinates(grip);
-            up.Y -= 0.1f;
-            URCoordinates debug = new URCoordinates(up);
-            debug.Y -= 0.02f;//在高一點以Rxyz有問題
+            //up.Y -= 0.1f;
+            //URCoordinates debug = new URCoordinates(up);
+            //debug.Y -= 0.02f;//在高一點以Rxyz有問題
 
-            rtn.infotxt.Add("position");
-            rtn.infotxt.Add(debug.ToPos());
-            rtn.infotxt.Add(up.ToPos());
+            //rtn.infotxt.Add("position");
+            //rtn.infotxt.Add(debug.ToPos());
+            //rtn.infotxt.Add(up.ToPos());
 
-            rtn.infotxt.Add("gripper");
-            rtn.infotxt.Add("0");
+            //rtn.infotxt.Add("gripper");
+            //rtn.infotxt.Add("0");
 
-            rtn.infotxt.Add("sleep");
-            rtn.infotxt.Add("1000");
+            //rtn.infotxt.Add("sleep");
+            //rtn.infotxt.Add("1000");
 
-            rtn.infotxt.Add("position");
-            rtn.infotxt.Add(grip.ToPos());
+            //rtn.infotxt.Add("position");
+            //rtn.infotxt.Add(grip.ToPos());
 
-            rtn.infotxt.Add("gripper");
-            rtn.infotxt.Add("31");
+            //rtn.infotxt.Add("gripper");
+            //rtn.infotxt.Add("31");
 
-            rtn.infotxt.Add("sleep");
-            rtn.infotxt.Add("1000");
+            //rtn.infotxt.Add("sleep");
+            //rtn.infotxt.Add("1000");
 
-            rtn.infotxt.Add("position");
-            rtn.infotxt.Add(up.ToPos());
+            //rtn.infotxt.Add("position");
+            //rtn.infotxt.Add(up.ToPos());
             return rtn;
         }
         public static subactInfo Pick(subactInfo.place ThePlace)
@@ -134,22 +120,22 @@ namespace myActionBase
             subactInfo rtn = new subactInfo();
             URCoordinates grip = new URCoordinates(cup.gripPos());
             URCoordinates up = new URCoordinates(grip);
-            up.Y -= 0.1f;
-            URCoordinates debug = new URCoordinates(up);
-            debug.Y -= 0.02f;//在高一點以Rxyz有問題
+            //up.Y -= 0.1f;
+            //URCoordinates debug = new URCoordinates(up);
+            //debug.Y -= 0.02f;//在高一點以Rxyz有問題
 
-            rtn.infotxt.Add("position");
-            rtn.infotxt.Add(debug.ToPos());
-            rtn.infotxt.Add(up.ToPos());
-            rtn.infotxt.Add(grip.ToPos());
-            rtn.infotxt.Add("gripper");
-            rtn.infotxt.Add("0");
+            //rtn.infotxt.Add("position");
+            //rtn.infotxt.Add(debug.ToPos());
+            //rtn.infotxt.Add(up.ToPos());
+            //rtn.infotxt.Add(grip.ToPos());
+            //rtn.infotxt.Add("gripper");
+            //rtn.infotxt.Add("0");
 
-            rtn.infotxt.Add("sleep");
-            rtn.infotxt.Add("1000");
+            //rtn.infotxt.Add("sleep");
+            //rtn.infotxt.Add("1000");
 
-            rtn.infotxt.Add("position");
-            rtn.infotxt.Add(up.ToPos());
+            //rtn.infotxt.Add("position");
+            //rtn.infotxt.Add(up.ToPos());
             return rtn;
         }
         public static subactInfo Place(subactInfo.place ThePlace)
@@ -172,24 +158,24 @@ namespace myActionBase
             subactInfo rtn = new subactInfo();
             URCoordinates grip = new URCoordinates(toCup.gripPos());
             URCoordinates up = new URCoordinates(grip);
-            up.Y -= 0.1f;
-            URCoordinates debug = new URCoordinates(up);
-            debug.Y -= 0.02f;//在高一點以Rxyz有問題
+            //up.Y -= 0.1f;
+            //URCoordinates debug = new URCoordinates(up);
+            //debug.Y -= 0.02f;//在高一點以Rxyz有問題
 
-            URCoordinates now = new URCoordinates(up);
+            //URCoordinates now = new URCoordinates(up);
 
-            rtn.infotxt.Add("position");
-            rtn.infotxt.Add(debug.ToPos());
-            rtn.infotxt.Add(up.ToPos());
+            //rtn.infotxt.Add("position");
+            //rtn.infotxt.Add(debug.ToPos());
+            //rtn.infotxt.Add(up.ToPos());
 
-            now.X -= 0.08f;
-            rtn.infotxt.Add(now.ToPos());
+            //now.X -= 0.08f;
+            //rtn.infotxt.Add(now.ToPos());
 
-            rtn.infotxt.Add("Rmovej");
-            rtn.infotxt.Add("[0,0,0,0,0,-2]");
+            //rtn.infotxt.Add("Rmovej");
+            //rtn.infotxt.Add("[0,0,0,0,0,-2]");
 
-            rtn.infotxt.Add("position");
-            rtn.infotxt.Add(debug.ToPos());
+            //rtn.infotxt.Add("position");
+            //rtn.infotxt.Add(debug.ToPos());
             return rtn;
         }
         public static subactInfo Trigger()
@@ -214,61 +200,61 @@ namespace myActionBase
         {
             subactInfo rtn = new subactInfo();
             URCoordinates up = new URCoordinates(toCup.gripPos());
-            up.X -= 0.015f;
-            up.Z += 0.015f;
-            up.Y -= 0.06f;//上升
-            URCoordinates now = new URCoordinates(up);
-            rtn.infotxt.Add("pmovej");
-            rtn.infotxt.Add(up.ToPos());
-            now.Y += 0.05f;//下去
+            //up.X -= 0.015f;
+            //up.Z += 0.015f;
+            //up.Y -= 0.06f;//上升
+            //URCoordinates now = new URCoordinates(up);
+            //rtn.infotxt.Add("pmovej");
+            //rtn.infotxt.Add(up.ToPos());
+            //now.Y += 0.05f;//下去
 
-            now.X -= 0.01f;
-            rtn.infotxt.Add(now.ToPos());
-            now.X += 0.01f;
-            now.Z += 0.01f;
-            rtn.infotxt.Add(now.ToPos());
-            now.X += 0.01f;
-            now.Z -= 0.01f;
-            rtn.infotxt.Add(now.ToPos());
-            now.X -= 0.01f;
-            now.Z -= 0.01f;
-            rtn.infotxt.Add(now.ToPos());
-            now.X -= 0.01f;
-            now.Z += 0.01f;
-            rtn.infotxt.Add(now.ToPos());
-            rtn.infotxt.Add(up.ToPos());
+            //now.X -= 0.01f;
+            //rtn.infotxt.Add(now.ToPos());
+            //now.X += 0.01f;
+            //now.Z += 0.01f;
+            //rtn.infotxt.Add(now.ToPos());
+            //now.X += 0.01f;
+            //now.Z -= 0.01f;
+            //rtn.infotxt.Add(now.ToPos());
+            //now.X -= 0.01f;
+            //now.Z -= 0.01f;
+            //rtn.infotxt.Add(now.ToPos());
+            //now.X -= 0.01f;
+            //now.Z += 0.01f;
+            //rtn.infotxt.Add(now.ToPos());
+            //rtn.infotxt.Add(up.ToPos());
             return rtn;
         }
         public static subactInfo AddaSpoon(Objects toCup)
         {
             subactInfo rtn = new subactInfo();
             URCoordinates up = new URCoordinates(toCup.gripPos());
-            up.Rx = 2.2f;
-            up.Ry = -2.2f;
-            up.Rz = 0;
-            up.X -= 0.09f;
-            up.Z += 0.02f;
-            up.Y += 0.03f;//下降
+            //up.Rx = 2.2f;
+            //up.Ry = -2.2f;
+            //up.Rz = 0;
+            //up.X -= 0.09f;
+            //up.Z += 0.02f;
+            //up.Y += 0.03f;//下降
 
-            URCoordinates upper = new URCoordinates(up);
-            upper.Y -= 0.07f;//上
-            rtn.infotxt.Add("pmovej");
-            rtn.infotxt.Add(upper.ToPos());
+            //URCoordinates upper = new URCoordinates(up);
+            //upper.Y -= 0.07f;//上
+            //rtn.infotxt.Add("pmovej");
+            //rtn.infotxt.Add(upper.ToPos());
 
 
-            URCoordinates add = new URCoordinates(up);
-            add.Rx = 3.14f;
-            add.Ry = 0f;
-            add.Rz = 0f;
-            add.Y -= 0.09f;//上升
-            add.X += 0.05f;
-            rtn.infotxt.Add("pmovej");
-            rtn.infotxt.Add(up.ToPos());
-            rtn.infotxt.Add("pmovej");
-            rtn.infotxt.Add(add.ToPos());
-            rtn.infotxt.Add("pmovej");
-            add.Y -= 0.03f;//上升
-            rtn.infotxt.Add(add.ToPos());
+            //URCoordinates add = new URCoordinates(up);
+            //add.Rx = 3.14f;
+            //add.Ry = 0f;
+            //add.Rz = 0f;
+            //add.Y -= 0.09f;//上升
+            //add.X += 0.05f;
+            //rtn.infotxt.Add("pmovej");
+            //rtn.infotxt.Add(up.ToPos());
+            //rtn.infotxt.Add("pmovej");
+            //rtn.infotxt.Add(add.ToPos());
+            //rtn.infotxt.Add("pmovej");
+            //add.Y -= 0.03f;//上升
+            //rtn.infotxt.Add(add.ToPos());
             return rtn;
         }
         public static class Name
@@ -278,8 +264,8 @@ namespace myActionBase
             public static string Pour = "Pour";
             public static string Trigger = "Toggle";
             public static string PutBoxIn = "Put case into";
-            public static string Scoop = "Ladle";
-            public static string AddaSpoon = "Add";
+            public static string Scoop = "Scoop";
+            public static string AddaSpoon = "Add into";
             public static string Stir = "Stir";
         }
 

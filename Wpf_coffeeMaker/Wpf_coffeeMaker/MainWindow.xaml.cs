@@ -33,7 +33,8 @@ using Alturos.Yolo;
 using Alturos.Yolo.Model;
 using myObjects;
 using myEmguLibrary;
-using UrRobot;
+using UrRobot.Socket;
+using UrRobot.Coordinates;
 using System.IO;
 using myActionBase;
 using myTCP;
@@ -118,6 +119,23 @@ namespace Wpf_coffeeMaker
                 cir_toggle.Fill = new SolidColorBrush(Colors.LightGray);
             }
         }
+
+        private void setRecordRect(int S)
+        {
+            rect_record.Fill = new SolidColorBrush(Color.FromArgb(20,200,50,50));
+            rect_endRecord.Fill = new SolidColorBrush(Color.FromArgb(20, 193, 193, 80));
+            if (S == 0)
+            {
+            }
+            else if (S == 1)
+            {
+                rect_record.Fill = new SolidColorBrush(Color.FromArgb(100, 200, 50, 50));
+            }
+            else if (S == 2)
+            {
+                rect_endRecord.Fill = new SolidColorBrush(Color.FromArgb(100, 193, 193, 80));
+            }
+        }
         #endregion //---UI---//
 
         public MainWindow()
@@ -162,7 +180,7 @@ namespace Wpf_coffeeMaker
             try
             {
                 //Setup / start camera
-                CameraStart();
+                //CameraStart();
             }
             catch (Exception ex)
             {
@@ -170,7 +188,7 @@ namespace Wpf_coffeeMaker
                 Application.Current.Shutdown();
             }
             Rect_actionBaseTopColor.Fill = new SolidColorBrush(Colors.Transparent);
-
+            setRecordRect(0);
         }
         private void CameraStart()
         {
@@ -376,8 +394,7 @@ namespace Wpf_coffeeMaker
                                     CvInvoke.PutText(color_resize, item.Confidence.ToString("0.0"), new Point(x, y), FontFace.HersheySimplex, 1.2, new MCvScalar(80, 150, 220), 3);
                                     CvInvoke.Rectangle(color_resize, new Rectangle(x, y, W, H), new MCvScalar(80, 150, 220), 3);
 
-                                    process_actionOfCups(cups[0], mat_cup, TB_Bcup_msg, TB_Bcup_state, objPos, 10, 40);
-                                    //this.Dispatcher.Invoke((Action)(() => { TB_Bcup.Text = $"({posMap[center.X, center.Y, 0].ToString("0.000")},{posMap[center.X, center.Y, 1].ToString("0.000")},{posMap[center.X, center.Y, 2].ToString("0.000")})"; }));
+                                    // process_actionOfCups(cups[0], mat_cup, TB_Bcup_msg, TB_Bcup_state, objPos, 10, 40);
                                     CvInvoke.Circle(color_resize, center, 10, new MCvScalar(200, 200, 20), -1);
                                 }
                                 else if (name == "pink cup")//index 1
@@ -391,8 +408,7 @@ namespace Wpf_coffeeMaker
                                     CvInvoke.PutText(color_resize, item.Confidence.ToString("0.0"), new Point(x, y), FontFace.HersheySimplex, 1.2, new MCvScalar(250, 80, 80), 3);
                                     CvInvoke.Rectangle(color_resize, new Rectangle(x, y, W, H), new MCvScalar(250, 80, 80), 3);
 
-                                    process_actionOfCups(cups[1], mat_cup, TB_Pcup_msg, TB_Pcup_state, objPos, 60, 90);
-                                    //this.Dispatcher.Invoke((Action)(() => { TB_Pcup.Text = $"({posMap[center.X, center.Y, 0].ToString("0.000")},{posMap[center.X, center.Y, 1].ToString("0.000")},{posMap[center.X, center.Y, 2].ToString("0.000")})"; }));
+                                    // process_actionOfCups(cups[1], mat_cup, TB_Pcup_msg, TB_Pcup_state, objPos, 60, 90);
                                     CvInvoke.Circle(color_resize, center, 10, new MCvScalar(200, 200, 20), -1);
                                 }
 
@@ -400,7 +416,7 @@ namespace Wpf_coffeeMaker
                             timeTick++;
                             this.Dispatcher.Invoke((Action)(() =>
                             {
-                                img_cupState.Source = BitmapSourceConvert.ToBitmapSource(mat_cup);
+                                // img_cupState.Source = BitmapSourceConvert.ToBitmapSource(mat_cup);
                             }));
                             color_frame.CopyFrom(color_resize.DataPointer);
                             Dispatcher.Invoke(DispatcherPriority.Render, updateOriginColor, color_frame);
@@ -442,33 +458,33 @@ namespace Wpf_coffeeMaker
                         {//所以這個時候handing是前一個拿起的東西(已經被放下的那個)
                             this.Dispatcher.Invoke((Action)(() =>
                             {
-                                ActionList.Add(new ActionBaseList("Place", handing.Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(handing.color)));
-                                LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-                                if (handing.Distanse(dripTrayPos) < dripTrayD)//代表在drip tray上
-                                {
-                                    ActionList.Add(new ActionBaseList("     to", subactInfo.place.DripTray.ToString(), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black)));
-                                    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-                                }
-                                else
-                                {
-                                    ActionList.Add(new ActionBaseList("     to", (handing.getNowPos()).ToString("mm", "3(", "0"), new SolidColorBrush(Colors.Black), new SolidColorBrush(handing.color)));
-                                    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-                                }
+                                //ActionList.Add(new ActionBaseList("Place", handing.Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(handing.color)));
+                                //LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
+                                //if (handing.Distanse(dripTrayPos) < dripTrayD)//代表在drip tray上
+                                //{
+                                //    ActionList.Add(new ActionBaseList("     to", subactInfo.place.DripTray.ToString(), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black)));
+                                //    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
+                                //}
+                                //else
+                                //{
+                                //    ActionList.Add(new ActionBaseList("     to", (handing.getNowPos()).ToString("mm", "3(", "0"), new SolidColorBrush(Colors.Black), new SolidColorBrush(handing.color)));
+                                //    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
+                                //}
                             }));
-                            //ActionBaseAdd("Place", handing.Name, color1: Color.FromArgb(240, 230, 176), color2: handing.color);
+
                         }
                         this.Dispatcher.Invoke((Action)(() =>
                         {
-                            if (detectObject.Distanse(dripTrayPos) < dripTrayD)//代表在drip tray上
-                            {
-                                ActionList.Add(new ActionBaseList("Pick up", subactInfo.place.DripTray.ToString(), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black)));
-                                LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-                            }
-                            else
-                            {
-                                ActionList.Add(new ActionBaseList("Pick up", detectObject.Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(detectObject.color)));
-                                LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-                            }
+                            //if (detectObject.Distanse(dripTrayPos) < dripTrayD)//代表在drip tray上
+                            //{
+                            //    ActionList.Add(new ActionBaseList("Pick up", subactInfo.place.DripTray.ToString(), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black)));
+                            //    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
+                            //}
+                            //else
+                            //{
+                            //    ActionList.Add(new ActionBaseList("Pick up", detectObject.Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(detectObject.color)));
+                            //    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
+                            //}
                         }));
                         // ActionBaseAdd("Pick up", detectObject.Name, color1: Color.FromArgb(255, 200, 14), color2: detectObject.color);
                     }
@@ -541,6 +557,7 @@ namespace Wpf_coffeeMaker
         static bool wantTrans = false;
         private void CheckBox_transfer_Click(object sender, RoutedEventArgs e)
         {
+            /*
             if (CheckBox_wantTrans.IsChecked == true)
             {
                 wantTrans = true;
@@ -557,6 +574,7 @@ namespace Wpf_coffeeMaker
                 Tb_CSYS1.Foreground = new SolidColorBrush(Color.FromRgb(0, 35, 120));
                 Tb_CSYS2.Foreground = new SolidColorBrush(Color.FromRgb(0, 35, 120));
             }
+            */
         }
         private void Button_setBcupTrans_Click(object sender, RoutedEventArgs e)
         {
@@ -572,7 +590,7 @@ namespace Wpf_coffeeMaker
         #endregion //---座標轉換---//
 
         #region //---參數設定---//
-        URCoordinates dripTrayPos = null;
+        //URCoordinates dripTrayPos = null;
         private void Button_setDripTrayPos_Click(object sender, RoutedEventArgs e)
         {
             if (CheckBox_wantTrans.IsChecked == false)
@@ -581,38 +599,38 @@ namespace Wpf_coffeeMaker
                 return;
             }
 
-            dripTrayPos = new URCoordinates(cups[0].getX_m(), cups[0].getY_m(), cups[0].getZ_m(), 0, 0, 0);
+            //dripTrayPos = new URCoordinates(cups[0].getX_m(), cups[0].getY_m(), cups[0].getZ_m(), 0, 0, 0);
             cir_setDrip.Fill = new SolidColorBrush(Colors.DarkSeaGreen);
         }
         private void Button_saveValue_Click(object sender, RoutedEventArgs e)
         {
             StreamWriter saveTxt;
             saveTxt = new StreamWriter($"value.txt", false);
-            saveTxt.WriteLine(TrVal[0]);
-            saveTxt.WriteLine(TrVal[1]);
-            saveTxt.WriteLine(TrVal[2]);
-            saveTxt.WriteLine(dripTrayPos.X);
-            saveTxt.WriteLine(dripTrayPos.Y);
-            saveTxt.WriteLine(dripTrayPos.Z);
-            saveTxt.WriteLine(Zoffset);
-            saveTxt.Flush();
-            saveTxt.Close();
+            //saveTxt.WriteLine(TrVal[0]);
+            //saveTxt.WriteLine(TrVal[1]);
+            //saveTxt.WriteLine(TrVal[2]);
+            //saveTxt.WriteLine(dripTrayPos.X);
+            //saveTxt.WriteLine(dripTrayPos.Y);
+            //saveTxt.WriteLine(dripTrayPos.Z);
+            //saveTxt.WriteLine(Zoffset);
+            //saveTxt.Flush();
+            //saveTxt.Close();
         }
         private void Button_loadValue_Click(object sender, RoutedEventArgs e)
         {
-            dripTrayPos = new URCoordinates();
-            string[] file = System.IO.File.ReadAllLines("value.txt");
-            TrVal[0] = float.Parse(file[0]);
-            TrVal[1] = float.Parse(file[1]);
-            TrVal[2] = float.Parse(file[2]);
-            dripTrayPos.X = float.Parse(file[3]);
-            dripTrayPos.Y = float.Parse(file[4]);
-            dripTrayPos.Z = float.Parse(file[5]);
-            Zoffset = float.Parse(file[6]);
+            //dripTrayPos = new URCoordinates();
+            //string[] file = System.IO.File.ReadAllLines("value.txt");
+            //TrVal[0] = float.Parse(file[0]);
+            //TrVal[1] = float.Parse(file[1]);
+            //TrVal[2] = float.Parse(file[2]);
+            //dripTrayPos.X = float.Parse(file[3]);
+            //dripTrayPos.Y = float.Parse(file[4]);
+            //dripTrayPos.Z = float.Parse(file[5]);
+            //Zoffset = float.Parse(file[6]);
 
-            cir_setTrans.Fill = new SolidColorBrush(Colors.DarkSeaGreen);
-            cir_setDrip.Fill = new SolidColorBrush(Colors.DarkSeaGreen);
-            cir_setZoff.Fill = new SolidColorBrush(Colors.DarkSeaGreen);
+            //cir_setTrans.Fill = new SolidColorBrush(Colors.DarkSeaGreen);
+            //cir_setDrip.Fill = new SolidColorBrush(Colors.DarkSeaGreen);
+            //cir_setZoff.Fill = new SolidColorBrush(Colors.DarkSeaGreen);
         }
 
         float baseZ = 0;
@@ -631,26 +649,38 @@ namespace Wpf_coffeeMaker
 
         //UR
         #region  //---UR server---//
-        robotControl UR = new robotControl();
+        UrSocketControl UR = new UrSocketControl();
         private void Button_startServer_Click(object sender, RoutedEventArgs e)
         {
-            UR.ServerOn("192.168.1.100", 888);
+            UR.startServer("auto", 888);
         }
         private void Button_disconnect_Click(object sender, RoutedEventArgs e)
         {
-            UR.ServerOff();
+            UR.stopServer();
         }
-        private void OnUrStateChange(object sender, LinkArgs e)
+        private void OnUrStateChange(tcpState S)
         {
-            this.Dispatcher.Invoke((Action)(() =>
+            try
             {
-                if (e.state == "Connect")
-                    setConnectCircle(3);
-                else if (e.state == "Disconnect")
-                    setConnectCircle(1);
-                else if (e.state == "Wait Connect")
-                    setConnectCircle(2);
-            }));
+                this.Dispatcher.Invoke((Action)(() =>
+                {
+                    if (S == tcpState.Connect)
+                        setConnectCircle(3);
+                    else if (S == tcpState.Disconnect)
+                        setConnectCircle(1);
+                    else if (S == tcpState.waitAccept)
+                        setConnectCircle(2);
+                    else if (S == tcpState.startListener)
+                        setConnectCircle(2);
+                    else
+                        setConnectCircle(1);
+                }));
+            }
+            catch
+            {
+                Console.WriteLine("server thread already end");
+            }
+
 
 
         }
@@ -659,41 +689,54 @@ namespace Wpf_coffeeMaker
         #region //---Record---//
         private void Button_recordMode_Click(object sender, RoutedEventArgs e)
         {
-            UR.Record_start(Tb_recordName.Text);
+            // UR.Record_start(Tb_recordName.Text);
+            UR.startRecord(Tb_recordName.Text + ".path");
+            setRecordRect(1);
         }
 
         private void Button_recordWrite_Click(object sender, RoutedEventArgs e)
         {
-            UR.Record_writePos();
+            // UR.Record_writePos();
+            UR.Record_joint();
         }
         private void Button_recordEnd_Click(object sender, RoutedEventArgs e)
         {
-            UR.Record_stop();
+            UR.endRecord();
+            // UR.Record_stop();
+            setRecordRect(2);
         }
 
         private void Button_grip_Click(object sender, RoutedEventArgs e)
         {
-            UR.goGrip((byte)int.Parse(Tb_gripVal.Text));
+            UR.Record_grip(int.Parse(Tb_gripVal.Text), true);
+            // UR.goGrip((byte)int.Parse(Tb_gripVal.Text));
         }
         private void Button_grip2_Click(object sender, RoutedEventArgs e)
         {
-            UR.goGrip((byte)int.Parse(Tb_gripVal2.Text));
+            UR.Record_grip(int.Parse(Tb_gripVal2.Text), true);
+            //UR.goGrip((byte)int.Parse(Tb_gripVal2.Text));
         }
         private void Button_grip3_Click(object sender, RoutedEventArgs e)
         {
-            UR.goGrip((byte)int.Parse(Tb_gripVal3.Text));
+            // UR.goGrip((byte)int.Parse(Tb_gripVal3.Text));
+            UR.Record_grip(int.Parse(Tb_gripVal3.Text), true);
         }
+        private void Button_recordSleep_Click(object sender, RoutedEventArgs e)
+        {
+            UR.Record_sleep(Tb_sleepVal.Text.toInt());
+        }
+
         #endregion //---Record---//
 
         #region //---Play path---//
         private void Button_goPosHome_Click(object sender, RoutedEventArgs e)
         {
-            UR.goToFilePos("Home.pos");
+            //UR.goToFilePos("Home.pos");
         }
         private void Cb_Path_DropDownOpened(object sender, EventArgs e)
         {
             Cb_Path.Items.Clear();
-            DirectoryInfo PathFolder = new DirectoryInfo(UR.folder_Path);
+            DirectoryInfo PathFolder = new DirectoryInfo(UR.rootPath);
             FileInfo[] ActFiles = PathFolder.GetFiles("*.path");
             foreach (FileInfo file in ActFiles)
             {
@@ -702,7 +745,7 @@ namespace Wpf_coffeeMaker
         }
         private void Btn_goPath_Click(object sender, RoutedEventArgs e)
         {
-            UR.goFilePath(Cb_Path.SelectedValue.ToString());
+            UR.goFile(UR.rootPath + Cb_Path.SelectedValue.ToString());
         }
         #endregion //---Play path---//
 
@@ -717,11 +760,11 @@ namespace Wpf_coffeeMaker
                 MessageBox.Show("請使用世界座標系");
                 return;
             }
-            if (dripTrayPos == null)
-            {
-                MessageBox.Show("請設定Drip Tray位置");
-                return;
-            }
+            //if (dripTrayPos == null)
+            //{
+            //    MessageBox.Show("請設定Drip Tray位置");
+            //    return;
+            //}
             evil_toggleOnce = false;
             cir_toggleOnce.Fill = new SolidColorBrush(Colors.Gray);
 
@@ -744,16 +787,16 @@ namespace Wpf_coffeeMaker
 
             ActionList.Add(new ActionBaseList("Place", handing.Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(handing.color)));
             LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-            if (handing.Distanse(dripTrayPos) < dripTrayD)//代表在drip tray上
-            {
-                ActionList.Add(new ActionBaseList("     to", subactInfo.place.DripTray.ToString(), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black)));
-                LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-            }
-            else
-            {
-                ActionList.Add(new ActionBaseList("     to", (handing.getNowPos()).ToString("mm", "3(", "0"), new SolidColorBrush(Colors.Black), new SolidColorBrush(handing.color)));
-                LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-            }
+            //if (handing.Distanse(dripTrayPos) < dripTrayD)//代表在drip tray上
+            //{
+            //    ActionList.Add(new ActionBaseList("     to", subactInfo.place.DripTray.ToString(), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black)));
+            //    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
+            //}
+            //else
+            //{
+            //    ActionList.Add(new ActionBaseList("     to", (handing.getNowPos()).ToString("mm", "3(", "0"), new SolidColorBrush(Colors.Black), new SolidColorBrush(handing.color)));
+            //    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
+            //}
             Rect_actionBaseTopColor.Fill = new SolidColorBrush(Colors.Transparent);
 
             startDemo = false;
@@ -794,7 +837,7 @@ namespace Wpf_coffeeMaker
                             {
                                 detial = detial.Substring(1, detial.Length - 2);
                                 string[] pos = detial.Split(',');
-                                actionBase.add(Subact.Place(obj, new URCoordinates(float.Parse(pos[0]) / 1000f, float.Parse(pos[1]) / 1000f, float.Parse(pos[2]) / 1000f, 0, 0, 0)));
+                                //actionBase.add(Subact.Place(obj, new URCoordinates(float.Parse(pos[0]) / 1000f, float.Parse(pos[1]) / 1000f, float.Parse(pos[2]) / 1000f, 0, 0, 0)));
                             }
 
                         }
@@ -867,16 +910,16 @@ namespace Wpf_coffeeMaker
                     return;
                 ActionList.Add(new ActionBaseList("Place", handing.Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(handing.color)));
                 LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-                if (handing.Distanse(dripTrayPos) < 0.02)//代表在drip tray上
-                {
-                    ActionList.Add(new ActionBaseList("     to", subactInfo.place.DripTray.ToString(), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black)));
-                    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-                }
-                else
-                {
-                    ActionList.Add(new ActionBaseList("     to", (handing.getNowPos()).ToString("mm", "3(", "0"), new SolidColorBrush(Colors.Black), new SolidColorBrush(handing.color)));
-                    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-                }
+                //if (handing.Distanse(dripTrayPos) < 0.02)//代表在drip tray上
+                //{
+                //    ActionList.Add(new ActionBaseList("     to", subactInfo.place.DripTray.ToString(), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black)));
+                //    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
+                //}
+                //else
+                //{
+                //    ActionList.Add(new ActionBaseList("     to", (handing.getNowPos()).ToString("mm", "3(", "0"), new SolidColorBrush(Colors.Black), new SolidColorBrush(handing.color)));
+                //    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
+                //}
                 handing = machine;
                 ActionList.Add(new ActionBaseList(Subact.Name.Trigger, "", new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black)));
                 LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
@@ -935,6 +978,10 @@ namespace Wpf_coffeeMaker
             lbi.Foreground = new SolidColorBrush(Colors.Red);
         }
 
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+
+        {
+        }
     }//class
     public static class BitmapSourceConvert
     {

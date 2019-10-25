@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Wpf_coffeeMaker"
         mc:Ignorable="d"
-        Title="MainWindow" Height="905" Width="1521" Loaded="Window_Loaded">
-    <Grid>
+        Title="MainWindow" Height="905" Width="1800" Loaded="Window_Loaded">
+    <Grid Margin="0,0,4,0">
         <Grid HorizontalAlignment="Left" Height="641" Margin="319,9,0,0" VerticalAlignment="Top" Width="870" Background="#FFBDBDBD">
             <Image x:Name="Img_main" HorizontalAlignment="Left" Height="360" Margin="10,23,0,0" VerticalAlignment="Top" Width="640"/>
             <RadioButton x:Name="Rb_mix" Content="Mix" HorizontalAlignment="Left" Margin="11,1,0,0" VerticalAlignment="Top" IsChecked="True" Checked="Rb_imgShow_Checked" FontSize="18"/>
@@ -60,22 +60,11 @@
             </ListView.View>
 
         </ListView>
-        <Button Content="go Home" HorizontalAlignment="Left" Margin="505,656,0,0" VerticalAlignment="Top" Width="105" Height="47" Click="Button_goPosHome_Click"/>
-        <Button Content="Record mode" HorizontalAlignment="Left" Margin="472,725,0,0" VerticalAlignment="Top" Width="105" Height="35" Click="Button_recordMode_Click"/>
-        <Button Content="Write Pos" HorizontalAlignment="Left" Margin="582,725,0,0" VerticalAlignment="Top" Width="105" Height="35" Click="Button_recordWrite_Click"/>
-        <Button Content="End Record" HorizontalAlignment="Left" Margin="692,725,0,0" VerticalAlignment="Top" Width="105" Height="35" Click="Button_recordEnd_Click"/>
         <ComboBox x:Name="Cb_Path" HorizontalAlignment="Left" Margin="615,656,0,0" VerticalAlignment="Top" Width="182" VerticalContentAlignment="Center" DropDownOpened="Cb_Path_DropDownOpened" FontSize="16" Height="47"/>
         <Button x:Name="Btn_goPath" Content="Go Path" HorizontalAlignment="Left" Margin="802,656,0,0" VerticalAlignment="Top" Width="75" Height="47" FontSize="16" Click="Btn_goPath_Click"/>
         <Button Content="Creat Action" HorizontalAlignment="Left" Margin="10,732,0,0" VerticalAlignment="Top" Width="291" Height="53" Click="Button_creatAction_Click" FontSize="16"/>
-        <Button Content="Grip" HorizontalAlignment="Left" Margin="582,765,0,0" VerticalAlignment="Top" Width="75" Height="28" Click="Button_grip_Click"/>
-        <TextBox x:Name="Tb_gripVal" HorizontalAlignment="Left" Height="28" Margin="657,765,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="0" VerticalAlignment="Top" Width="30"/>
         <Rectangle x:Name="Rect_actionBaseTopColor" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="10" Margin="10,0,0,0" Stroke="Black" VerticalAlignment="Top" Width="291"/>
         <Button Content="Start Demo" HorizontalAlignment="Left" Margin="329,574,0,0" VerticalAlignment="Top" Width="120" Height="54" FontSize="16" Click="Button_startRecord_Click"/>
-        <TextBox x:Name="Tb_recordName" HorizontalAlignment="Left" Height="35" Margin="320,725,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="recordPath" VerticalAlignment="Top" Width="148" FontSize="16"/>
-        <Button Content="Grip" HorizontalAlignment="Left" Margin="582,798,0,0" VerticalAlignment="Top" Width="75" Height="28" Click="Button_grip2_Click"/>
-        <TextBox x:Name="Tb_gripVal2" HorizontalAlignment="Left" Height="28" Margin="657,798,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="31" VerticalAlignment="Top" Width="30"/>
-        <TextBox x:Name="Tb_gripVal3" HorizontalAlignment="Left" Height="28" Margin="657,831,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="100" VerticalAlignment="Top" Width="30"/>
-        <Button Content="Grip" HorizontalAlignment="Left" Margin="582,831,0,0" VerticalAlignment="Top" Width="75" Height="28" Click="Button_grip3_Click"/>
         <Button Content="cmd add&#xD;&#xA;Pour" HorizontalAlignment="Left" Margin="1199,333,0,0" VerticalAlignment="Top" Width="75" Height="59" Click="Button_addPour_Click"/>
         <Button Content="cmd add&#xA;Toggle" HorizontalAlignment="Left" Margin="1279,333,0,0" VerticalAlignment="Top" Width="75" Height="59" Click="Button_addToggle_Click"/>
         <Grid HorizontalAlignment="Left" Height="304" Margin="1199,10,0,0" VerticalAlignment="Top" Width="294" Background="#FFE2D0C3">
@@ -110,6 +99,32 @@
             <Ellipse x:Name="cir_UrState_off" Fill="#FFE63232" HorizontalAlignment="Left" Height="15" Margin="21,60,0,0" Stroke="Black" VerticalAlignment="Top" Width="15"/>
             <Ellipse x:Name="cir_UrState_connecting" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="15" Margin="41,60,0,0" Stroke="Black" VerticalAlignment="Top" Width="15"/>
             <Ellipse x:Name="cir_UrState_on" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="15" Margin="61,60,0,0" Stroke="Black" VerticalAlignment="Top" Width="15"/>
+            <TabControl HorizontalAlignment="Left" Height="234" Margin="10,160,0,0" VerticalAlignment="Top" Width="225">
+                <TabItem Header="TabItem">
+                    <Grid Background="#FFE5E5E5"/>
+                </TabItem>
+                <TabItem Header="Record">
+                    <Grid Background="#FFE5E5E5">
+                        <Rectangle x:Name="rect_record" Fill="#FFE63232" HorizontalAlignment="Left" Height="35" Margin="78,10,0,0" Stroke="Black" VerticalAlignment="Top" Width="7" RadiusY="2.083" RadiusX="2.083"/>
+                        <Rectangle x:Name="rect_endRecord" Fill="#FFC1C150" HorizontalAlignment="Left" Height="35" Margin="78,90,0,0" Stroke="Black" VerticalAlignment="Top" Width="7" RadiusY="2.083" RadiusX="2.083"/>
+                        <Button Content="Record mode" HorizontalAlignment="Left" Margin="0,10,0,0" VerticalAlignment="Top" Width="81" Height="35" Click="Button_recordMode_Click"/>
+                        <Button Content="Write joint" HorizontalAlignment="Left" Margin="0,50,0,0" VerticalAlignment="Top" Width="81" Height="35" Click="Button_recordWrite_Click"/>
+                        <Button Content="End Record" HorizontalAlignment="Left" Margin="0,90,0,0" VerticalAlignment="Top" Width="81" Height="35" Click="Button_recordEnd_Click"/>
+                        <TextBox x:Name="Tb_recordName" HorizontalAlignment="Left" Height="35" Margin="86,10,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="recordPath" VerticalAlignment="Top" Width="104" FontSize="16"/>
+                        <TextBlock HorizontalAlignment="Left" Margin="190,24,0,0" TextWrapping="Wrap" Text=".path" VerticalAlignment="Top"/>
+                        <Button Content="Grip" HorizontalAlignment="Left" Margin="110,70,0,0" VerticalAlignment="Top" Width="38" Height="28" Click="Button_grip_Click"/>
+                        <TextBox x:Name="Tb_gripVal" HorizontalAlignment="Left" Height="28" Margin="148,70,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="0" VerticalAlignment="Top" Width="30"/>
+                        <Button Content="Grip" HorizontalAlignment="Left" Margin="110,98,0,0" VerticalAlignment="Top" Width="38" Height="28" Click="Button_grip2_Click"/>
+                        <TextBox x:Name="Tb_gripVal2" HorizontalAlignment="Left" Height="28" Margin="148,98,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="31" VerticalAlignment="Top" Width="30"/>
+                        <TextBox x:Name="Tb_gripVal3" HorizontalAlignment="Left" Height="28" Margin="148,126,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="100" VerticalAlignment="Top" Width="30"/>
+                        <Button Content="Grip" HorizontalAlignment="Left" Margin="110,126,0,0" VerticalAlignment="Top" Width="38" Height="28" Click="Button_grip3_Click"/>
+                        <Button Content="Sleep" HorizontalAlignment="Left" Margin="110,159,0,0" VerticalAlignment="Top" Width="38" Click="Button_recordSleep_Click" Height="28"/>
+                        <TextBox x:Name="Tb_sleepVal" HorizontalAlignment="Left" Height="28" Margin="148,159,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="1000" VerticalAlignment="Top" Width="42" TextAlignment="Center"/>
+                        <TextBlock HorizontalAlignment="Left" Margin="190,166,0,0" TextWrapping="Wrap" Text="ms" VerticalAlignment="Top"/>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+            <Button Content="go Home" HorizontalAlignment="Left" Margin="131,98,0,0" VerticalAlignment="Top" Width="104" Height="48" Click="Button_goPosHome_Click"/>
         </Grid>
 
     </Grid>

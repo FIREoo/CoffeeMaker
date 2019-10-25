@@ -68,3 +68,6 @@ C:\Users\FIRE\Desktop\Git\CoffeeMaker\Wpf_coffeeMaker\Wpf_coffeeMaker\obj\x64\De
 C:\Users\FIRE\Desktop\Git\CoffeeMaker\Wpf_coffeeMaker\Wpf_coffeeMaker\obj\x64\Debug\Wpf_coffeeMaker.csproj.GenerateResource.cache
 C:\Users\FIRE\Desktop\Git\CoffeeMaker\Wpf_coffeeMaker\Wpf_coffeeMaker\obj\x64\Debug\Wpf_coffeeMaker.csproj.CoreCompileInputs.cache
 C:\Users\FIRE\Desktop\Git\CoffeeMaker\Wpf_coffeeMaker\Wpf_coffeeMaker\obj\x64\Debug\Wpf_coffeeMaker.csproj.CopyComplete
+C:\Users\FIRE\Desktop\Git\CoffeeMaker\Wpf_coffeeMaker\Wpf_coffeeMaker\bin\x64\Debug\CS_UR_socketControl.dll
+C:\Users\FIRE\Desktop\Git\CoffeeMaker\Wpf_coffeeMaker\Wpf_coffeeMaker\bin\x64\Debug\CS_UR_socketControl.pdb
+C:\Users\FIRE\Desktop\Git\CoffeeMaker\Wpf_coffeeMaker\Wpf_coffeeMaker\bin\x64\Debug\CS_UR_socketControl.dll.config

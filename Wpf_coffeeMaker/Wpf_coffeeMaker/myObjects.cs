@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UrRobot;
+using UrRobot.Coordinates;
 
 namespace myObjects
 {
@@ -27,7 +27,7 @@ namespace myObjects
         public float gripOffset_M_x = 0;
         public float gripOffset_M_y = 0;
         public float gripOffset_M_z = 0;
-        private URCoordinates nowPos = new URCoordinates();//再action中 可能因為中間移動過 所以必須記錄移動後的位置 以免之後抓空
+        private URCoordinates nowPos = new URCoordinates(0, 0, 0, 0, 0, 0);//再action中 可能因為中間移動過 所以必須記錄移動後的位置 以免之後抓空
 
         public void saveNowPos()
         {
@@ -89,7 +89,7 @@ namespace myObjects
         {
             if (deg == 0)
                 //return new URCoordinates(nowPos.X + gripOffset_M_x, nowPos.Y + gripOffset_M_y, nowPos.Z + gripOffset_M_z, (float)(Math.PI), 0, 0);
-                return new URCoordinates(nowPos.X + gripOffset_M_x, 0.297f, nowPos.Z + gripOffset_M_z, (float)(Math.PI), 0, 0);//evil
+                return new URCoordinates(nowPos.X.M + gripOffset_M_x, 0.297f, nowPos.Z.M + gripOffset_M_z, (float)(Math.PI), 0, 0);//evil
 
             throw new System.ArgumentException("未完成", "現在只能水平");
         }
@@ -144,9 +144,9 @@ namespace myObjects
             float avgx = avg(x, 0, fileterSize);
             float avgy = avg(y, 0, fileterSize);
             float avgz = avg(z, 0, fileterSize);
-            double dx = (pos.X - avgx) * (pos.X - avgx);
-            double dy = (pos.Y - avgy) * (pos.Y - avgy);
-            double dz = (pos.Z - avgz) * (pos.Z - avgz);
+            double dx = (pos.X.M - avgx) * (pos.X.M - avgx);
+            double dy = (pos.Y.M - avgy) * (pos.Y.M - avgy);
+            double dz = (pos.Z.M - avgz) * (pos.Z.M - avgz);
             return (float)Math.Pow((dx + dy + dz), 0.5d);
 
         }
