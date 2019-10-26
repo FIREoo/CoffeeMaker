@@ -53,7 +53,9 @@ namespace Wpf_coffeeMaker
         {
             none = 0,
             mix = 1,
-            color = 2
+            color_full = 2,
+            depth = 3,
+            color_resize = 4
         }
 
         Mat matrix;
@@ -122,7 +124,7 @@ namespace Wpf_coffeeMaker
 
         private void setRecordRect(int S)
         {
-            rect_record.Fill = new SolidColorBrush(Color.FromArgb(20,200,50,50));
+            rect_record.Fill = new SolidColorBrush(Color.FromArgb(20, 200, 50, 50));
             rect_endRecord.Fill = new SolidColorBrush(Color.FromArgb(20, 193, 193, 80));
             if (S == 0)
             {
@@ -195,7 +197,7 @@ namespace Wpf_coffeeMaker
             // Setup config settings
             var cfg = new Config();
             cfg.EnableStream(Stream.Depth, 1280, 720, Format.Z16, 30);
-            cfg.EnableStream(Stream.Color, 1280, 720, Format.Bgr8, 30);
+            cfg.EnableStream(Stream.Color, 1280, 720, Format.Rgb8, 30);
 
             // Pipeline start
             Pipeline pipeline = new Pipeline();
@@ -203,6 +205,7 @@ namespace Wpf_coffeeMaker
 
             using (var p = pp.GetStream(Stream.Color) as VideoStreamProfile)
                 Img_main.Source = new WriteableBitmap(p.Width, p.Height, 96d, 96d, System.Windows.Media.PixelFormats.Rgb24, null);
+
             Action<VideoFrame> updateColor = UpdateImage(Img_main);
 
             // Setup filter / alignment settings
@@ -243,9 +246,11 @@ namespace Wpf_coffeeMaker
         }
         private CustomProcessingBlock SetupProcessingBlock(Pipeline pipeline, Colorizer colorizer, DecimationFilter decimate, SpatialFilter spatial, TemporalFilter temp, HoleFillingFilter holeFill, Align align_to)
         {
+            showType = imgType.color_full;
             CustomProcessingBlock processingBlock = null;
-            if (showType == imgType.color)
-            {
+            //if (showType == imgType.mix)
+            //{
+                // Setup / start frame processing
                 processingBlock = new CustomProcessingBlock((f, src) =>
                 {
                     using (var releaser = new FramesReleaser())
@@ -253,36 +258,19 @@ namespace Wpf_coffeeMaker
                         using (var frames = pipeline.WaitForFrames().DisposeWith(releaser))
                         {
                             var processedFrames = frames
-                            .ApplyFilter(align_to).DisposeWith(releaser);
+                            .ApplyFilter(align_to).DisposeWith(releaser)
+                            .ApplyFilter(decimate).DisposeWith(releaser)
+                            .ApplyFilter(spatial).DisposeWith(releaser)
+                            .ApplyFilter(temp).DisposeWith(releaser)
+                            .ApplyFilter(holeFill).DisposeWith(releaser)
+                            .ApplyFilter(colorizer).DisposeWith(releaser);
+
                             // Send it to the next processing stage
                             src.FramesReady(processedFrames);
                         }
                     }
                 });
-            }
-            else if (showType == imgType.mix)
-            {
-                // Setup / start frame processing
-                processingBlock = new CustomProcessingBlock((f, src) =>
-            {
-                using (var releaser = new FramesReleaser())
-                {
-                    using (var frames = pipeline.WaitForFrames().DisposeWith(releaser))
-                    {
-                        var processedFrames = frames
-                        .ApplyFilter(align_to).DisposeWith(releaser)
-                        .ApplyFilter(decimate).DisposeWith(releaser)
-                        .ApplyFilter(spatial).DisposeWith(releaser)
-                        .ApplyFilter(temp).DisposeWith(releaser)
-                        .ApplyFilter(holeFill).DisposeWith(releaser)
-                        .ApplyFilter(colorizer).DisposeWith(releaser);
-
-                        // Send it to the next processing stage
-                        src.FramesReady(processedFrames);
-                    }
-                }
-            });
-            }
+           // }
 
             return processingBlock;
         }
@@ -290,144 +278,127 @@ namespace Wpf_coffeeMaker
 
         private void StartProcessingBlock(CustomProcessingBlock processingBlock, PipelineProfile pp, Action<VideoFrame> updateColor, Pipeline pipeline)
         {
-            float[,,] posMap = new float[1280, 720, 3];
+            showType = imgType.color_full;
+
+            float[,,] posMap = new float[1280, 720, 3];//整張距離圖
+            float[,,] posMap2 = new float[1280, 720, 3];//整張距離圖
 
             Size RS_depthSize = new Size(1280, 720);
             Mat processMat = new Mat(RS_depthSize, DepthType.Cv8U, 3);
-            processingBlock.Start(f =>
+            if (showType == imgType.color_full)
             {
-                using (var frames = FrameSet.FromFrame(f))
+                //depth Processing
+                processingBlock.Start(f =>
                 {
-                    //var color_frame = frames.ColorFrame.DisposeWith(frames);
-                    //color_frame.CopyTo(processMat.DataPointer);
-
-                    var depthintr = (pp.GetStream(Stream.Depth) as VideoStreamProfile).GetIntrinsics();
-                    var depth_frame = frames.DepthFrame.DisposeWith(frames);
-
-                    //float depth = depth_frame.GetDistance((int)thePoint.X,(int)thePoint.Y); //From
-                    //thePos = HelperClass.DeprojectPixelToPoint(depthintr, thePoint, depth);
-
-                    unsafe
+                    using (var frames = FrameSet.FromFrame(f))
                     {
-                        Int16* pixelPtr_byte = (Int16*)depth_frame.Data;
-                        for (int i = 0; i < 1280; i++)
-                            for (int j = 0; j < 720; j++)
-                            {
-                                var tmpF = HelperClass.DeprojectPixelToPoint(depthintr, new PointF(i, j), (float)pixelPtr_byte[j * 1280 + i] / 1000f);
-                                posMap[i, j, 0] = tmpF[0];
-                                posMap[i, j, 1] = tmpF[1];
-                                posMap[i, j, 2] = tmpF[2];
-                            }
+                        //var color_frame = frames.ColorFrame.DisposeWith(frames);
+                        //Dispatcher.Invoke(DispatcherPriority.Render, updateColor, color_frame);
+
+                        var depthintr = (pp.GetStream(Stream.Depth) as VideoStreamProfile).GetIntrinsics();//這好像是取得什麼參數的，用來傳換成實際深度
+                        var depth_frame = frames.DepthFrame.DisposeWith(frames);//若 depth_frame不使用 FrameSet後的frame，那數值會少許多(可能是沒有filter吧)
+
+                        //製作 整張的距離圖
+                        unsafe
+                        {
+                            Int16* pixelPtr_byte = (Int16*)depth_frame.Data;
+                            for (int i = 0; i < 1280; i++)
+                                for (int j = 0; j < 720; j++)
+                                {
+                                    var tmpF = HelperClass.DeprojectPixelToPoint(depthintr, new PointF(i, j), (float)pixelPtr_byte[j * 1280 + i] / 1000f);
+                                    posMap[i, j, 0] = tmpF[0];
+                                    posMap[i, j, 1] = tmpF[1];
+                                    posMap[i, j, 2] = tmpF[2];
+                                }
+                        }
                     }
-                    // Dispatcher.Invoke(DispatcherPriority.Render, updateColor, color_frame);//顯示用
-                }
-            });
+                });
+
+                var token = _tokenSource.Token;
+                var t = Task.Factory.StartNew(() =>
+                {
+                    while (!token.IsCancellationRequested)
+                    {
+                        using (var frames = pipeline.WaitForFrames())
+                        {
+                            //這裡的color_frame沒有經過 processing block不是FrameSet後的成果，所以顯示的是原本的影像
+                            VideoFrame color_frame = frames.ColorFrame.DisposeWith(frames);
+                            Dispatcher.Invoke(DispatcherPriority.Render, updateColor, color_frame);//顯示 updateColor感覺是個指標，把color_frame放入updateColor
+
+                            processingBlock.ProcessFrames(frames);
+                        }
+                    }
+                }, token);
+
+            }
+
+            //MIXXXXXX
+            if (showType == imgType.mix)
+            {
+                //Mix Processing
+                processingBlock.Start(f =>
+                {
+                    using (var frames = FrameSet.FromFrame(f))
+                    {
+                        var mix_frame = frames.ColorFrame.DisposeWith(frames);
+                        Dispatcher.Invoke(DispatcherPriority.Render, updateColor, mix_frame);
+                    }
+                });
+
+                var token = _tokenSource.Token;
+
+                var t = Task.Factory.StartNew(() =>//執行續  ， 裡面執行 processing block
+                {
+                    while (!token.IsCancellationRequested)
+                    {
+                        using (var frames = pipeline.WaitForFrames())
+                        {
+                            // Invoke custom processing block
+                            processingBlock.ProcessFrames(frames);
+                        }
+                    }
+                }, token);
+            }
 
 
             //start
-            var token = _tokenSource.Token;
-            Action<VideoFrame> updateOriginColor = UpdateImage(Img_main);
-            var t = Task.Factory.StartNew(() =>
-            {
-                Mat color_orig = new Mat(RS_depthSize, DepthType.Cv8U, 3);
-                Mat color_resize = new Mat(RS_depthSize, DepthType.Cv8U, 3);
+            //var token = _tokenSource.Token;
+            //Action<VideoFrame> updateOriginColor = UpdateImage(Img_main);
+            //var t = Task.Factory.StartNew(() =>
+            //{
+            //    Mat color_orig = new Mat(RS_depthSize, DepthType.Cv8U, 3);
+            //    Mat color_resize = new Mat(RS_depthSize, DepthType.Cv8U, 3);
 
-                yoloWrapper = new YoloWrapper("modle\\yolov3-tiny-3obj.cfg", "modle\\yolov3-tiny-3obj_3cup.weights", "modle\\obj.names");
-                string detectionSystemDetail = string.Empty;
-                if (!string.IsNullOrEmpty(yoloWrapper.EnvironmentReport.GraphicDeviceName))
-                    detectionSystemDetail = $"({yoloWrapper.EnvironmentReport.GraphicDeviceName})";
-                Console.WriteLine($"Detection System:{yoloWrapper.DetectionSystem}{detectionSystemDetail}");
+            //    yoloWrapper = new YoloWrapper("modle\\yolov3-tiny-3obj.cfg", "modle\\yolov3-tiny-3obj_3cup.weights", "modle\\obj.names");
+            //    string detectionSystemDetail = string.Empty;
+            //    if (!string.IsNullOrEmpty(yoloWrapper.EnvironmentReport.GraphicDeviceName))
+            //        detectionSystemDetail = $"({yoloWrapper.EnvironmentReport.GraphicDeviceName})";
+            //    Console.WriteLine($"Detection System:{yoloWrapper.DetectionSystem}{detectionSystemDetail}");
 
-                while (!token.IsCancellationRequested)
-                {
-                    using (var frames = pipeline.WaitForFrames())
-                    {
-                        if (showType == imgType.color)
-                        {
-                            VideoFrame color_frame = frames.ColorFrame.DisposeWith(frames);
-                            color_frame.CopyTo(color_orig.DataPointer);
+            //    while (!token.IsCancellationRequested)
+            //    {
+            //        using (var frames = pipeline.WaitForFrames())
+            //        {
+            //            if (showType == imgType.color)
+            //            {
+            //                VideoFrame color_frame = frames.ColorFrame.DisposeWith(frames);
+            //                color_frame.CopyTo(color_orig.DataPointer);
 
-                            CvInvoke.WarpPerspective(color_orig, color_resize, matrix, new Size(1280, 720));
+            //                timeTick++;
+            //                color_frame.CopyFrom(color_resize.DataPointer);
+            //                Dispatcher.Invoke(DispatcherPriority.Render, updateOriginColor, color_frame);
+            //            }
+            //            else if (showType == imgType.mix)//顯示 mix 圖
+            //            {
+            //                processingBlock.ProcessFrames(frames);
 
+            //            }
 
-                            CvInvoke.Imwrite("yolo1.png", color_resize);
-                            try { items = yoloWrapper.Detect(@"yolo1.png"); }
-                            catch { break; }
-                            CvInvoke.CvtColor(color_resize, color_resize, ColorConversion.Bgr2Rgb);
-                            processingBlock.ProcessFrames(frames);
-
-                            foreach (YoloItem item in items)
-                            {
-                                string name = item.Type;
-                                int x = item.X;
-                                int y = item.Y;
-                                int H = item.Height;
-                                int W = item.Width;
-                                Point center = item.Center();
-
-                                int evilLine = 420;
-                                //640
-                                int evilLinex1 = 500;
-                                int evilLinex2 = 700;
-                                CvInvoke.Line(color_resize, new Point(0, evilLine), new Point(1280, evilLine), new MCvScalar(100, 100, 250), 2);//以上代表可能在咖啡機
-                                CvInvoke.Line(color_resize, new Point(evilLinex1, 0), new Point(evilLinex1, evilLine), new MCvScalar(100, 100, 250), 2);//
-                                CvInvoke.Line(color_resize, new Point(evilLinex2, 0), new Point(evilLinex2, evilLine), new MCvScalar(100, 100, 250), 2);//
-
-                                if (y > evilLine || x < evilLinex1 || x > evilLinex2)//代不再咖啡機附近
-                                    if (item.Confidence < 0.6)//沒信心的東西就跳過，避免偵測到其他東西
-                                        continue;
-
-
-                                float[] objPos = new float[] { posMap[center.X, center.Y, 0], posMap[center.X, center.Y, 1], posMap[center.X, center.Y, 2] };
-
-                                if (objPos[0] == 0 || objPos[1] == 0 || objPos[2] == 0)//不然會影響平均
-                                    continue;
-
-                                if (name == "blue cup")//index 0
-                                {
-                                    //evil color check
-                                    MCvScalar clr = MyInvoke.GetColorM(color_resize, center.Y - 5, center.X);
-                                    if (clr.V0 > clr.V2)//R>B  //YOLO搞錯
-                                        continue;
-
-                                    //  CvInvoke.PutText(color_resize, "B", new Point(x, y), FontFace.HersheySimplex, 1.2, new MCvScalar(80, 150, 220), 2);
-                                    CvInvoke.PutText(color_resize, item.Confidence.ToString("0.0"), new Point(x, y), FontFace.HersheySimplex, 1.2, new MCvScalar(80, 150, 220), 3);
-                                    CvInvoke.Rectangle(color_resize, new Rectangle(x, y, W, H), new MCvScalar(80, 150, 220), 3);
-
-                                    // process_actionOfCups(cups[0], mat_cup, TB_Bcup_msg, TB_Bcup_state, objPos, 10, 40);
-                                    CvInvoke.Circle(color_resize, center, 10, new MCvScalar(200, 200, 20), -1);
-                                }
-                                else if (name == "pink cup")//index 1
-                                {
-                                    //evil color check
-                                    MCvScalar clr = MyInvoke.GetColorM(color_resize, center.Y - 5, center.X);
-                                    if (clr.V0 < clr.V2)//R<B  //YOLO搞錯
-                                        continue;
-
-                                    // CvInvoke.PutText(color_resize, "P", new Point(x, y), FontFace.HersheySimplex, 1.2, new MCvScalar(250, 80, 80), 2);
-                                    CvInvoke.PutText(color_resize, item.Confidence.ToString("0.0"), new Point(x, y), FontFace.HersheySimplex, 1.2, new MCvScalar(250, 80, 80), 3);
-                                    CvInvoke.Rectangle(color_resize, new Rectangle(x, y, W, H), new MCvScalar(250, 80, 80), 3);
-
-                                    // process_actionOfCups(cups[1], mat_cup, TB_Pcup_msg, TB_Pcup_state, objPos, 60, 90);
-                                    CvInvoke.Circle(color_resize, center, 10, new MCvScalar(200, 200, 20), -1);
-                                }
-
-                            }//foreach cups 
-                            timeTick++;
-                            color_frame.CopyFrom(color_resize.DataPointer);
-                            Dispatcher.Invoke(DispatcherPriority.Render, updateOriginColor, color_frame);
-                        }
-                        else if (showType == imgType.mix)//顯示 mix 圖
-                        {
-                            processingBlock.ProcessFrames(frames);
-                            
-                        }
-
-                    }
-                }
-            }, token);
+            //        }
+            //    }
+            //}, token);
         }
-    
+
         static Action<VideoFrame> UpdateImage(Image img)
         {
             var wbmp = img.Source as WriteableBitmap;
@@ -449,7 +420,7 @@ namespace Wpf_coffeeMaker
             }
             else if (((RadioButton)sender).Content.ToString() == "Color")
             {
-                showType = imgType.color;
+                showType = imgType.color_full;
             }
         }
 
