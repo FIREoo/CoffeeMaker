@@ -8,7 +8,7 @@
         Title="MainWindow" Height="905" Width="1800" Loaded="Window_Loaded">
     <Grid Margin="0,0,4,0">
         <Grid HorizontalAlignment="Left" Height="641" Margin="435,10,0,0" VerticalAlignment="Top" Width="870" Background="#FFBDBDBD">
-            <Grid Margin="11,41,219,240" Background="Black">
+            <Grid x:Name="grid_img_grip" Margin="11,41,219,240" Background="Black" MouseMove="Grid_MouseMove">
                 <Image x:Name="Img_main" HorizontalAlignment="Left" Height="360" VerticalAlignment="Top" Width="640"/>
                 <Grid.ContextMenu >
                     <ContextMenu x:Name="cm" StaysOpen="true">
@@ -36,6 +36,7 @@
             </GroupBox>
             <Button Content="Connect Action" HorizontalAlignment="Left" Margin="670,17,0,0" VerticalAlignment="Top" Width="100" Height="30" Click="Button_askActionRecognition_Click"/>
             <Ellipse x:Name="cir_connectAct" Fill="Salmon" HorizontalAlignment="Left" Height="21" Margin="756,10,0,0" Stroke="Black" VerticalAlignment="Top" Width="21" RenderTransformOrigin="0.5,0.5"/>
+            <Button Content="Button" HorizontalAlignment="Left" Margin="677,222,0,0" VerticalAlignment="Top" Width="100" Height="50"/>
         </Grid>
         <ListView x:Name="LV_actionBase" ItemsSource="{Binding listOfAction}" HorizontalAlignment="Left" Height="717" Margin="10,64,0,0" VerticalAlignment="Top" Width="407" FontSize="22">
             <ListView.ItemContainerStyle>

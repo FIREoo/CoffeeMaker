@@ -38,6 +38,7 @@ using UrRobot.Coordinates;
 using System.IO;
 using myActionBase;
 using myTCP;
+using Emgu.CV.Util;
 
 namespace Wpf_coffeeMaker
 {
@@ -246,42 +247,40 @@ namespace Wpf_coffeeMaker
         }
         private CustomProcessingBlock SetupProcessingBlock(Pipeline pipeline, Colorizer colorizer, DecimationFilter decimate, SpatialFilter spatial, TemporalFilter temp, HoleFillingFilter holeFill, Align align_to)
         {
-            showType = imgType.color_full;
             CustomProcessingBlock processingBlock = null;
             //if (showType == imgType.mix)
             //{
-                // Setup / start frame processing
-                processingBlock = new CustomProcessingBlock((f, src) =>
+            // Setup / start frame processing
+            processingBlock = new CustomProcessingBlock((f, src) =>
+            {
+                using (var releaser = new FramesReleaser())
                 {
-                    using (var releaser = new FramesReleaser())
+                    using (var frames = pipeline.WaitForFrames().DisposeWith(releaser))
                     {
-                        using (var frames = pipeline.WaitForFrames().DisposeWith(releaser))
-                        {
-                            var processedFrames = frames
-                            .ApplyFilter(align_to).DisposeWith(releaser)
-                            .ApplyFilter(decimate).DisposeWith(releaser)
-                            .ApplyFilter(spatial).DisposeWith(releaser)
-                            .ApplyFilter(temp).DisposeWith(releaser)
-                            .ApplyFilter(holeFill).DisposeWith(releaser)
-                            .ApplyFilter(colorizer).DisposeWith(releaser);
+                        var processedFrames = frames
+                        .ApplyFilter(align_to).DisposeWith(releaser)
+                        .ApplyFilter(decimate).DisposeWith(releaser)
+                        .ApplyFilter(spatial).DisposeWith(releaser)
+                        .ApplyFilter(temp).DisposeWith(releaser)
+                        .ApplyFilter(holeFill).DisposeWith(releaser)
+                        .ApplyFilter(colorizer).DisposeWith(releaser);
 
-                            // Send it to the next processing stage
-                            src.FramesReady(processedFrames);
-                        }
+                        // Send it to the next processing stage
+                        src.FramesReady(processedFrames);
                     }
-                });
-           // }
+                }
+            });
+            // }
 
             return processingBlock;
         }
 
-
+        float[,,] posMap = new float[1280, 720, 3];//整張距離圖
         private void StartProcessingBlock(CustomProcessingBlock processingBlock, PipelineProfile pp, Action<VideoFrame> updateColor, Pipeline pipeline)
         {
-            showType = imgType.color_full;
+            showType = imgType.depth;
 
-            float[,,] posMap = new float[1280, 720, 3];//整張距離圖
-            float[,,] posMap2 = new float[1280, 720, 3];//整張距離圖
+
 
             Size RS_depthSize = new Size(1280, 720);
             Mat processMat = new Mat(RS_depthSize, DepthType.Cv8U, 3);
@@ -326,6 +325,7 @@ namespace Wpf_coffeeMaker
                             Dispatcher.Invoke(DispatcherPriority.Render, updateColor, color_frame);//顯示 updateColor感覺是個指標，把color_frame放入updateColor
 
                             processingBlock.ProcessFrames(frames);
+
                         }
                     }
                 }, token);
@@ -342,11 +342,29 @@ namespace Wpf_coffeeMaker
                     {
                         var mix_frame = frames.ColorFrame.DisposeWith(frames);
                         Dispatcher.Invoke(DispatcherPriority.Render, updateColor, mix_frame);
+
+                        var depthintr = (pp.GetStream(Stream.Depth) as VideoStreamProfile).GetIntrinsics();//這好像是取得什麼參數的，用來傳換成實際深度
+                        var depth_frame = frames.DepthFrame.DisposeWith(frames);//若 depth_frame不使用 FrameSet後的frame，那數值會少許多(可能是沒有filter吧)
+
+                        //製作 整張的距離圖
+                        unsafe
+                        {
+                            Int16* pixelPtr_byte = (Int16*)depth_frame.Data;
+                            for (int i = 0; i < 1280; i++)
+                                for (int j = 0; j < 720; j++)
+                                {
+                                    var tmpF = HelperClass.DeprojectPixelToPoint(depthintr, new PointF(i, j), (float)pixelPtr_byte[j * 1280 + i] / 1000f);
+                                    posMap[i, j, 0] = tmpF[0];
+                                    posMap[i, j, 1] = tmpF[1];
+                                    posMap[i, j, 2] = tmpF[2];
+                                }
+                        }
+
                     }
                 });
 
-                var token = _tokenSource.Token;
 
+                var token = _tokenSource.Token;
                 var t = Task.Factory.StartNew(() =>//執行續  ， 裡面執行 processing block
                 {
                     while (!token.IsCancellationRequested)
@@ -360,6 +378,163 @@ namespace Wpf_coffeeMaker
                 }, token);
             }
 
+            //depth
+            if (showType == imgType.depth)
+            {
+                Mat img_depth = new Mat(RS_depthSize, DepthType.Cv8U, 1);
+                processingBlock.Start(f =>
+                {
+                    using (var frames = FrameSet.FromFrame(f))
+                    {
+                        var depthintr = (pp.GetStream(Stream.Depth) as VideoStreamProfile).GetIntrinsics();//這好像是取得什麼參數的，用來傳換成實際深度
+                        var depth_frame = frames.DepthFrame.DisposeWith(frames);//若 depth_frame不使用 FrameSet後的frame，那數值會少許多(可能是沒有filter吧)
+
+                        //製作 整張的距離圖
+                        unsafe
+                        {
+                            Int16* pixelPtr_byte = (Int16*)depth_frame.Data;
+                            for (int i = 0; i < 1280; i++)
+                                for (int j = 0; j < 720; j++)
+                                {
+                                    var tmpF = HelperClass.DeprojectPixelToPoint(depthintr, new PointF(i, j), (float)pixelPtr_byte[j * 1280 + i] / 1000f);
+                                    posMap[i, j, 0] = tmpF[0];
+                                    posMap[i, j, 1] = tmpF[1];
+                                    posMap[i, j, 2] = tmpF[2];
+                                }
+                        }
+
+                    }
+                });
+
+                var token = _tokenSource.Token;
+                var t = Task.Factory.StartNew(() =>//執行續  ， 裡面執行 processing block
+                {
+                    while (!token.IsCancellationRequested)
+                    {
+                        using (var frames = pipeline.WaitForFrames())
+                        {
+                            // processingBlock.ProcessFrames(frames);//有filter (效果是不是比較差啊...
+
+
+                            var depthintr = (pp.GetStream(Stream.Depth) as VideoStreamProfile).GetIntrinsics();//這好像是取得什麼參數的，用來傳換成實際深度
+                            var depth_frame = frames.DepthFrame.DisposeWith(frames);//若 depth_frame不使用 FrameSet後的frame，那數值會少許多(可能是沒有filter吧)
+
+                            //製作 整張的距離圖
+                            unsafe
+                            {
+                                Int16* pixelPtr_byte = (Int16*)depth_frame.Data;
+                                for (int i = 0; i < 1280; i++)
+                                    for (int j = 0; j < 720; j++)
+                                    {
+                                        var tmpF = HelperClass.DeprojectPixelToPoint(depthintr, new PointF(i, j), (float)pixelPtr_byte[j * 1280 + i] / 1000f);
+                                        posMap[i, j, 0] = tmpF[0];
+                                        posMap[i, j, 1] = tmpF[1];
+                                        posMap[i, j, 2] = tmpF[2];
+                                    }
+                            }
+
+
+                            unsafe
+                            {
+                                byte* pixelPtr_byte = (byte*)img_depth.DataPointer;
+                                for (int i = 0; i < 1280; i++)
+                                    for (int j = 0; j < 720; j++)
+                                    {
+                                        int value = (int)(((posMap[i, j, 2] * 1000) - 300) * 5 + 128);
+                                        value = 255 - value;//反向 讓越高越白
+                                        if (value > 255)
+                                            value = 255;
+                                        if (value < 0)
+                                            value = 0;
+
+                                        int thres = 80;
+                                        if (value == 255)
+                                            value = 0;//去除一些 原本測不到的(太近的，黑色)
+                                        if (value > thres)
+                                            value = 128;
+                                        if (value < thres)
+                                            value = 0;
+
+                                        pixelPtr_byte[j * 1280 + i] = (byte)value;
+                                    }
+                            }
+
+                            Point grip_center = new Point(710, 380);//夾爪中心，如果我找到..則旋轉會不影響中心點
+
+                            Mat mat_img_show = new Mat(RS_depthSize, DepthType.Cv8U, 3);
+                            Mat img_depth_ch3 = new Mat(RS_depthSize, DepthType.Cv8U, 3);
+                            CvInvoke.CvtColor(img_depth, img_depth_ch3, ColorConversion.Gray2Bgr);
+                            CvInvoke.CvtColor(img_depth, mat_img_show, ColorConversion.Gray2Bgr);
+
+                            //畫線條 有碰到的地方就會被填滿，不然只會有一點，離開那一點就找不到物件了
+                            int size = 80;
+                            CvInvoke.Line(mat_img_show, new Point(grip_center.X + size, grip_center.Y), new Point(grip_center.X - size, grip_center.Y), new MCvScalar(128, 128, 128));
+                            CvInvoke.Line(mat_img_show, new Point(grip_center.X, grip_center.Y + size), new Point(grip_center.X, grip_center.Y - size), new MCvScalar(128, 128, 128));
+                            CvInvoke.Rectangle(mat_img_show, new Rectangle(grip_center.X - size, grip_center.Y - size, size * 2, size * 2), new MCvScalar(128, 128, 128));
+
+                            //if (MyInvoke.GetValue<byte>(img_depth, 360, 700) != 0)
+                            //{
+
+                            Mat filling_mask = new Mat(RS_depthSize.Height + 2, RS_depthSize.Width + 2, DepthType.Cv8U, 1);
+                            filling_mask.SetTo(new MCvScalar(0, 0, 0));
+                            CvInvoke.FloodFill(mat_img_show, filling_mask, grip_center, new MCvScalar(70, 100, 250), out Rectangle rect, new MCvScalar(10, 10, 10), new MCvScalar(10, 10, 10));
+                            //CvInvoke.Rectangle(mat_img_show, rect,new MCvScalar(200,50,20),3);
+                            //CvInvoke.FloodFill(img_depth, filling_mask, new Point(700, 360), new MCvScalar(255), out Rectangle rect, new MCvScalar(10), new MCvScalar(10));
+                            //}
+                            Mat element = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Cross, new Size(3, 3), new Point(-1, -1));
+                            CvInvoke.Erode(mat_img_show, mat_img_show, element, new Point(-1, -1), 2, BorderType.Default, new MCvScalar(0, 0, 0));
+                            CvInvoke.Dilate(mat_img_show, mat_img_show, element, new Point(-1, -1), 4, BorderType.Default, new MCvScalar(0, 0, 0));
+
+                            //找物件mask
+                            Mat mat_img_object_mask = new Mat(RS_depthSize, DepthType.Cv8U, 1);
+                            CvInvoke.InRange(mat_img_show, new ScalarArray(new MCvScalar(70, 100, 250)), new ScalarArray(new MCvScalar(70, 100, 250)), mat_img_object_mask);
+
+
+                            // CvInvoke.CvtColor(mat_img_object_mask, mat_img_show, ColorConversion.Gray2Bgr);
+
+                            //畫出中心
+                            // CvInvoke.Circle(mat_img_show, new Point(700, 360), 5, new MCvScalar(20, 50, 200), -1);
+                            CvInvoke.Line(mat_img_show, new Point(grip_center.X + size, grip_center.Y), new Point(grip_center.X - size, grip_center.Y), new MCvScalar(20, 50, 200), 2);
+                            CvInvoke.Line(mat_img_show, new Point(grip_center.X, grip_center.Y + size), new Point(grip_center.X, grip_center.Y - size), new MCvScalar(20, 50, 200), 2);
+                            CvInvoke.Rectangle(mat_img_show, new Rectangle(grip_center.X - size, grip_center.Y - size, size * 2, size * 2), new MCvScalar(20, 50, 200), 2);
+
+                            //重心
+                            //MCvMoments mu = CvInvoke.Moments(mat_img_object_mask);
+                            // Point cP = new Point((int)(mu.M10 / mu.M00), (int)(mu.M01 / mu.M00));
+                            //CvInvoke.Circle(mat_img_show, cP, 10, new MCvScalar(100, 50, 200), 3);
+
+                            //畫最小矩形
+                            PointF center_obj = new PointF();
+                            using (VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint())
+                            {
+                                CvInvoke.FindContours(mat_img_object_mask, contours, null, RetrType.External, ChainApproxMethod.ChainApproxSimple);
+                                for (int i = 0; i < contours.Size; i++)
+                                {
+                                    using (VectorOfPoint contour = contours[i])
+                                    {
+                                        if (contour.Size < 100)
+                                            continue;
+                                        RotatedRect BoundingBox = CvInvoke.MinAreaRect(contour);
+                                        center_obj = BoundingBox.Center;
+                                        CvInvoke.Circle(mat_img_show, new Point((int)BoundingBox.Center.X, (int)BoundingBox.Center.Y), 10, new MCvScalar(100, 50, 200), 3);
+                                        CvInvoke.Polylines(mat_img_show, Array.ConvertAll(BoundingBox.GetVertices(), Point.Round), true, new MCvScalar(50, 180, 200), 3);
+                                    }
+                                }
+                            }
+
+                            //手臂要移動的距離(注意座標轉換和scaling)
+                            float armMoveX = (center_obj.X - grip_center.X);
+                            float armMoveY = (grip_center.Y - center_obj.Y);
+                            Console.WriteLine($"tool space move:({(int)armMoveX},{(int)armMoveY})");
+
+                            //CvInvoke.Add(mat_img_show,img_depth_ch3, mat_img_show);
+
+                            Dispatcher.Invoke(DispatcherPriority.Normal, (Action)(() => { Img_main.Source = BitmapSourceConvert.ToBitmapSource(mat_img_show); }));
+
+                        }
+                    }
+                }, token);
+            }
 
             //start
             //var token = _tokenSource.Token;
@@ -398,7 +573,18 @@ namespace Wpf_coffeeMaker
             //    }
             //}, token);
         }
+        public static void MinAreaBoundingBox(Mat src, Mat draw)
+        {
 
+        }
+
+        private void Grid_MouseMove(object sender, MouseEventArgs e)
+        {
+            int x = (int)e.GetPosition(grid_img_grip).X;
+            int y = (int)e.GetPosition(grid_img_grip).Y;
+            Console.WriteLine($"mouse at({x},{y})");
+            Console.WriteLine($"RS position({posMap[x * 2, y * 2, 0]},{posMap[x * 2, y * 2, 1]},{posMap[x * 2, y * 2, 2]})");
+        }
         static Action<VideoFrame> UpdateImage(Image img)
         {
             var wbmp = img.Source as WriteableBitmap;
@@ -759,6 +945,7 @@ namespace Wpf_coffeeMaker
             ListViewItem lbi = LV_actionBase.ItemContainerGenerator.ContainerFromIndex(3) as ListViewItem;
             lbi.Foreground = new SolidColorBrush(Colors.Red);
         }
+
 
     }//class
     public static class BitmapSourceConvert
