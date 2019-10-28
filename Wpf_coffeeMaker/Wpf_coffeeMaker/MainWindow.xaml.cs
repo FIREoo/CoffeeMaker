@@ -440,20 +440,20 @@ namespace Wpf_coffeeMaker
                                 for (int i = 0; i < 1280; i++)
                                     for (int j = 0; j < 720; j++)
                                     {
-                                        int value = (int)(((posMap[i, j, 2] * 1000) - 300) * 5 + 128);
+                                        int value = (int)(((posMap[i, j, 2] * 1000) - 300) *1 +200);
                                         value = 255 - value;//反向 讓越高越白
                                         if (value > 255)
                                             value = 255;
                                         if (value < 0)
                                             value = 0;
 
-                                        int thres = 80;
-                                        if (value == 255)
-                                            value = 0;//去除一些 原本測不到的(太近的，黑色)
-                                        if (value > thres)
-                                            value = 128;
-                                        if (value < thres)
-                                            value = 0;
+                                        //int thres = 80;
+                                        //if (value == 255)
+                                        //    value = 0;//去除一些 原本測不到的(太近的，黑色)
+                                        //if (value > thres)
+                                        //    value = 128;
+                                        //if (value < thres)
+                                        //    value = 0;
 
                                         pixelPtr_byte[j * 1280 + i] = (byte)value;
                                     }
@@ -472,12 +472,28 @@ namespace Wpf_coffeeMaker
                             CvInvoke.Line(mat_img_show, new Point(grip_center.X, grip_center.Y + size), new Point(grip_center.X, grip_center.Y - size), new MCvScalar(128, 128, 128));
                             CvInvoke.Rectangle(mat_img_show, new Rectangle(grip_center.X - size, grip_center.Y - size, size * 2, size * 2), new MCvScalar(128, 128, 128));
 
+                            //int _x = grip_center.X - 100;
+                            //int _y = grip_center.Y - 100;
+                            //Console.WriteLine($"({_x},{_y}) = {posMap[_x,_y,2]}");
+                            // _x = grip_center.X + 100;
+                            // _y = grip_center.Y - 100;
+                            //Console.WriteLine($"({_x},{_y}) = {posMap[_x, _y, 2]}");
+                            // _x = grip_center.X + 100;
+                            // _y = grip_center.Y + 100;
+                            //Console.WriteLine($"({_x},{_y}) = {posMap[_x, _y, 2]}");
+                            // _x = grip_center.X - 100;
+                            // _y = grip_center.Y + 100;
+                            //Console.WriteLine($"({_x},{_y}) = {posMap[_x, _y, 2]}");
+                            //Console.WriteLine($"-------------------------------");
+
+
                             //if (MyInvoke.GetValue<byte>(img_depth, 360, 700) != 0)
                             //{
 
                             Mat filling_mask = new Mat(RS_depthSize.Height + 2, RS_depthSize.Width + 2, DepthType.Cv8U, 1);
                             filling_mask.SetTo(new MCvScalar(0, 0, 0));
-                            CvInvoke.FloodFill(mat_img_show, filling_mask, grip_center, new MCvScalar(70, 100, 250), out Rectangle rect, new MCvScalar(10, 10, 10), new MCvScalar(10, 10, 10));
+                            //CvInvoke.FloodFill(mat_img_show, filling_mask, grip_center, new MCvScalar(70, 100, 250), out Rectangle rect, new MCvScalar(10, 10, 10), new MCvScalar(10, 10, 10));
+                          
                             //CvInvoke.Rectangle(mat_img_show, rect,new MCvScalar(200,50,20),3);
                             //CvInvoke.FloodFill(img_depth, filling_mask, new Point(700, 360), new MCvScalar(255), out Rectangle rect, new MCvScalar(10), new MCvScalar(10));
                             //}
@@ -523,9 +539,19 @@ namespace Wpf_coffeeMaker
                             }
 
                             //手臂要移動的距離(注意座標轉換和scaling)
-                            float armMoveX = (center_obj.X - grip_center.X);
-                            float armMoveY = (grip_center.Y - center_obj.Y);
-                            Console.WriteLine($"tool space move:({(int)armMoveX},{(int)armMoveY})");
+                            float xg = posMap[(int)grip_center.X, (int)grip_center.Y, 0];
+                            float yg = posMap[(int)grip_center.X, (int)grip_center.Y, 1];
+
+                            float xo = posMap[(int)center_obj.X, (int)center_obj.Y, 0];
+                            float yo = posMap[(int)center_obj.X, (int)center_obj.Y, 1];
+
+                            //float armMoveX = (center_obj.X - grip_center.X);
+                            //float armMoveY = (grip_center.Y - center_obj.Y);
+
+                            float armMoveX = (xo - xg);
+                            float armMoveY = (yg - yo);
+
+                            Console.WriteLine($"tool space move:({armMoveX*1000},{armMoveY*1000})");
 
                             //CvInvoke.Add(mat_img_show,img_depth_ch3, mat_img_show);
 
@@ -946,7 +972,12 @@ namespace Wpf_coffeeMaker
             lbi.Foreground = new SolidColorBrush(Colors.Red);
         }
 
-
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            UR.creatClient("auto");
+            string str = "movep(p[0.0,-2.2,2.0,3.14,0,0])";
+            UR.client_SendData(str);
+        }
     }//class
     public static class BitmapSourceConvert
     {

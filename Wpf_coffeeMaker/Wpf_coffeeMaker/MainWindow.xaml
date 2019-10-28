@@ -36,7 +36,7 @@
             </GroupBox>
             <Button Content="Connect Action" HorizontalAlignment="Left" Margin="670,17,0,0" VerticalAlignment="Top" Width="100" Height="30" Click="Button_askActionRecognition_Click"/>
             <Ellipse x:Name="cir_connectAct" Fill="Salmon" HorizontalAlignment="Left" Height="21" Margin="756,10,0,0" Stroke="Black" VerticalAlignment="Top" Width="21" RenderTransformOrigin="0.5,0.5"/>
-            <Button Content="Button" HorizontalAlignment="Left" Margin="677,222,0,0" VerticalAlignment="Top" Width="100" Height="50"/>
+            <Button Content="Button" HorizontalAlignment="Left" Margin="677,222,0,0" VerticalAlignment="Top" Width="100" Height="50" Click="Button_Click_1"/>
         </Grid>
         <ListView x:Name="LV_actionBase" ItemsSource="{Binding listOfAction}" HorizontalAlignment="Left" Height="717" Margin="10,64,0,0" VerticalAlignment="Top" Width="407" FontSize="22">
             <ListView.ItemContainerStyle>
