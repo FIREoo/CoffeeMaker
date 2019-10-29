@@ -276,6 +276,13 @@ namespace Wpf_coffeeMaker
         }
 
         float[,,] posMap = new float[1280, 720, 3];//整張距離圖
+
+        //偵測到的物件資訊
+        PointF center_obj = new PointF();
+        float angel_obj = 0;
+        SizeF size_obj = new Size();
+        float armMoveX;
+        float armMoveY;
         private void StartProcessingBlock(CustomProcessingBlock processingBlock, PipelineProfile pp, Action<VideoFrame> updateColor, Pipeline pipeline)
         {
             showType = imgType.depth;
@@ -433,33 +440,34 @@ namespace Wpf_coffeeMaker
                                     }
                             }
 
-
+                            int thres = 80;
+                            Dispatcher.Invoke(DispatcherPriority.Normal, (Action)(() => { thres = tb_value_depthThres.Text.toInt(); }));
                             unsafe
                             {
                                 byte* pixelPtr_byte = (byte*)img_depth.DataPointer;
                                 for (int i = 0; i < 1280; i++)
                                     for (int j = 0; j < 720; j++)
                                     {
-                                        int value = (int)(((posMap[i, j, 2] * 1000) - 300) *1 +200);
+                                        int value = (int)(((posMap[i, j, 2] * 1000) - 300) * 1 + 200);
                                         value = 255 - value;//反向 讓越高越白
                                         if (value > 255)
                                             value = 255;
                                         if (value < 0)
                                             value = 0;
 
-                                        //int thres = 80;
-                                        //if (value == 255)
-                                        //    value = 0;//去除一些 原本測不到的(太近的，黑色)
-                                        //if (value > thres)
-                                        //    value = 128;
-                                        //if (value < thres)
-                                        //    value = 0;
+
+                                        if (value == 255)
+                                            value = 0;//去除一些 原本測不到的(太近的，黑色)
+                                        if (value > thres)
+                                            value = 128;
+                                        if (value < thres)
+                                            value = 0;
 
                                         pixelPtr_byte[j * 1280 + i] = (byte)value;
                                     }
                             }
 
-                            Point grip_center = new Point(710, 380);//夾爪中心，如果我找到..則旋轉會不影響中心點
+                            Point grip_center = new Point(710, 460);//夾爪中心，如果我找到..則旋轉會不影響中心點
 
                             Mat mat_img_show = new Mat(RS_depthSize, DepthType.Cv8U, 3);
                             Mat img_depth_ch3 = new Mat(RS_depthSize, DepthType.Cv8U, 3);
@@ -492,8 +500,8 @@ namespace Wpf_coffeeMaker
 
                             Mat filling_mask = new Mat(RS_depthSize.Height + 2, RS_depthSize.Width + 2, DepthType.Cv8U, 1);
                             filling_mask.SetTo(new MCvScalar(0, 0, 0));
-                            //CvInvoke.FloodFill(mat_img_show, filling_mask, grip_center, new MCvScalar(70, 100, 250), out Rectangle rect, new MCvScalar(10, 10, 10), new MCvScalar(10, 10, 10));
-                          
+                            CvInvoke.FloodFill(mat_img_show, filling_mask, grip_center, new MCvScalar(70, 100, 250), out Rectangle rect, new MCvScalar(10, 10, 10), new MCvScalar(10, 10, 10));
+
                             //CvInvoke.Rectangle(mat_img_show, rect,new MCvScalar(200,50,20),3);
                             //CvInvoke.FloodFill(img_depth, filling_mask, new Point(700, 360), new MCvScalar(255), out Rectangle rect, new MCvScalar(10), new MCvScalar(10));
                             //}
@@ -520,7 +528,7 @@ namespace Wpf_coffeeMaker
                             //CvInvoke.Circle(mat_img_show, cP, 10, new MCvScalar(100, 50, 200), 3);
 
                             //畫最小矩形
-                            PointF center_obj = new PointF();
+
                             using (VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint())
                             {
                                 CvInvoke.FindContours(mat_img_object_mask, contours, null, RetrType.External, ChainApproxMethod.ChainApproxSimple);
@@ -531,8 +539,11 @@ namespace Wpf_coffeeMaker
                                         if (contour.Size < 100)
                                             continue;
                                         RotatedRect BoundingBox = CvInvoke.MinAreaRect(contour);
+                                        angel_obj = BoundingBox.Angle;
                                         center_obj = BoundingBox.Center;
+                                        size_obj = BoundingBox.Size;
                                         CvInvoke.Circle(mat_img_show, new Point((int)BoundingBox.Center.X, (int)BoundingBox.Center.Y), 10, new MCvScalar(100, 50, 200), 3);
+
                                         CvInvoke.Polylines(mat_img_show, Array.ConvertAll(BoundingBox.GetVertices(), Point.Round), true, new MCvScalar(50, 180, 200), 3);
                                     }
                                 }
@@ -548,10 +559,12 @@ namespace Wpf_coffeeMaker
                             //float armMoveX = (center_obj.X - grip_center.X);
                             //float armMoveY = (grip_center.Y - center_obj.Y);
 
-                            float armMoveX = (xo - xg);
-                            float armMoveY = (yg - yo);
+                            armMoveX = (xg - xo);
+                            armMoveY = (yo - yg);
 
-                            Console.WriteLine($"tool space move:({armMoveX*1000},{armMoveY*1000})");
+                            if (size_obj.Width > size_obj.Height)
+                                angel_obj = angel_obj + 90;
+                            Dispatcher.Invoke(DispatcherPriority.Normal, (Action)(() => { tb_object_msg.Text = $"ts:({armMoveX * 1000},{armMoveY * 1000}),\n degree:{angel_obj},\n size:{size_obj.Width},{size_obj.Height}"; }));
 
                             //CvInvoke.Add(mat_img_show,img_depth_ch3, mat_img_show);
 
@@ -606,10 +619,10 @@ namespace Wpf_coffeeMaker
 
         private void Grid_MouseMove(object sender, MouseEventArgs e)
         {
-            int x = (int)e.GetPosition(grid_img_grip).X;
-            int y = (int)e.GetPosition(grid_img_grip).Y;
-            Console.WriteLine($"mouse at({x},{y})");
-            Console.WriteLine($"RS position({posMap[x * 2, y * 2, 0]},{posMap[x * 2, y * 2, 1]},{posMap[x * 2, y * 2, 2]})");
+            //int x = (int)e.GetPosition(grid_img_grip).X;
+            //int y = (int)e.GetPosition(grid_img_grip).Y;
+            //Console.WriteLine($"mouse at({x},{y})");
+            //Console.WriteLine($"RS position({posMap[x * 2, y * 2, 0]},{posMap[x * 2, y * 2, 1]},{posMap[x * 2, y * 2, 2]})");
         }
         static Action<VideoFrame> UpdateImage(Image img)
         {
@@ -974,9 +987,21 @@ namespace Wpf_coffeeMaker
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            UR.creatClient("auto");
-            string str = "movep(p[0.0,-2.2,2.0,3.14,0,0])";
+            UR.creatClient("192.168.1.108");
+            string str = "movep(p[0.0,-0.22,0.2,3.14,0,0])\n";
             UR.client_SendData(str);
+        }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            Task.Run(() =>
+            {
+                UR.getPosition(out URCoordinates nowPos);
+                UR.goRelativePosition(armMoveX.M(), armMoveY.M());
+               UR.goRelativeJoint(j6: (angel_obj-10).deg());
+            });
+
+
         }
     }//class
     public static class BitmapSourceConvert
