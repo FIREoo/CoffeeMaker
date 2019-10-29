@@ -5,10 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Wpf_coffeeMaker"
         mc:Ignorable="d"
-        Title="MainWindow" Height="905" Width="1800" Loaded="Window_Loaded">
+        Title="MainWindow" Height="825.5" Width="1800" Loaded="Window_Loaded">
     <Grid Margin="0,0,4,0">
-        <Grid HorizontalAlignment="Left" Height="641" Margin="435,10,0,0" VerticalAlignment="Top" Width="870" Background="#FFBDBDBD">
-            <Grid x:Name="grid_img_grip" Margin="11,41,219,240" Background="Black" MouseMove="Grid_MouseMove">
+        <Grid HorizontalAlignment="Left" Height="771" Margin="435,10,0,0" VerticalAlignment="Top" Width="870" Background="#FFBDBDBD">
+            <Grid x:Name="grid_img_grip" Margin="11,41,219,240" Background="Black" MouseMove="Grid_MouseMove" VerticalAlignment="Top" HorizontalAlignment="Left">
                 <Image x:Name="Img_main" HorizontalAlignment="Left" Height="360" VerticalAlignment="Top" Width="640"/>
                 <Grid.ContextMenu >
                     <ContextMenu x:Name="cm" StaysOpen="true">
@@ -36,9 +36,11 @@
             </GroupBox>
             <Button Content="Connect Action" HorizontalAlignment="Left" Margin="670,17,0,0" VerticalAlignment="Top" Width="100" Height="30" Click="Button_askActionRecognition_Click"/>
             <Ellipse x:Name="cir_connectAct" Fill="Salmon" HorizontalAlignment="Left" Height="21" Margin="756,10,0,0" Stroke="Black" VerticalAlignment="Top" Width="21" RenderTransformOrigin="0.5,0.5"/>
-            <Button Content="Button" HorizontalAlignment="Left" Margin="677,222,0,0" VerticalAlignment="Top" Width="100" Height="50" Click="Button_Click_1"/>
+            <Button Content="Button" HorizontalAlignment="Left" Margin="656,406,0,0" VerticalAlignment="Top" Width="100" Height="50" Click="Button_Click_1"/>
+            <Grid HorizontalAlignment="Left" Height="332" Margin="11,406,0,0" VerticalAlignment="Top" Width="640" Background="Black"/>
+
         </Grid>
-        <ListView x:Name="LV_actionBase" ItemsSource="{Binding listOfAction}" HorizontalAlignment="Left" Height="717" Margin="10,64,0,0" VerticalAlignment="Top" Width="407" FontSize="22">
+        <ListView x:Name="LV_actionBase" ItemsSource="{Binding listOfAction}" HorizontalAlignment="Left" Height="631" Margin="10,64,0,0" VerticalAlignment="Top" Width="407" FontSize="22">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -80,12 +82,12 @@
             </ListView.View>
 
         </ListView>
-        <Button Content="Creat Action" HorizontalAlignment="Left" Margin="10,813,0,0" VerticalAlignment="Top" Width="407" Height="53" Click="Button_creatAction_Click" FontSize="16"/>
+        <Button Content="Creat Action" HorizontalAlignment="Left" Margin="10,727,0,0" VerticalAlignment="Top" Width="407" Height="54" Click="Button_creatAction_Click" FontSize="16"/>
         <Button Content="Start Demo" HorizontalAlignment="Left" Margin="10,15,0,0" VerticalAlignment="Top" Width="407" Height="49" FontSize="16" Click="Button_startRecord_Click"/>
-        <Button Content="Button" HorizontalAlignment="Left" Margin="980,686,0,0" VerticalAlignment="Top" Width="76" FontSize="18" Click="Button_Click" Background="#FF3F73B2"/>
+        <Button Content="Button" HorizontalAlignment="Left" Margin="1310,448,0,0" VerticalAlignment="Top" Width="76" FontSize="18" Click="Button_Click" Background="#FF3F73B2"/>
         <Rectangle x:Name="Rect_actionBaseTopColor" Fill="#00F4F4F5" HorizontalAlignment="Left" Height="10" Margin="10,54,0,0" Stroke="Black" VerticalAlignment="Top" Width="407" RadiusY="2.917" RadiusX="2.917"/>
-        <Button Content="End Demo" HorizontalAlignment="Left" Margin="10,781,0,0" VerticalAlignment="Top" Width="407" Height="32" FontSize="16" Click="Button_endDemo_Click"/>
-        <Grid HorizontalAlignment="Left" Height="416" Margin="1310,27,0,0" VerticalAlignment="Top" Width="274" Background="#FFC1D9ED">
+        <Button Content="End Demo" HorizontalAlignment="Left" Margin="10,695,0,0" VerticalAlignment="Top" Width="407" Height="32" FontSize="16" Click="Button_endDemo_Click"/>
+        <Grid HorizontalAlignment="Left" Height="416" Margin="1310,15,0,0" VerticalAlignment="Top" Width="274" Background="#FFC1D9ED">
             <Button x:Name="Btn_UrConnect" Content="Start Server" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="106" FontSize="16" Height="45" Click="Button_startServer_Click"/>
             <Button Content="dis" HorizontalAlignment="Left" Margin="121,10,0,0" VerticalAlignment="Top" Width="32" Height="45" Click="Button_disconnect_Click"/>
             <Ellipse x:Name="cir_UrState_off" Fill="#FFE63232" HorizontalAlignment="Left" Height="15" Margin="21,60,0,0" Stroke="Black" VerticalAlignment="Top" Width="15"/>
