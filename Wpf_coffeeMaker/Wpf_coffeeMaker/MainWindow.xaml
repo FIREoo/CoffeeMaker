@@ -86,7 +86,6 @@
         </ListView>
         <Button Content="Creat Action" HorizontalAlignment="Left" Margin="10,727,0,0" VerticalAlignment="Top" Width="407" Height="54" Click="Button_creatAction_Click" FontSize="16"/>
         <Button Content="Start Demo" HorizontalAlignment="Left" Margin="10,15,0,0" VerticalAlignment="Top" Width="407" Height="49" FontSize="16" Click="Button_startRecord_Click"/>
-        <Button Content="Button" HorizontalAlignment="Left" Margin="1310,552,0,0" VerticalAlignment="Top" Width="76" FontSize="18" Click="Button_Click" Background="#FF3F73B2"/>
         <Rectangle x:Name="Rect_actionBaseTopColor" Fill="#00F4F4F5" HorizontalAlignment="Left" Height="10" Margin="10,54,0,0" Stroke="Black" VerticalAlignment="Top" Width="407" RadiusY="2.917" RadiusX="2.917"/>
         <Button Content="End Demo" HorizontalAlignment="Left" Margin="10,695,0,0" VerticalAlignment="Top" Width="407" Height="32" FontSize="16" Click="Button_endDemo_Click"/>
         <Grid HorizontalAlignment="Left" Height="476" Margin="1310,15,0,0" VerticalAlignment="Top" Width="274" Background="#FFC1D9ED">
@@ -125,6 +124,7 @@
             <Button x:Name="Btn_goPath" Content="Go Path" HorizontalAlignment="Left" Margin="189,96,0,0" VerticalAlignment="Top" Width="75" Height="47" FontSize="16" Click="Btn_goPath_Click"/>
             <Button Content="Button" HorizontalAlignment="Left" Margin="16,399,0,0" VerticalAlignment="Top" Width="100" Height="50" Click="Button_Click_1"/>
         </Grid>
+        <Button x:Name="btn_adminWindow" Content="Button" HorizontalAlignment="Left" Margin="1310,496,0,0" VerticalAlignment="Top" Width="133" Height="46" Click="Btn_adminWindow_Click"/>
 
 
     </Grid>

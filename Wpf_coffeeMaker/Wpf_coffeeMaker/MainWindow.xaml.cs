@@ -1003,6 +1003,12 @@ namespace Wpf_coffeeMaker
 
 
         }
+
+        private void Btn_adminWindow_Click(object sender, RoutedEventArgs e)
+        {
+            adminWindow adminWindow = new adminWindow();
+            adminWindow.Show();
+        }
     }//class
     public static class BitmapSourceConvert
     {
