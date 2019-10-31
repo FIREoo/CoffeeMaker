@@ -6,9 +6,42 @@ using UrRobot.Coordinates;
 
 namespace myActionBase
 {
-    class ActionBase
+    public class ActionLine
     {
-        //private static robotControl UR;
+        public string Action;
+        public Objects target;
+        public Objects destination;
+
+        public static void addToListView(ref System.Windows.Controls.ListView listView)
+        {
+
+            listView.Items.Add(
+                new ActionBaseAdder(
+                    act,
+                    target.Name,
+                    pos.ToString("()"),
+                    new SolidColorBrush(Colors.Black),
+                    new SolidColorBrush(Colors.Black),
+                    new SolidColorBrush(Colors.Black)
+                    ));
+        }
+    }
+
+    public class Action
+    {
+
+    }
+    public class Target
+    {
+        Objects _object = new Objects();
+    }
+    public class Destination
+    {
+
+    }
+
+    public class ActionBase
+    {
         private static StreamWriter txt;
         private static string fileName;
         public ActionBase(string file)
@@ -48,7 +81,7 @@ namespace myActionBase
             }
         }
     }
-    class Subact
+    public class SubAct
     {
         public static subactInfo Pick(Objects cup)
         {
@@ -109,7 +142,7 @@ namespace myActionBase
             }
             if (TheObject == subactInfo.thing.Case)
             {
-               // rtn.AddFile($"Path//moveCase.path");
+                // rtn.AddFile($"Path//moveCase.path");
             }
             return rtn;
         }
@@ -259,7 +292,7 @@ namespace myActionBase
         }
         public static class Name
         {
-            public static string Pick  = "Pick up";
+            public static string Pick = "Pick up";
             public static string Place = "Place";
             public static string Pour = "Pour";
             public static string Trigger = "Toggle";
@@ -271,7 +304,7 @@ namespace myActionBase
 
     }
 
-    class subactInfo
+    public class subactInfo
     {
         public List<string> infotxt = new List<string>();
         public void AddFile(string filename)
@@ -294,4 +327,14 @@ namespace myActionBase
             Case = 1
         }
     }
+
+    public class myAction
+    {
+        class Pick
+        {
+            string Name;
+        }
+
+    }
+
 }

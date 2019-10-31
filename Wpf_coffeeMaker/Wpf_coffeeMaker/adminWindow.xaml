@@ -7,6 +7,10 @@
         mc:Ignorable="d"
         Title="adminWindow" Height="450" Width="800">
     <Grid>
-        
+        <Button x:Name="btn_addSimAction" Content="Add action" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="105" Height="51" Click="Btn_addSimAction_Click"/>
+        <ComboBox x:Name="cb_action" HorizontalAlignment="Left" Margin="10,66,0,0" VerticalAlignment="Top" Width="105"/>
+        <ComboBox x:Name="cb_target" HorizontalAlignment="Left" Margin="120,66,0,0" VerticalAlignment="Top" Width="120"/>
+        <ComboBox x:Name="cb_destination" HorizontalAlignment="Left" Margin="245,66,0,0" VerticalAlignment="Top" Width="120"/>
+
     </Grid>
 </Window>

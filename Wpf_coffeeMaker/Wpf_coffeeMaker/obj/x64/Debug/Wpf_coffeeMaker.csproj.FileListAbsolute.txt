@@ -75,3 +75,5 @@ G:\Desktop\Git\CoffeeMaker\Wpf_coffeeMaker\Wpf_coffeeMaker\bin\x64\Debug\CS_UR_s
 G:\Desktop\Git\CoffeeMaker\Wpf_coffeeMaker\Wpf_coffeeMaker\bin\x64\Debug\CS_UR_socketControl.dll.config
 G:\Desktop\Git\CoffeeMaker\Wpf_coffeeMaker\Wpf_coffeeMaker\bin\x64\Debug\Emgu.CV.DebuggerVisualizers.VS2019.dll
 G:\Desktop\Git\CoffeeMaker\Wpf_coffeeMaker\Wpf_coffeeMaker\obj\x64\Debug\adminWindow.g.cs
+C:\Users\FIRE\Desktop\Git\CoffeeMaker\Wpf_coffeeMaker\Wpf_coffeeMaker\obj\x64\Debug\adminWindow.g.cs
+C:\Users\FIRE\Desktop\Git\CoffeeMaker\Wpf_coffeeMaker\Wpf_coffeeMaker\obj\x64\Debug\adminWindow.baml

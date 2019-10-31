@@ -102,7 +102,6 @@
       <DependentUpon>adminWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ezTCP.cs" />
-    <Compile Include="robotControl.cs" />
     <Page Include="adminWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -71,6 +71,8 @@ namespace Wpf_coffeeMaker
         public static Objects machine = new Objects();
         public static Objects handing = new Objects();
 
+        public static Objects[] theObjects = new Objects[4];
+
         ActionBase actionBase;
 
         #region //---UI---//
@@ -167,15 +169,21 @@ namespace Wpf_coffeeMaker
         }
         private void creatObject()
         {
-            machine.Name = "machine";
+            //machine.Name = "machine";
 
-            cups[0] = new Objects();
-            cups[0].Name = "blue cup";
-            cups[0].color = System.Windows.Media.Color.FromArgb(255, 103, 167, 184);
+            //cups[0] = new Objects();
+            //cups[0].Name = "blue cup";
+            //cups[0].color = System.Windows.Media.Color.FromArgb(255, 103, 167, 184);
 
-            cups[1] = new Objects();
-            cups[1].Name = "pink cup";
-            cups[1].color = System.Windows.Media.Color.FromArgb(255, 205, 130, 150);
+            //cups[1] = new Objects();
+            //cups[1].Name = "pink cup";
+            //cups[1].color = System.Windows.Media.Color.FromArgb(255, 205, 130, 150);
+
+            for (int i = 0; i < theObjects.Count(); i++)
+            {
+                theObjects[i] = new Objects();
+                theObjects[i].Name = "test";
+            }
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -820,18 +828,18 @@ namespace Wpf_coffeeMaker
             for (int i = 0; i < ActionList.Count(); i++)
             {
 
-                if (ActionList[i].Action == Subact.Name.Pick)
+                if (ActionList[i].Action == SubAct.Name.Pick)
                 {
                     if (ActionList[i].Detial == subactInfo.place.DripTray.ToString())
-                        actionBase.add(Subact.Pick(subactInfo.place.DripTray));
+                        actionBase.add(SubAct.Pick(subactInfo.place.DripTray));
                     else if (ActionList[i].Detial == subactInfo.thing.Case.ToString())
-                        actionBase.add(Subact.Pick(subactInfo.thing.Case));
+                        actionBase.add(SubAct.Pick(subactInfo.thing.Case));
                     else
                         foreach (Objects obj in cups)
                             if (obj.Name == ActionList[i].Detial)
-                                actionBase.add(Subact.Pick(obj));
+                                actionBase.add(SubAct.Pick(obj));
                 }
-                else if (ActionList[i].Action == Subact.Name.Place)
+                else if (ActionList[i].Action == SubAct.Name.Place)
                 {
                     foreach (Objects obj in cups)
                         if (obj.Name == ActionList[i].Detial)
@@ -839,7 +847,7 @@ namespace Wpf_coffeeMaker
                             i++;
                             string detial = ActionList[i].Detial;
                             if (detial == subactInfo.place.DripTray.ToString())
-                                actionBase.add(Subact.Place(subactInfo.place.DripTray));
+                                actionBase.add(SubAct.Place(subactInfo.place.DripTray));
                             else
                             {
                                 detial = detial.Substring(1, detial.Length - 2);
@@ -849,16 +857,16 @@ namespace Wpf_coffeeMaker
 
                         }
                 }
-                else if (ActionList[i].Action == Subact.Name.Pour)
+                else if (ActionList[i].Action == SubAct.Name.Pour)
                 {
 
                     if (cups[0].Name == ActionList[i].Detial)
                     {
-                        actionBase.add(Subact.Pour(cups[1]));
+                        actionBase.add(SubAct.Pour(cups[1]));
                     }
                     else if (cups[1].Name == ActionList[i].Detial)
                     {
-                        actionBase.add(Subact.Pour(cups[0]));
+                        actionBase.add(SubAct.Pour(cups[0]));
                     }
                     else
                     {
@@ -866,19 +874,40 @@ namespace Wpf_coffeeMaker
                     }
                     i++;
                 }
-                else if (ActionList[i].Action == Subact.Name.Trigger)
+                else if (ActionList[i].Action == SubAct.Name.Trigger)
                 {
-                    actionBase.add(Subact.Trigger());
+                    actionBase.add(SubAct.Trigger());
                 }
-                else if (ActionList[i].Action == Subact.Name.PutBoxIn)
+                else if (ActionList[i].Action == SubAct.Name.PutBoxIn)
                 {
-                    actionBase.add(Subact.PutBoxIn());
+                    actionBase.add(SubAct.PutBoxIn());
                 }
 
             }
             actionBase.saveFile();
 
         }
+
+        public void addActionBase(string act, Objects target, Objects destination)
+        {
+            LV_actionBase.Items.Add(new ActionBaseAdder(act, target.Name, destination.Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black)));
+
+        }
+        public void addActionBase(string act, Objects target, URCoordinates pos)
+        {
+            LV_actionBase.Items.Add(new ActionBaseAdder(act, target.Name, pos.ToString("()"), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black)));
+        }
+        public void addActionBase(ActionLine al)
+        {
+            // this.LV_actionBase.Items.Add(new ActionBaseAdder("test1", "test2", "(10,10,10)", new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black)));
+            ActionBaseAdder ab;
+            if (al.destination.Name == "pos")
+            ab = new ActionBaseAdder(al.Action, al.target.Name, al.destination.getNowPos().ToString("()"), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black));
+           else
+                ab = new ActionBaseAdder(al.Action, al.target.Name, al.destination.Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black));
+            this.LV_actionBase.Items.Add(ab);
+        }
+
         #endregion //--- Action base Control---//
 
         #region //---Connect Python Action recognition---//
@@ -890,14 +919,14 @@ namespace Wpf_coffeeMaker
                     return;
                 if (handing == cups[0])
                 {
-                    ActionList.Add(new ActionBaseList(Subact.Name.Pour, cups[0].Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(cups[0].color)));
+                    ActionList.Add(new ActionBaseList(SubAct.Name.Pour, cups[0].Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(cups[0].color)));
                     LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
                     ActionList.Add(new ActionBaseList("    to", cups[1].Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(cups[1].color)));
                     LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
                 }
                 else if (handing == cups[1])
                 {
-                    ActionList.Add(new ActionBaseList(Subact.Name.Pour, cups[1].Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(cups[1].color)));
+                    ActionList.Add(new ActionBaseList(SubAct.Name.Pour, cups[1].Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(cups[1].color)));
                     LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
                     ActionList.Add(new ActionBaseList("    to", cups[0].Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(cups[0].color)));
                     LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
@@ -928,7 +957,7 @@ namespace Wpf_coffeeMaker
                 //    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
                 //}
                 handing = machine;
-                ActionList.Add(new ActionBaseList(Subact.Name.Trigger, "", new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black)));
+                ActionList.Add(new ActionBaseList(SubAct.Name.Trigger, "", new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black)));
                 LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
                 nowAct = "Toggle";
 
@@ -998,7 +1027,7 @@ namespace Wpf_coffeeMaker
             {
                 UR.getPosition(out URCoordinates nowPos);
                 UR.goRelativePosition(armMoveX.M(), armMoveY.M());
-               UR.goRelativeJoint(j6: (angel_obj-10).deg());
+                UR.goRelativeJoint(j6: (angel_obj - 10).deg());
             });
 
 
@@ -1006,8 +1035,28 @@ namespace Wpf_coffeeMaker
 
         private void Btn_adminWindow_Click(object sender, RoutedEventArgs e)
         {
+            // addActionBase("Pick", myObjects[1], myObjects[2]);
             adminWindow adminWindow = new adminWindow();
             adminWindow.Show();
+
+        }
+
+        public void Btn_addSimAction_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("hey");
+            addActionBase("Pick", theObjects[1], theObjects[2]);
+           // tb_object_msg.Text = "this one??";
+        }
+        public string LabelText
+        {
+            get
+            {
+                return this.tb_object_msg.Text;
+            }
+            set
+            {
+                this.tb_object_msg.Text = value;
+            }
         }
     }//class
     public static class BitmapSourceConvert
@@ -1046,6 +1095,24 @@ namespace Wpf_coffeeMaker
         public string Detial { get; set; }
         public SolidColorBrush Color1 { get; set; } = new SolidColorBrush(Colors.Black);
         public SolidColorBrush Color2 { get; set; } = new SolidColorBrush(Colors.Black);
+    }
+    public class ActionBaseAdder
+    {
+        public ActionBaseAdder(string action, string target, string destination, SolidColorBrush C1, SolidColorBrush C2, SolidColorBrush C3)
+        {
+            Action = action;
+            Target = target;
+            Destination = destination;
+            Color1 = (C1);
+            Color2 = (C2);
+            Color3 = (C3);
+        }
+        public static string Action { get; set; }
+        public static string Target { get; set; }
+        public static string Destination { get; set; }
+        public static SolidColorBrush Color1 { get; set; } = new SolidColorBrush(Colors.Black);
+        public static SolidColorBrush Color2 { get; set; } = new SolidColorBrush(Colors.Black);
+        public static SolidColorBrush Color3 { get; set; } = new SolidColorBrush(Colors.Black);
     }
 
     public static class MatExtension
