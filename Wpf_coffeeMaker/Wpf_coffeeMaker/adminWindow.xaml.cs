@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using myActionBase;
+using UrRobot.Coordinates;
+
 
 namespace Wpf_coffeeMaker
 {
@@ -31,45 +33,80 @@ namespace Wpf_coffeeMaker
 
             List<string> itemNames3 = DestinationList();//準備資料
             cb_destination.ItemsSource = itemNames3;  //資料繫結
+
+            List<string> itemNames4 = TemplateList();//準備資料
+            cb_simTemplate.ItemsSource = itemNames4;  //資料繫結
         }
         private List<string> ActionList()
         {
             List<string> list = new List<string>();
-            list.Add(SubAct.Name.Pick);
-            list.Add(SubAct.Name.Place);
-            list.Add(SubAct.Name.Pour);
-            list.Add(SubAct.Name.AddaSpoon);
-            list.Add(SubAct.Name.Scoop);
+            foreach (var act in MainWindow.actLv)
+                list.Add(act.Name);
             return list;
         }
         private List<string> TargetList()
         {
             List<string> list = new List<string>();
-            foreach(var obj in MainWindow.theObjects)
-            {
+            foreach (var obj in MainWindow.objects)
                 list.Add(obj.Name);
-            }
             return list;
         }
         private List<string> DestinationList()
         {
             List<string> list = new List<string>();
-            list.Add("pos");
-            foreach (var obj in MainWindow.theObjects)
-            {
+
+            foreach (var obj in MainWindow.objects)
                 list.Add(obj.Name);
-            }
+
+            list.Add("pos");
+            return list;
+        }
+        private List<string> TemplateList()
+        {
+            List<string> list = new List<string>();
+            list.Add("pick");
+            list.Add("place");
             return list;
         }
 
         private void Btn_addSimAction_Click(object sender, RoutedEventArgs e)
         {
-            mw.addActionBase(cb_action.Text, cb_target.Text, cb_destination.Text);
+            ActionLine actLine;
+            if (cb_destination.SelectedIndex >= MainWindow.objects.Count)//代表選到pos
+            {
+                myObjects.Objects pos = new myObjects.Objects(100, "pos");
+                pos.nowPos = new URCoordinates(tb_pos_x.Text.toFloat(), tb_pos_y.Text.toFloat(), tb_pos_z.Text.toFloat(), 0, 0, 0);
+                actLine = new ActionLine(MainWindow.actLv[cb_action.SelectedIndex], MainWindow.objects[cb_target.SelectedIndex], pos);
+            }
+            else
+            {
+                //actLine = new ActionLine(MainWindow.actions[cb_action.SelectedIndex], MainWindow.objects[cb_target.SelectedIndex], MainWindow.objects[cb_destination.SelectedIndex]);
+                actLine = new ActionLine(MainWindow.actLv[cb_action.SelectedIndex], MainWindow.objects[cb_target.SelectedIndex], MainWindow.objects[cb_destination.SelectedIndex]);
+            }
+
+            MainWindow.mainAction.Add(actLine);
+            mw.ActionLine2ListView(actLine);
         }
 
-
+        private void Cb_simTemplate_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (cb_simTemplate.SelectedIndex == 0)
+            {
+                cb_action.SelectedIndex = 1;
+                cb_target.SelectedIndex = 1;
+                cb_destination.SelectedIndex = 0;
+            }
+            else if(cb_simTemplate.SelectedIndex == 1)
+            {
+                {
+                    cb_action.SelectedIndex = 2;
+                    cb_target.SelectedIndex = 1;
+                    cb_destination.SelectedIndex = 9;//pos
+                }
+            }
+        }
     }
 
- 
+
 
 }

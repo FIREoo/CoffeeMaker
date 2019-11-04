@@ -58,22 +58,9 @@ namespace Wpf_coffeeMaker
             depth = 3,
             color_resize = 4
         }
-
-        Mat matrix;
-
-        static YoloWrapper yoloWrapper;
-        static IEnumerable<YoloItem> items;
-
-        Mat mat_cup = new Mat(100, 500, DepthType.Cv8U, 3);
+        public static List<ActionLine> mainAction = new List<ActionLine>();
 
         public static int timeTick = 0;
-        public static Objects[] cups = new Objects[2];
-        public static Objects machine = new Objects();
-        public static Objects handing = new Objects();
-
-        public static Objects[] theObjects = new Objects[4];
-
-        ActionBase actionBase;
 
         #region //---UI---//
         private void setConnectCircle(int S)
@@ -160,30 +147,44 @@ namespace Wpf_coffeeMaker
                     new PointF(1062,608),
                     new PointF(1058,105) };
 
-            matrix = CvInvoke.GetPerspectiveTransform(src, dst);
             creatObject();
-
+            creatAction();
             UR.stateChange += OnUrStateChange;
-
-            actionBase = new ActionBase("demoAct.path");
+            UR.dynamicGrip = new UrSocketControl.ControlFunction(() =>Button_goDynamicGrip(null,null));
         }
+
+        public static List<Objects> objects = new List<Objects>();
         private void creatObject()
         {
-            //machine.Name = "machine";
+            objects.Add(new Objects(0, "none"));
+            objects.Add(new Objects(1, "Blue cup"));
+            objects.Add(new Objects(2, "Pink cup"));
+            objects.Add(new Objects(3, "Pot"));
+            objects.Add(new Objects(4, "Spoon"));
+            objects.Add(new Objects(5, "Powder box"));
+            objects.Add(new Objects(6, "Red pill box"));
+            objects.Add(new Objects(7, "Green pill box"));
+            objects.Add(new Objects(8, "Blue pill box"));
+        }
 
-            //cups[0] = new Objects();
-            //cups[0].Name = "blue cup";
-            //cups[0].color = System.Windows.Media.Color.FromArgb(255, 103, 167, 184);
-
-            //cups[1] = new Objects();
-            //cups[1].Name = "pink cup";
-            //cups[1].color = System.Windows.Media.Color.FromArgb(255, 205, 130, 150);
-
-            for (int i = 0; i < theObjects.Count(); i++)
-            {
-                theObjects[i] = new Objects();
-                theObjects[i].Name = "test";
-            }
+        //public static List<myAction> actions = new List<myAction>();
+        public static List<myAction> actLv = new List<myAction>();
+        private void creatAction()
+        {
+            //actions.Add(new myAction(0, "none"));
+            //actions.Add(new myAction(1, "Pick up"));
+            //actions.Add(new myAction(2, "Place"));
+            //actions.Add(new myAction(3, "Pour"));
+            //actions.Add(new myAction(4, "Scoop"));
+            //actions.Add(new myAction(5, "Add in"));
+            //actions.Add(new myAction(6, "Stir"));
+            actLv.Add(new myAction(0, "none"));
+            actLv.Add(myActionAdder.Pick());
+            actLv.Add(myActionAdder.Place());
+            actLv.Add(myActionAdder.Pour());
+            actLv.Add(myActionAdder.Scoop());
+            actLv.Add(myActionAdder.AddIn());
+            actLv.Add(myActionAdder.Stir());
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -201,6 +202,302 @@ namespace Wpf_coffeeMaker
             Rect_actionBaseTopColor.Fill = new SolidColorBrush(Colors.Transparent);
             setRecordRect(0);
         }
+     
+
+        #region //---griping mode---//
+        private void Button_startCamera_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                CameraStart();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        #endregion ---griping mode---
+
+        //UR
+        #region  //---UR server---//
+        UrSocketControl UR = new UrSocketControl();
+        private void Button_startServer_Click(object sender, RoutedEventArgs e)
+        {
+            UR.startServer("auto", 888);
+        }
+        private void Button_disconnect_Click(object sender, RoutedEventArgs e)
+        {
+            UR.stopServer();
+        }
+        private void OnUrStateChange(tcpState S)
+        {
+            try
+            {
+                this.Dispatcher.Invoke((Action)(() =>
+                {
+                    if (S == tcpState.Connect)
+                        setConnectCircle(3);
+                    else if (S == tcpState.Disconnect)
+                        setConnectCircle(1);
+                    else if (S == tcpState.waitAccept)
+                        setConnectCircle(2);
+                    else if (S == tcpState.startListener)
+                        setConnectCircle(2);
+                    else
+                        setConnectCircle(1);
+                }));
+            }
+            catch
+            {
+                Console.WriteLine("server thread already end");
+            }
+
+
+
+        }
+        #endregion //---UR server---//
+
+        #region //---Record---//
+        private void Button_recordMode_Click(object sender, RoutedEventArgs e)
+        {
+            // UR.Record_start(Tb_recordName.Text);
+            UR.startRecord(Tb_recordName.Text + ".path");
+            setRecordRect(1);
+        }
+
+        private void Button_recordWrite_Click(object sender, RoutedEventArgs e)
+        {
+            // UR.Record_writePos();
+            UR.Record_joint();
+        }
+        private void Button_recordEnd_Click(object sender, RoutedEventArgs e)
+        {
+            UR.endRecord();
+            // UR.Record_stop();
+            setRecordRect(2);
+        }
+
+        private void Button_grip_Click(object sender, RoutedEventArgs e)
+        {
+            UR.Record_grip(int.Parse(Tb_gripVal.Text), true);
+            // UR.goGrip((byte)int.Parse(Tb_gripVal.Text));
+        }
+        private void Button_grip2_Click(object sender, RoutedEventArgs e)
+        {
+            UR.Record_grip(int.Parse(Tb_gripVal2.Text), true);
+            //UR.goGrip((byte)int.Parse(Tb_gripVal2.Text));
+        }
+        private void Button_grip3_Click(object sender, RoutedEventArgs e)
+        {
+            // UR.goGrip((byte)int.Parse(Tb_gripVal3.Text));
+            UR.Record_grip(int.Parse(Tb_gripVal3.Text), true);
+        }
+        private void Button_recordSleep_Click(object sender, RoutedEventArgs e)
+        {
+            UR.Record_sleep(Tb_sleepVal.Text.toInt());
+        }
+
+        #endregion //---Record---//
+
+        #region //---Play path---//
+        private void Button_goPosHome_Click(object sender, RoutedEventArgs e)
+        {
+            //UR.goToFilePos("Home.pos");
+        }
+        private void Cb_Path_DropDownOpened(object sender, EventArgs e)
+        {
+            Cb_Path.Items.Clear();
+            DirectoryInfo PathFolder = new DirectoryInfo(UR.rootPath);
+            FileInfo[] ActFiles = PathFolder.GetFiles("*.path");
+            foreach (FileInfo file in ActFiles)
+            {
+                Cb_Path.Items.Add(file.Name);
+            }
+        }
+        private void Btn_goPath_Click(object sender, RoutedEventArgs e)
+        {
+            UR.goFile(UR.rootPath + Cb_Path.SelectedValue.ToString());
+        }
+        #endregion //---Play path---//
+
+        //action base
+        #region //--- Action base Control---//
+        List<ActionBaseList> ActionList = new List<ActionBaseList>();
+        static bool startDemo = false;
+        private void Button_startRecord_Click(object sender, RoutedEventArgs e)
+        {
+            LV_actionBase.Items.Clear();
+
+            Rect_actionBaseTopColor.Fill = new SolidColorBrush(Color.FromArgb(200, 40, 210, 80));
+            startDemo = true;
+        }
+        private void Button_endDemo_Click(object sender, RoutedEventArgs e)
+        {
+            if (startDemo == false)
+            {
+                MessageBox.Show("已經結束了");
+                return;
+            }
+
+            Rect_actionBaseTopColor.Fill = new SolidColorBrush(Color.FromArgb(200, 210, 80, 40));
+
+            startDemo = false;
+        }
+        private void Button_createAction_Click(object sender, RoutedEventArgs e)
+        {
+            if (startDemo == true) //need startDemo == false
+            {
+                MessageBox.Show("尚未結束示範，請按下[End Demo]按鈕");
+                return;
+            }
+            string fileName = "testtt";
+
+            //必須放新的物件座標!! 才能計算
+            for (int i = 0; i < mainAction.Count(); i++)
+            {
+                if (mainAction[i].target.Name != "pos")//如果不是pos才要更新 //基本上不會發生
+                    mainAction[i].target.nowPos = objects[mainAction[i].target.index].getPosition();
+                if (mainAction[i].destination.Name != "pos")//如果不是pos才要更新 //也就是像place到某個點
+                    mainAction[i].destination.nowPos = objects[mainAction[i].destination.index].getPosition();
+            }
+
+            ActionBase2Cmd(mainAction, fileName);
+
+            //執行
+            if (UR.isServerRunning == false)
+            {
+                MessageBox.Show("UR手臂未連結，但已經規劃好路徑");
+                return;
+            }
+            UR.goFile(fileName);
+        }
+
+        public void ActionLine2ListView(ActionLine al)
+        {
+
+            ActionBaseAdder ab;
+            if (al.destination.Name == "pos")
+                ab = new ActionBaseAdder(al.Action.Name, al.target.Name, al.destination.getPosition().ToString("(3)"), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black));
+            else
+                ab = new ActionBaseAdder(al.Action.Name, al.target.Name, al.destination.Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black));
+            this.LV_actionBase.Items.Add(ab);
+        }
+
+        public void ActionBase2Cmd(List<ActionLine> actLine, string fileName)
+        {
+            if (fileName.IndexOf(".path") < 0)
+                fileName += ".path";
+            StreamWriter txt;
+            txt = new StreamWriter($"Path//{fileName}", false);
+            foreach (ActionLine al in actLine)
+                foreach (string str in al.getCmdText())
+                    txt.WriteLine(str);
+            txt.Flush();
+            txt.Close();
+        }
+
+        #endregion //--- Action base Control---//
+
+        #region //---Connect Python Action recognition---//
+        private void Button_addPour_Click(object sender, RoutedEventArgs e)
+        {
+            //if (startDemo == true)
+            //{
+            //    if (nowAct == "Pour")
+            //        return;
+            //    if (handing == cups[0])
+            //    {
+            //        ActionList.Add(new ActionBaseList(myActionAdder.Name.Pour, cups[0].Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(cups[0].color)));
+            //        LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
+            //        ActionList.Add(new ActionBaseList("    to", cups[1].Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(cups[1].color)));
+            //        LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
+            //    }
+            //    else if (handing == cups[1])
+            //    {
+            //        ActionList.Add(new ActionBaseList(myActionAdder.Name.Pour, cups[1].Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(cups[1].color)));
+            //        LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
+            //        ActionList.Add(new ActionBaseList("    to", cups[0].Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(cups[0].color)));
+            //        LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
+            //    }
+            //    nowAct = "Pour";
+            //}
+
+        }
+        bool evil_toggleOnce = false;
+        private void Button_addToggle_Click(object sender, RoutedEventArgs e)
+        {
+            //if (startDemo == true)
+            //{
+            //    if (evil_toggleOnce == true)
+            //        return;
+            //    if (nowAct == "Toggle")
+            //        return;
+            //    ActionList.Add(new ActionBaseList("Place", handing.Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(handing.color)));
+            //    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
+            //    //if (handing.Distanse(dripTrayPos) < 0.02)//代表在drip tray上
+            //    //{
+            //    //    ActionList.Add(new ActionBaseList("     to", subactInfo.place.DripTray.ToString(), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black)));
+            //    //    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
+            //    //}
+            //    //else
+            //    //{
+            //    //    ActionList.Add(new ActionBaseList("     to", (handing.getNowPos()).ToString("mm", "3(", "0"), new SolidColorBrush(Colors.Black), new SolidColorBrush(handing.color)));
+            //    //    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
+            //    //}
+            //    handing = machine;
+            //    ActionList.Add(new ActionBaseList(myActionAdder.Name.Trigger, "", new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black)));
+            //    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
+            //    nowAct = "Toggle";
+
+            //    evil_toggleOnce = true;
+            //    cir_toggleOnce.Fill = new SolidColorBrush(Colors.Salmon);
+            //}
+
+        }
+        string nowAct = "Background";
+        private void Button_askActionRecognition_Click(object sender, RoutedEventArgs e)
+        {
+            ezTCP TCP = new ezTCP();
+            setActiionCircle("");
+            Task.Run(() =>
+            {
+                if (!TCP.creatClient("192.168.1.102", 777))
+                    return;
+
+                this.Dispatcher.Invoke((Action)(() => { cir_connectAct.Fill = new SolidColorBrush(Colors.DarkSeaGreen); }));
+                while (true)
+                {
+                    try
+                    {
+                        TCP.client_SendData("hey");
+                        string msg = TCP.client_ReadData();
+                        if (msg == "")
+                            break;
+
+                        if (msg == "Pour")
+                            this.Dispatcher.Invoke((Action)(() => { Button_addPour_Click(null, null); setActiionCircle("Pour"); }));
+                        else if (msg == "Toggle")
+                            this.Dispatcher.Invoke((Action)(() => { Button_addToggle_Click(null, null); setActiionCircle("Toggle"); }));
+                        else if (msg == "Background")
+                            this.Dispatcher.Invoke((Action)(() => { nowAct = "Background"; setActiionCircle("Background"); }));
+
+                        Thread.Sleep(0);
+                    }
+                    catch
+                    {
+                        break;
+                    }
+
+                }
+                Console.WriteLine("client 中斷");
+                this.Dispatcher.Invoke((Action)(() => { cir_connectAct.Fill = new SolidColorBrush(Colors.Salmon); setActiionCircle(""); }));
+            });
+
+        }
+        #endregion //---Connect Python Action recognition---//
+
+        #region //---RealSense and gripMode---//
         private void CameraStart()
         {
             // Setup config settings
@@ -294,8 +591,6 @@ namespace Wpf_coffeeMaker
         private void StartProcessingBlock(CustomProcessingBlock processingBlock, PipelineProfile pp, Action<VideoFrame> updateColor, Pipeline pipeline)
         {
             showType = imgType.depth;
-
-
 
             Size RS_depthSize = new Size(1280, 720);
             Mat processMat = new Mat(RS_depthSize, DepthType.Cv8U, 3);
@@ -429,7 +724,6 @@ namespace Wpf_coffeeMaker
                         using (var frames = pipeline.WaitForFrames())
                         {
                             // processingBlock.ProcessFrames(frames);//有filter (效果是不是比較差啊...
-
 
                             var depthintr = (pp.GetStream(Stream.Depth) as VideoStreamProfile).GetIntrinsics();//這好像是取得什麼參數的，用來傳換成實際深度
                             var depth_frame = frames.DepthFrame.DisposeWith(frames);//若 depth_frame不使用 FrameSet後的frame，那數值會少許多(可能是沒有filter吧)
@@ -572,7 +866,7 @@ namespace Wpf_coffeeMaker
 
                             if (size_obj.Width > size_obj.Height)
                                 angel_obj = angel_obj + 90;
-                            Dispatcher.Invoke(DispatcherPriority.Normal, (Action)(() => { tb_object_msg.Text = $"ts:({armMoveX * 1000},{armMoveY * 1000}),\n degree:{angel_obj},\n size:{size_obj.Width},{size_obj.Height}"; }));
+                            Dispatcher.Invoke(DispatcherPriority.Normal, (Action)(() => { tb_object_msg.Text = $"distanse:({armMoveX * 1000},{armMoveY * 1000}),\n degree:{angel_obj},\n size:{size_obj.Width},{size_obj.Height}"; }));
 
                             //CvInvoke.Add(mat_img_show,img_depth_ch3, mat_img_show);
 
@@ -581,48 +875,7 @@ namespace Wpf_coffeeMaker
                         }
                     }
                 }, token);
-            }
-
-            //start
-            //var token = _tokenSource.Token;
-            //Action<VideoFrame> updateOriginColor = UpdateImage(Img_main);
-            //var t = Task.Factory.StartNew(() =>
-            //{
-            //    Mat color_orig = new Mat(RS_depthSize, DepthType.Cv8U, 3);
-            //    Mat color_resize = new Mat(RS_depthSize, DepthType.Cv8U, 3);
-
-            //    yoloWrapper = new YoloWrapper("modle\\yolov3-tiny-3obj.cfg", "modle\\yolov3-tiny-3obj_3cup.weights", "modle\\obj.names");
-            //    string detectionSystemDetail = string.Empty;
-            //    if (!string.IsNullOrEmpty(yoloWrapper.EnvironmentReport.GraphicDeviceName))
-            //        detectionSystemDetail = $"({yoloWrapper.EnvironmentReport.GraphicDeviceName})";
-            //    Console.WriteLine($"Detection System:{yoloWrapper.DetectionSystem}{detectionSystemDetail}");
-
-            //    while (!token.IsCancellationRequested)
-            //    {
-            //        using (var frames = pipeline.WaitForFrames())
-            //        {
-            //            if (showType == imgType.color)
-            //            {
-            //                VideoFrame color_frame = frames.ColorFrame.DisposeWith(frames);
-            //                color_frame.CopyTo(color_orig.DataPointer);
-
-            //                timeTick++;
-            //                color_frame.CopyFrom(color_resize.DataPointer);
-            //                Dispatcher.Invoke(DispatcherPriority.Render, updateOriginColor, color_frame);
-            //            }
-            //            else if (showType == imgType.mix)//顯示 mix 圖
-            //            {
-            //                processingBlock.ProcessFrames(frames);
-
-            //            }
-
-            //        }
-            //    }
-            //}, token);
-        }
-        public static void MinAreaBoundingBox(Mat src, Mat draw)
-        {
-
+            }//if type == depth
         }
 
         private void Grid_MouseMove(object sender, MouseEventArgs e)
@@ -657,362 +910,18 @@ namespace Wpf_coffeeMaker
             }
         }
 
-        #region //---griping mode---//
-        private void Button_startCamera_Click(object sender, RoutedEventArgs e)
+        private void Button_goDynamicGrip(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                CameraStart();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
-
-        #endregion ---griping mode---
-
-        //UR
-        #region  //---UR server---//
-        UrSocketControl UR = new UrSocketControl();
-        private void Button_startServer_Click(object sender, RoutedEventArgs e)
-        {
-            UR.startServer("auto", 888);
-        }
-        private void Button_disconnect_Click(object sender, RoutedEventArgs e)
-        {
-            UR.stopServer();
-        }
-        private void OnUrStateChange(tcpState S)
-        {
-            try
-            {
-                this.Dispatcher.Invoke((Action)(() =>
-                {
-                    if (S == tcpState.Connect)
-                        setConnectCircle(3);
-                    else if (S == tcpState.Disconnect)
-                        setConnectCircle(1);
-                    else if (S == tcpState.waitAccept)
-                        setConnectCircle(2);
-                    else if (S == tcpState.startListener)
-                        setConnectCircle(2);
-                    else
-                        setConnectCircle(1);
-                }));
-            }
-            catch
-            {
-                Console.WriteLine("server thread already end");
-            }
-
-
-
-        }
-        #endregion //---UR server---//
-
-        #region //---Record---//
-        private void Button_recordMode_Click(object sender, RoutedEventArgs e)
-        {
-            // UR.Record_start(Tb_recordName.Text);
-            UR.startRecord(Tb_recordName.Text + ".path");
-            setRecordRect(1);
-        }
-
-        private void Button_recordWrite_Click(object sender, RoutedEventArgs e)
-        {
-            // UR.Record_writePos();
-            UR.Record_joint();
-        }
-        private void Button_recordEnd_Click(object sender, RoutedEventArgs e)
-        {
-            UR.endRecord();
-            // UR.Record_stop();
-            setRecordRect(2);
-        }
-
-        private void Button_grip_Click(object sender, RoutedEventArgs e)
-        {
-            UR.Record_grip(int.Parse(Tb_gripVal.Text), true);
-            // UR.goGrip((byte)int.Parse(Tb_gripVal.Text));
-        }
-        private void Button_grip2_Click(object sender, RoutedEventArgs e)
-        {
-            UR.Record_grip(int.Parse(Tb_gripVal2.Text), true);
-            //UR.goGrip((byte)int.Parse(Tb_gripVal2.Text));
-        }
-        private void Button_grip3_Click(object sender, RoutedEventArgs e)
-        {
-            // UR.goGrip((byte)int.Parse(Tb_gripVal3.Text));
-            UR.Record_grip(int.Parse(Tb_gripVal3.Text), true);
-        }
-        private void Button_recordSleep_Click(object sender, RoutedEventArgs e)
-        {
-            UR.Record_sleep(Tb_sleepVal.Text.toInt());
-        }
-
-        #endregion //---Record---//
-
-        #region //---Play path---//
-        private void Button_goPosHome_Click(object sender, RoutedEventArgs e)
-        {
-            //UR.goToFilePos("Home.pos");
-        }
-        private void Cb_Path_DropDownOpened(object sender, EventArgs e)
-        {
-            Cb_Path.Items.Clear();
-            DirectoryInfo PathFolder = new DirectoryInfo(UR.rootPath);
-            FileInfo[] ActFiles = PathFolder.GetFiles("*.path");
-            foreach (FileInfo file in ActFiles)
-            {
-                Cb_Path.Items.Add(file.Name);
-            }
-        }
-        private void Btn_goPath_Click(object sender, RoutedEventArgs e)
-        {
-            UR.goFile(UR.rootPath + Cb_Path.SelectedValue.ToString());
-        }
-        #endregion //---Play path---//
-
-        //action base
-        #region //--- Action base Control---//
-        List<ActionBaseList> ActionList = new List<ActionBaseList>();
-        static bool startDemo = false;
-        private void Button_startRecord_Click(object sender, RoutedEventArgs e)
-        {
-            evil_toggleOnce = false;
-            cir_toggleOnce.Fill = new SolidColorBrush(Colors.Gray);
-
-            handing = new Objects();
-            LV_actionBase.Items.Clear();
-            MyInvoke.setToZero(ref mat_cup);
-            timeTick = 0;
-
-            ActionList.Clear();
-            Rect_actionBaseTopColor.Fill = new SolidColorBrush(Color.FromArgb(200, 40, 210, 40));
-            startDemo = true;
-        }
-        private void Button_endDemo_Click(object sender, RoutedEventArgs e)
-        {
-            if (startDemo == false)
-            {
-                MessageBox.Show("已經結束了");
-                return;
-            }
-
-            ActionList.Add(new ActionBaseList("Place", handing.Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(handing.color)));
-            LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-            //if (handing.Distanse(dripTrayPos) < dripTrayD)//代表在drip tray上
-            //{
-            //    ActionList.Add(new ActionBaseList("     to", subactInfo.place.DripTray.ToString(), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black)));
-            //    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-            //}
-            //else
-            //{
-            //    ActionList.Add(new ActionBaseList("     to", (handing.getNowPos()).ToString("mm", "3(", "0"), new SolidColorBrush(Colors.Black), new SolidColorBrush(handing.color)));
-            //    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-            //}
-            Rect_actionBaseTopColor.Fill = new SolidColorBrush(Colors.Transparent);
-
-            startDemo = false;
-        }
-        private void Button_creatAction_Click(object sender, RoutedEventArgs e)
-        {
-            if (startDemo == true) //need startDemo == false
-            {
-                MessageBox.Show("尚未結束示範，請按下[End Demo]按鈕");
-                return;
-            }
-            actionBase.start(cups);
-
-            for (int i = 0; i < ActionList.Count(); i++)
-            {
-
-                if (ActionList[i].Action == SubAct.Name.Pick)
-                {
-                    if (ActionList[i].Detial == subactInfo.place.DripTray.ToString())
-                        actionBase.add(SubAct.Pick(subactInfo.place.DripTray));
-                    else if (ActionList[i].Detial == subactInfo.thing.Case.ToString())
-                        actionBase.add(SubAct.Pick(subactInfo.thing.Case));
-                    else
-                        foreach (Objects obj in cups)
-                            if (obj.Name == ActionList[i].Detial)
-                                actionBase.add(SubAct.Pick(obj));
-                }
-                else if (ActionList[i].Action == SubAct.Name.Place)
-                {
-                    foreach (Objects obj in cups)
-                        if (obj.Name == ActionList[i].Detial)
-                        {
-                            i++;
-                            string detial = ActionList[i].Detial;
-                            if (detial == subactInfo.place.DripTray.ToString())
-                                actionBase.add(SubAct.Place(subactInfo.place.DripTray));
-                            else
-                            {
-                                detial = detial.Substring(1, detial.Length - 2);
-                                string[] pos = detial.Split(',');
-                                //actionBase.add(Subact.Place(obj, new URCoordinates(float.Parse(pos[0]) / 1000f, float.Parse(pos[1]) / 1000f, float.Parse(pos[2]) / 1000f, 0, 0, 0)));
-                            }
-
-                        }
-                }
-                else if (ActionList[i].Action == SubAct.Name.Pour)
-                {
-
-                    if (cups[0].Name == ActionList[i].Detial)
-                    {
-                        actionBase.add(SubAct.Pour(cups[1]));
-                    }
-                    else if (cups[1].Name == ActionList[i].Detial)
-                    {
-                        actionBase.add(SubAct.Pour(cups[0]));
-                    }
-                    else
-                    {
-                        MessageBox.Show("error!!! 不是杯子");
-                    }
-                    i++;
-                }
-                else if (ActionList[i].Action == SubAct.Name.Trigger)
-                {
-                    actionBase.add(SubAct.Trigger());
-                }
-                else if (ActionList[i].Action == SubAct.Name.PutBoxIn)
-                {
-                    actionBase.add(SubAct.PutBoxIn());
-                }
-
-            }
-            actionBase.saveFile();
-
-        }
-
-        public void addActionBase(string act, Objects target, Objects destination)
-        {
-            LV_actionBase.Items.Add(new ActionBaseAdder(act, target.Name, destination.Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black)));
-
-        }
-        public void addActionBase(string act, Objects target, URCoordinates pos)
-        {
-            LV_actionBase.Items.Add(new ActionBaseAdder(act, target.Name, pos.ToString("()"), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black)));
-        }
-        public void addActionBase(ActionLine al)
-        {
-            // this.LV_actionBase.Items.Add(new ActionBaseAdder("test1", "test2", "(10,10,10)", new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black)));
-            ActionBaseAdder ab;
-            if (al.destination.Name == "pos")
-            ab = new ActionBaseAdder(al.Action, al.target.Name, al.destination.getNowPos().ToString("()"), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black));
-           else
-                ab = new ActionBaseAdder(al.Action, al.target.Name, al.destination.Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black));
-            this.LV_actionBase.Items.Add(ab);
-        }
-
-        #endregion //--- Action base Control---//
-
-        #region //---Connect Python Action recognition---//
-        private void Button_addPour_Click(object sender, RoutedEventArgs e)
-        {
-            if (startDemo == true)
-            {
-                if (nowAct == "Pour")
-                    return;
-                if (handing == cups[0])
-                {
-                    ActionList.Add(new ActionBaseList(SubAct.Name.Pour, cups[0].Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(cups[0].color)));
-                    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-                    ActionList.Add(new ActionBaseList("    to", cups[1].Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(cups[1].color)));
-                    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-                }
-                else if (handing == cups[1])
-                {
-                    ActionList.Add(new ActionBaseList(SubAct.Name.Pour, cups[1].Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(cups[1].color)));
-                    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-                    ActionList.Add(new ActionBaseList("    to", cups[0].Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(cups[0].color)));
-                    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-                }
-                nowAct = "Pour";
-            }
-
-        }
-        bool evil_toggleOnce = false;
-        private void Button_addToggle_Click(object sender, RoutedEventArgs e)
-        {
-            if (startDemo == true)
-            {
-                if (evil_toggleOnce == true)
-                    return;
-                if (nowAct == "Toggle")
-                    return;
-                ActionList.Add(new ActionBaseList("Place", handing.Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(handing.color)));
-                LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-                //if (handing.Distanse(dripTrayPos) < 0.02)//代表在drip tray上
-                //{
-                //    ActionList.Add(new ActionBaseList("     to", subactInfo.place.DripTray.ToString(), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black)));
-                //    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-                //}
-                //else
-                //{
-                //    ActionList.Add(new ActionBaseList("     to", (handing.getNowPos()).ToString("mm", "3(", "0"), new SolidColorBrush(Colors.Black), new SolidColorBrush(handing.color)));
-                //    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-                //}
-                handing = machine;
-                ActionList.Add(new ActionBaseList(SubAct.Name.Trigger, "", new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black)));
-                LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-                nowAct = "Toggle";
-
-                evil_toggleOnce = true;
-                cir_toggleOnce.Fill = new SolidColorBrush(Colors.Salmon);
-            }
-
-        }
-        string nowAct = "Background";
-        private void Button_askActionRecognition_Click(object sender, RoutedEventArgs e)
-        {
-            ezTCP TCP = new ezTCP();
-            setActiionCircle("");
             Task.Run(() =>
             {
-                if (!TCP.creatClient("192.168.1.102", 777))
-                    return;
-
-                this.Dispatcher.Invoke((Action)(() => { cir_connectAct.Fill = new SolidColorBrush(Colors.DarkSeaGreen); }));
-                while (true)
-                {
-                    try
-                    {
-                        TCP.client_SendData("hey");
-                        string msg = TCP.client_ReadData();
-                        if (msg == "")
-                            break;
-
-                        if (msg == "Pour")
-                            this.Dispatcher.Invoke((Action)(() => { Button_addPour_Click(null, null); setActiionCircle("Pour"); }));
-                        else if (msg == "Toggle")
-                            this.Dispatcher.Invoke((Action)(() => { Button_addToggle_Click(null, null); setActiionCircle("Toggle"); }));
-                        else if (msg == "Background")
-                            this.Dispatcher.Invoke((Action)(() => { nowAct = "Background"; setActiionCircle("Background"); }));
-
-                        Thread.Sleep(0);
-                    }
-                    catch
-                    {
-                        break;
-                    }
-
-                }
-                Console.WriteLine("client 中斷");
-                this.Dispatcher.Invoke((Action)(() => { cir_connectAct.Fill = new SolidColorBrush(Colors.Salmon); setActiionCircle(""); }));
+                //UR.getPosition(out URCoordinates nowPos);//等等 沒意義阿??
+                UR.goRelativePosition(armMoveX.M(), armMoveY.M());
+                UR.goRelativeJoint(j6: (angel_obj - 10).deg());//-10 是因為原本攝影機跟夾爪就有10度
             });
 
-        }
-        #endregion //---Connect Python Action recognition---//
 
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            ListViewItem lbi = LV_actionBase.ItemContainerGenerator.ContainerFromIndex(3) as ListViewItem;
-            lbi.Foreground = new SolidColorBrush(Colors.Red);
         }
+        #endregion
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
@@ -1023,29 +932,17 @@ namespace Wpf_coffeeMaker
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            Task.Run(() =>
-            {
-                UR.getPosition(out URCoordinates nowPos);
-                UR.goRelativePosition(armMoveX.M(), armMoveY.M());
-                UR.goRelativeJoint(j6: (angel_obj - 10).deg());
-            });
-
-
+            UR.goFile("testttt");
         }
 
         private void Btn_adminWindow_Click(object sender, RoutedEventArgs e)
         {
-            // addActionBase("Pick", myObjects[1], myObjects[2]);
             adminWindow adminWindow = new adminWindow();
             adminWindow.Show();
-
         }
 
         public void Btn_addSimAction_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("hey");
-            addActionBase("Pick", theObjects[1], theObjects[2]);
-           // tb_object_msg.Text = "this one??";
         }
         public string LabelText
         {

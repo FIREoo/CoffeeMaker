@@ -5,12 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Wpf_coffeeMaker"
         mc:Ignorable="d"
-        Title="adminWindow" Height="450" Width="800">
+        Title="adminWindow" Height="450" Width="800" Left="-1920">
     <Grid>
         <Button x:Name="btn_addSimAction" Content="Add action" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="105" Height="51" Click="Btn_addSimAction_Click"/>
         <ComboBox x:Name="cb_action" HorizontalAlignment="Left" Margin="10,66,0,0" VerticalAlignment="Top" Width="105"/>
         <ComboBox x:Name="cb_target" HorizontalAlignment="Left" Margin="120,66,0,0" VerticalAlignment="Top" Width="120"/>
         <ComboBox x:Name="cb_destination" HorizontalAlignment="Left" Margin="245,66,0,0" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="tb_pos_x" HorizontalAlignment="Left" Height="23" Margin="245,94,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="42" TextAlignment="Center" VerticalContentAlignment="Center"/>
+        <TextBox x:Name="tb_pos_y" HorizontalAlignment="Left" Height="23" Margin="287,94,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="42" TextAlignment="Center" VerticalContentAlignment="Center"/>
+        <TextBox x:Name="tb_pos_z" HorizontalAlignment="Left" Height="23" Margin="329,94,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="42" TextAlignment="Center" VerticalContentAlignment="Center"/>
+        <ComboBox x:Name="cb_simTemplate" HorizontalAlignment="Left" Margin="120,22,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="Cb_simTemplate_SelectionChanged"/>
 
     </Grid>
 </Window>

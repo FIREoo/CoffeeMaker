@@ -9,12 +9,24 @@ namespace myObjects
 {
     public class Objects
     {
+        public Objects(int index, string name)
+        {
+            this.index = index;
+            Name = name;
+            //nowPos = new URCoordinates();
+        }
+        public Objects(URCoordinates pos)
+        {
+            Name = "pos";
+            nowPos = new URCoordinates(pos);
+        }
         public enum states
         {
             stop = 0,
             move = 1
         }
-        public string Name = "";
+        public string Name { get; } = "";
+        public int index { get; } = -1;
         public System.Windows.Media.Color color;
         private int fileterSize { get; set; } = 6;
         private List<float> x = new List<float>();//unit M
@@ -27,21 +39,16 @@ namespace myObjects
         public float gripOffset_M_x = 0;
         public float gripOffset_M_y = 0;
         public float gripOffset_M_z = 0;
-        private URCoordinates nowPos = new URCoordinates(0, 0, 0, 0, 0, 0);//再action中 可能因為中間移動過 所以必須記錄移動後的位置 以免之後抓空
-
-        public void saveNowPos()
+        public URCoordinates nowPos { get; set; }
+        public void savePositionToNowPos()
         {
             nowPos = new URCoordinates(getX_m(), getY_m(), getZ_m(), 0, 0, 0);
         }
-        public URCoordinates getNowPos()
+
+        public URCoordinates getPosition()
         {
             return new URCoordinates(getX_m(), getY_m(), getZ_m(), 0, 0, 0);
         }
-        public void setNowPos(URCoordinates urc)
-        {
-            nowPos = new URCoordinates(urc);
-        }
-
         public void setPos_mm(float x_mm, float y_mm, float z_mm)
         {
             setX_mm(x_mm);

@@ -77,3 +77,4 @@ G:\Desktop\Git\CoffeeMaker\Wpf_coffeeMaker\Wpf_coffeeMaker\bin\x64\Debug\Emgu.CV
 G:\Desktop\Git\CoffeeMaker\Wpf_coffeeMaker\Wpf_coffeeMaker\obj\x64\Debug\adminWindow.g.cs
 C:\Users\FIRE\Desktop\Git\CoffeeMaker\Wpf_coffeeMaker\Wpf_coffeeMaker\obj\x64\Debug\adminWindow.g.cs
 C:\Users\FIRE\Desktop\Git\CoffeeMaker\Wpf_coffeeMaker\Wpf_coffeeMaker\obj\x64\Debug\adminWindow.baml
+G:\Desktop\Git\CoffeeMaker\Wpf_coffeeMaker\Wpf_coffeeMaker\obj\x64\Debug\adminWindow.baml
