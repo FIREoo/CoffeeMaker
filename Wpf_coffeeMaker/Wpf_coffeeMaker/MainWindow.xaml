@@ -9,17 +9,17 @@
     <Grid Margin="0,0,4,0">
         <Grid HorizontalAlignment="Left" Height="879" Margin="435,10,0,0" VerticalAlignment="Top" Width="870" Background="#FFBDBDBD">
             <Grid x:Name="grid_img_grip" Margin="10,515,0,-30" Background="Black" MouseMove="Grid_MouseMove" VerticalAlignment="Top" HorizontalAlignment="Left">
-                <Image x:Name="Img_main" HorizontalAlignment="Left" Height="360" VerticalAlignment="Top" Width="640"/>
+                <Image x:Name="Img_main" HorizontalAlignment="Left" Height="360" VerticalAlignment="Top" Width="640" Margin="0,0,0,0"/>
                 <Grid.ContextMenu >
                     <ContextMenu x:Name="cm" StaysOpen="true">
                         <MenuItem Header="Open" Click="Button_startCamera_Click"/>
                         <MenuItem Header="UR control">
-                            <MenuItem Header="Grip" Click="Button_goDynamicGrip"/> />
-                            <MenuItem Header="..."/>
+                            <MenuItem Header="Grip box" Click="Button_goDynamicGrip_box"/>
+                            <MenuItem Header="Grip cup" Click="Button_goDynamicGrip_cup"/>
+                            <MenuItem Header="Grip spoon" Click="Button_goDynamicGrip_spoon"/>
                         </MenuItem>
                     </ContextMenu>
                 </Grid.ContextMenu>
-
             </Grid>
             <GroupBox Header="Action" HorizontalAlignment="Left" Height="145" Margin="723,71,0,0" VerticalAlignment="Top" Width="137" FontSize="20">
                 <Grid Margin="1,-2,-1,-6">
@@ -34,9 +34,23 @@
             </GroupBox>
             <Button Content="Connect Action" HorizontalAlignment="Left" Margin="723,36,0,0" VerticalAlignment="Top" Width="100" Height="30" Click="Button_askActionRecognition_Click"/>
             <Ellipse x:Name="cir_connectAct" Fill="Salmon" HorizontalAlignment="Left" Height="21" Margin="809,29,0,0" Stroke="Black" VerticalAlignment="Top" Width="21" RenderTransformOrigin="0.5,0.5"/>
-            <Grid HorizontalAlignment="Left" Height="500" Margin="10,10,0,0" VerticalAlignment="Top" Width="700" Background="#FF321400"/>
-            <TextBox x:Name="tb_value_depthThres" HorizontalAlignment="Left" Height="20" Margin="656,515,0,0" TextWrapping="Wrap" Text="23" VerticalAlignment="Top" Width="64" TextAlignment="Center"/>
+            <Grid HorizontalAlignment="Left" Height="500" Margin="10,10,0,0" VerticalAlignment="Top" Width="700" Background="#FF321400"  MouseMove="Grid_dask_MouseMove" MouseDown="Grid_desk_MouseDown">
+                <Grid.ContextMenu >
+                    <ContextMenu x:Name="cm_desk" StaysOpen="true">
+                        <MenuItem Header="x"/>
+                        <MenuItem Header="UR control">
+                            <MenuItem Header="Go pos" Click="Button_desk_goPos"/>
+                        </MenuItem>
+                    </ContextMenu>
+                </Grid.ContextMenu>
+                <Ellipse Fill="#FF85BEE0" HorizontalAlignment="Left" Height="120" Margin="540,190,0,0" Stroke="Black" VerticalAlignment="Top" Width="120"/>
+                <Ellipse x:Name="circle_gripPos" Fill="#FF85BEE0" HorizontalAlignment="Left" Height="30" Margin="76,0,0,0" Stroke="White" VerticalAlignment="Top" Width="30"/>
+
+            </Grid>
+            <TextBox x:Name="tb_value_depthThres" HorizontalAlignment="Left" Height="20" Margin="656,515,0,0" TextWrapping="Wrap" Text="26" VerticalAlignment="Top" Width="64" TextAlignment="Center" MaxLength="3"/>
             <TextBlock x:Name="tb_object_msg" x:FieldModifier="public" HorizontalAlignment="Left" Margin="656,540,0,0" TextWrapping="Wrap" Text="Object detial" VerticalAlignment="Top" FontSize="18"/>
+            <TextBlock x:Name="tb_desk_xy" HorizontalAlignment="Left" Margin="41,10,0,0" TextWrapping="Wrap" Text="(0,0)" VerticalAlignment="Top" Foreground="White" FontSize="18"/>
+            <CheckBox x:Name="cb_UpdatePos" Content="Pos update" HorizontalAlignment="Left" Margin="723,221,0,0" VerticalAlignment="Top" Click="Cb_UpdatePos_Click" FontSize="14"/>
 
         </Grid>
         <ListView x:Name="LV_actionBase" x:FieldModifier="public" HorizontalAlignment="Left" Height="631" Margin="10,64,0,0" VerticalAlignment="Top" Width="407" FontSize="22">
@@ -78,7 +92,6 @@
                     </GridViewColumn>
                 </GridView>
             </ListView.View>
-
         </ListView>
         <Button Content="Start Reproduction" HorizontalAlignment="Left" Margin="10,727,0,0" VerticalAlignment="Top" Width="407" Height="54" Click="Button_createAction_Click" FontSize="16"/>
         <Button Content="Start Demonstration" HorizontalAlignment="Left" Margin="10,15,0,0" VerticalAlignment="Top" Width="407" Height="39" FontSize="16" Click="Button_startRecord_Click" Background="#FFCCDCC0"/>
@@ -92,7 +105,9 @@
             <Ellipse x:Name="cir_UrState_on" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="15" Margin="61,60,0,0" Stroke="Black" VerticalAlignment="Top" Width="15"/>
             <TabControl HorizontalAlignment="Left" Height="234" Margin="10,160,0,0" VerticalAlignment="Top" Width="225">
                 <TabItem Header="TabItem">
-                    <Grid Background="#FFE5E5E5"/>
+                    <Grid Background="#FFE5E5E5">
+                        <Button Content="||" HorizontalAlignment="Left" Margin="87,17,0,0" VerticalAlignment="Top" Width="35" Click="Button_UR_V_Click"/>
+                    </Grid>
                 </TabItem>
                 <TabItem Header="Record">
                     <Grid Background="#FFE5E5E5">
@@ -104,10 +119,10 @@
                         <TextBox x:Name="Tb_recordName" HorizontalAlignment="Left" Height="35" Margin="86,10,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="recordPath" VerticalAlignment="Top" Width="104" FontSize="16"/>
                         <TextBlock HorizontalAlignment="Left" Margin="190,24,0,0" TextWrapping="Wrap" Text=".path" VerticalAlignment="Top"/>
                         <Button Content="Grip" HorizontalAlignment="Left" Margin="110,70,0,0" VerticalAlignment="Top" Width="38" Height="28" Click="Button_grip_Click"/>
-                        <TextBox x:Name="Tb_gripVal" HorizontalAlignment="Left" Height="28" Margin="148,70,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="0" VerticalAlignment="Top" Width="30"/>
                         <Button Content="Grip" HorizontalAlignment="Left" Margin="110,98,0,0" VerticalAlignment="Top" Width="38" Height="28" Click="Button_grip2_Click"/>
-                        <TextBox x:Name="Tb_gripVal2" HorizontalAlignment="Left" Height="28" Margin="148,98,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="31" VerticalAlignment="Top" Width="30"/>
-                        <TextBox x:Name="Tb_gripVal3" HorizontalAlignment="Left" Height="28" Margin="148,126,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="100" VerticalAlignment="Top" Width="30"/>
+                        <TextBox x:Name="Tb_gripVal" HorizontalAlignment="Left" Height="28" Margin="148,70,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="0" VerticalAlignment="Top" Width="30"/>
+                        <TextBox x:Name="Tb_gripVal2" HorizontalAlignment="Left" Height="28" Margin="148,98,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="70" VerticalAlignment="Top" Width="30"/>
+                        <TextBox x:Name="Tb_gripVal3" HorizontalAlignment="Left" Height="28" Margin="148,126,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="170" VerticalAlignment="Top" Width="30"/>
                         <Button Content="Grip" HorizontalAlignment="Left" Margin="110,126,0,0" VerticalAlignment="Top" Width="38" Height="28" Click="Button_grip3_Click"/>
                         <Button Content="Sleep" HorizontalAlignment="Left" Margin="110,159,0,0" VerticalAlignment="Top" Width="38" Click="Button_recordSleep_Click" Height="28"/>
                         <TextBox x:Name="Tb_sleepVal" HorizontalAlignment="Left" Height="28" Margin="148,159,0,0" TextWrapping="Wrap" VerticalContentAlignment="Center" Text="1000" VerticalAlignment="Top" Width="42" TextAlignment="Center"/>
@@ -115,7 +130,7 @@
                     </Grid>
                 </TabItem>
             </TabControl>
-            <Button Content="go Home" HorizontalAlignment="Left" Margin="192,32,0,0" VerticalAlignment="Top" Width="72" Height="48" Click="Button_goPosHome_Click"/>
+            <Button Content="go Home" HorizontalAlignment="Left" Margin="189,72,0,0" VerticalAlignment="Top" Width="72" Height="24" Click="Button_goPosHome_Click"/>
             <ComboBox x:Name="Cb_Path" HorizontalAlignment="Left" Margin="2,96,0,0" VerticalAlignment="Top" Width="182" VerticalContentAlignment="Center" DropDownOpened="Cb_Path_DropDownOpened" FontSize="16" Height="47"/>
             <Button x:Name="Btn_goPath" Content="Go Path" HorizontalAlignment="Left" Margin="189,96,0,0" VerticalAlignment="Top" Width="75" Height="47" FontSize="16" Click="Btn_goPath_Click"/>
             <Button Content="Button" HorizontalAlignment="Left" Margin="16,399,0,0" VerticalAlignment="Top" Width="100" Height="50" Click="Button_Click_1"/>

@@ -27,76 +27,61 @@ namespace myObjects
         }
         public string Name { get; } = "";
         public int index { get; } = -1;
+        public URCoordinates nowPos { get; set; }
+
         public System.Windows.Media.Color color;
-        private int fileterSize { get; set; } = 6;
-        private List<float> x = new List<float>();//unit M
-        private List<float> y = new List<float>();//unit M
-        private List<float> z = new List<float>();//unit M
-        private float moveD { get; set; } = 0.05f;
+        public Unit gripOffset_x = new Unit();
+        public Unit gripOffset_y = new Unit();
+        public Unit gripOffset_z = new Unit();
+
+        public int fileterSize { get; set; } = 6;
+        public float moveD { get; set; } = 0.05f;
+
+
+        private List<float> list_x = new List<float>();//unit M
+        private List<float> list_y = new List<float>();//unit M
+        private List<float> list_z = new List<float>();//unit M
         private float lastx = 0;
         private float lasty = 0;
         private float lastz = 0;
-        public float gripOffset_M_x = 0;
-        public float gripOffset_M_y = 0;
-        public float gripOffset_M_z = 0;
-        public URCoordinates nowPos { get; set; }
-        public void savePositionToNowPos()
+
+        public void pushPosition(Unit X, Unit Y, Unit Z)
         {
-            nowPos = new URCoordinates(getX_m(), getY_m(), getZ_m(), 0, 0, 0);
+            setX_M(X.M);
+            setY_M(Y.M);
+            setZ_M(Z.M);
+        }
+        private void setX_M(float x_m)
+        {
+            list_x.Add(x_m);
+            if (list_x.Count > fileterSize)
+                list_x.RemoveAt(0);
+        }
+        private void setY_M(float y_m)
+        {
+            list_y.Add(y_m);
+            if (list_y.Count > fileterSize)
+                list_y.RemoveAt(0);
+        }
+        private void setZ_M(float z_m)
+        {
+            list_z.Add(z_m);
+            if (list_z.Count > fileterSize)
+                list_z.RemoveAt(0);
         }
 
-        public URCoordinates getPosition()
+        public void getFilterPos(out Unit X, out Unit Y, out Unit Z)
         {
-            return new URCoordinates(getX_m(), getY_m(), getZ_m(), 0, 0, 0);
-        }
-        public void setPos_mm(float x_mm, float y_mm, float z_mm)
-        {
-            setX_mm(x_mm);
-            setY_mm(y_mm);
-            setZ_mm(z_mm);
-        }
-        public void setPos_m(float x_mm, float y_mm, float z_mm)
-        {
-            setX_mm(x_mm * 1000f);
-            setY_mm(y_mm * 1000f);
-            setZ_mm(z_mm * 1000f);
-        }
-        private void setX_mm(float x_mm)
-        {
-            x.Add(x_mm / 1000f);
-            if (x.Count > fileterSize)
-                x.RemoveAt(0);
-        }
-        private void setY_mm(float y_mm)
-        {
-            y.Add(y_mm / 1000f);
-            if (y.Count > fileterSize)
-                y.RemoveAt(0);
-        }
-        private void setZ_mm(float z_mm)
-        {
-            z.Add(z_mm / 1000f);
-            if (z.Count > fileterSize)
-                z.RemoveAt(0);
-        }
-        public float getX_m()
-        {
-            return avg(x, 0, fileterSize);
-        }
-        public float getY_m()
-        {
-            return avg(y, 0, fileterSize);
-        }
-        public float getZ_m()
-        {
-            return avg(z, 0, fileterSize);
+            X = avg(list_x, 0, fileterSize).M();
+            Y = avg(list_y, 0, fileterSize).M();
+            Z = avg(list_z, 0, fileterSize).M();
         }
 
         public URCoordinates gripPos(int deg = 0)
         {
             if (deg == 0)
                 //return new URCoordinates(nowPos.X + gripOffset_M_x, nowPos.Y + gripOffset_M_y, nowPos.Z + gripOffset_M_z, (float)(Math.PI), 0, 0);
-                return new URCoordinates(nowPos.X.M + gripOffset_M_x, 0.297f, nowPos.Z.M + gripOffset_M_z, (float)(Math.PI), 0, 0);//evil
+                return new URCoordinates(nowPos.X.M + gripOffset_x.M, 0.297f, nowPos.Z.M + gripOffset_z.M, (float)(Math.PI), 0, 0);//evil
 
             throw new System.ArgumentException("未完成", "現在只能水平");
         }
@@ -114,17 +99,16 @@ namespace myObjects
 
         public states State()
         {
-            if (x.Count < fileterSize)
+            if (list_x.Count < fileterSize)
                 return states.stop;
 
-
             //前半 跟 後半做比較
-            lastx = avg(x, 0, fileterSize / 2);
-            lasty = avg(y, 0, fileterSize / 2);
-            lastz = avg(z, 0, fileterSize / 2);
-            float avgx = avg(x, fileterSize / 2, fileterSize / 2);
-            float avgy = avg(y, fileterSize / 2, fileterSize / 2);
-            float avgz = avg(z, fileterSize / 2, fileterSize / 2);
+            lastx = avg(list_x, 0, fileterSize / 2);
+            lasty = avg(list_y, 0, fileterSize / 2);
+            lastz = avg(list_z, 0, fileterSize / 2);
+            float avgx = avg(list_x, fileterSize / 2, fileterSize / 2);
+            float avgy = avg(list_y, fileterSize / 2, fileterSize / 2);
+            float avgz = avg(list_z, fileterSize / 2, fileterSize / 2);
             float dx = (lastx - avgx) * (lastx - avgx);
             float dy = (lasty - avgy) * (lasty - avgy);
             float dz = (lastz - avgz) * (lastz - avgz);
@@ -133,28 +117,28 @@ namespace myObjects
             else
                 return states.stop;
         }
-        public float moveDistanse()
+        public Unit moveDistanse()
         {
-            lastx = avg(x, 0, fileterSize);
-            lasty = avg(y, 0, fileterSize);
-            lastz = avg(z, 0, fileterSize);
-            float avgx = avg(x, 0, fileterSize);
-            float avgy = avg(y, 0, fileterSize);
-            float avgz = avg(z, 0, fileterSize);
+            lastx = avg(list_x, 0, fileterSize);
+            lasty = avg(list_y, 0, fileterSize);
+            lastz = avg(list_z, 0, fileterSize);
+            float avgx = avg(list_x, 0, fileterSize);
+            float avgy = avg(list_y, 0, fileterSize);
+            float avgz = avg(list_z, 0, fileterSize);
             double dx = (lastx - avgx) * (lastx - avgx);
             double dy = (lasty - avgy) * (lasty - avgy);
             double dz = (lastz - avgz) * (lastz - avgz);
-            return (float)Math.Pow((dx + dy + dz), 0.5d);
+            return ((float)Math.Pow((dx + dy + dz), 0.5d)).M();
         }
-        public float Distanse(URCoordinates pos)
+        public Unit Distanse(URCoordinates pos)
         {
-            float avgx = avg(x, 0, fileterSize);
-            float avgy = avg(y, 0, fileterSize);
-            float avgz = avg(z, 0, fileterSize);
+            float avgx = avg(list_x, 0, fileterSize);
+            float avgy = avg(list_y, 0, fileterSize);
+            float avgz = avg(list_z, 0, fileterSize);
             double dx = (pos.X.M - avgx) * (pos.X.M - avgx);
             double dy = (pos.Y.M - avgy) * (pos.Y.M - avgy);
             double dz = (pos.Z.M - avgz) * (pos.Z.M - avgz);
-            return (float)Math.Pow((dx + dy + dz), 0.5d);
+            return ((float)Math.Pow((dx + dy + dz), 0.5d)).M();
 
         }
         public states S = states.stop;

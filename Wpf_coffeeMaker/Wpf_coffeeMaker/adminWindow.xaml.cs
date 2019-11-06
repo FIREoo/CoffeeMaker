@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -66,9 +67,89 @@ namespace Wpf_coffeeMaker
             List<string> list = new List<string>();
             list.Add("pick");
             list.Add("place");
+            list.Add("pour");
+            list.Add("組1");
+            list.Add("PPP");
             return list;
         }
+        private void Cb_simTemplate_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (cb_simTemplate.SelectedIndex == 0)
+            {
+                cb_action.SelectedIndex = 1;
+                cb_target.SelectedIndex = 1;
+                cb_destination.SelectedIndex = 0;
+            }
+            else if (cb_simTemplate.SelectedIndex == 1)
+            {
+                {
+                    cb_action.SelectedIndex = 2;
+                    cb_target.SelectedIndex = 1;
+                    cb_destination.SelectedIndex = 9;//pos
+                }
+            }
+            else if (cb_simTemplate.SelectedIndex == 2)
+            {
+                {
+                    cb_action.SelectedIndex = 3;
+                    cb_target.SelectedIndex = 1;//blue cup
+                    cb_destination.SelectedIndex = 2;//pink
+                }
+            }
+            else if (cb_simTemplate.SelectedIndex == 3)
+            {
+                {
+                    cb_action.SelectedIndex = 1;//pick
+                    cb_target.SelectedIndex = 1;//blue cup
+                    cb_destination.SelectedIndex = 0;
+                    Btn_addSimAction_Click(null, null);
 
+
+                    cb_action.SelectedIndex = 3;//pour
+                    cb_target.SelectedIndex = 1;//blue cup
+                    cb_destination.SelectedIndex = 2;//pink
+                    Btn_addSimAction_Click(null, null);
+     
+
+                    cb_action.SelectedIndex = 2;//place
+                    cb_target.SelectedIndex = 1;//blue cup
+                    cb_destination.SelectedIndex = 9;//pos
+                    tb_pos_x.Text = "-0.1"; tb_pos_y.Text = "-0.35";
+                    Btn_addSimAction_Click(null, null);
+   
+
+                    cb_action.SelectedIndex = 1;//pick
+                    cb_target.SelectedIndex = 2;//pink cup
+                    cb_destination.SelectedIndex = 0;
+                    Btn_addSimAction_Click(null, null);
+
+
+                    cb_action.SelectedIndex = 2;//place
+                    cb_target.SelectedIndex = 2;//pink cup
+                    cb_destination.SelectedIndex = 9;//pos
+                    tb_pos_x.Text = "-0.1"; tb_pos_y.Text = "-0.22";
+                    Btn_addSimAction_Click(null, null);
+
+                }
+            }
+            else if (cb_simTemplate.SelectedIndex == 4)
+            {
+                cb_action.SelectedIndex = 1;//pick
+                cb_target.SelectedIndex = 1;//blue cup
+                cb_destination.SelectedIndex = 0;
+                Btn_addSimAction_Click(null, null);
+
+                cb_action.SelectedIndex = 3;
+                cb_target.SelectedIndex = 1;//blue cup
+                cb_destination.SelectedIndex = 2;//pink
+                Btn_addSimAction_Click(null, null);
+
+                cb_action.SelectedIndex = 2;
+                cb_target.SelectedIndex = 1;
+                cb_destination.SelectedIndex = 9;//pos
+                Btn_addSimAction_Click(null, null);
+            }
+        }
         private void Btn_addSimAction_Click(object sender, RoutedEventArgs e)
         {
             ActionLine actLine;
@@ -80,30 +161,54 @@ namespace Wpf_coffeeMaker
             }
             else
             {
-                //actLine = new ActionLine(MainWindow.actions[cb_action.SelectedIndex], MainWindow.objects[cb_target.SelectedIndex], MainWindow.objects[cb_destination.SelectedIndex]);
-                actLine = new ActionLine(MainWindow.actLv[cb_action.SelectedIndex], MainWindow.objects[cb_target.SelectedIndex], MainWindow.objects[cb_destination.SelectedIndex]);
+                try
+                {
+                    actLine = new ActionLine(MainWindow.actLv[cb_action.SelectedIndex], MainWindow.objects[cb_target.SelectedIndex], MainWindow.objects[cb_destination.SelectedIndex]);
+                }
+                catch
+                {
+                    MessageBox.Show("沒選??");
+                    return;
+                }
             }
 
             MainWindow.mainAction.Add(actLine);
             mw.ActionLine2ListView(actLine);
         }
 
-        private void Cb_simTemplate_SelectionChanged(object sender, SelectionChangedEventArgs e)
+
+
+        private void CheckBox_thres_Checked(object sender, RoutedEventArgs e)
         {
-            if (cb_simTemplate.SelectedIndex == 0)
-            {
-                cb_action.SelectedIndex = 1;
-                cb_target.SelectedIndex = 1;
-                cb_destination.SelectedIndex = 0;
-            }
-            else if(cb_simTemplate.SelectedIndex == 1)
-            {
-                {
-                    cb_action.SelectedIndex = 2;
-                    cb_target.SelectedIndex = 1;
-                    cb_destination.SelectedIndex = 9;//pos
-                }
-            }
+            MainWindow.show_thres = (bool)((CheckBox)sender).IsChecked;
+        }
+        private void CheckBox_level_Checked(object sender, RoutedEventArgs e)
+        {
+            MainWindow.show_level = (bool)((CheckBox)sender).IsChecked;
+        }
+        
+
+        private void Button_fake_blueCup_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindow.objects[1].nowPos = new URCoordinates(0.mm(), -220.mm(), 200.mm());
+        }
+        private void Button_fake_spoon_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindow.objects[4].nowPos = new URCoordinates(150.mm(), -220.mm(), 200.mm());
+        }
+        private void Button_fake_pinkCup_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindow.objects[2].nowPos = new URCoordinates(80.mm(), -350.mm(), 200.mm());
+        }
+        private void Button_fake_redPillBox_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindow.objects[6].nowPos = new URCoordinates(-100.mm(), -350.mm(), 200.mm());
+        }
+
+        private void Button_set_gripOffset(object sender, RoutedEventArgs e)
+        {
+            MainWindow.val_gripOffset_cup.X = val_gripOffset_cup_x.Text.toInt();
+            MainWindow.val_gripOffset_cup.Y = val_gripOffset_cup_y.Text.toInt();
         }
     }
 

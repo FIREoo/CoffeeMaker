@@ -26,63 +26,6 @@ namespace myActionBase
             return Action.cmdText(target, destination);
         }
     }
-    public class ActionListView
-    {
-        //-1 initial
-        //0 保留 none
-        // 100 position
-        public int ActionInedx = -1;
-        public int TargetIndex = -1;
-        public int DestinationIndex = -1;
-
-        public string ActionName = "";
-        public string TargetName = "";
-        public string DestinationName = "";
-
-    }
-
-
-    public class ActionCmd
-    {
-        private static StreamWriter txt;
-        private static string fileName;
-        public ActionCmd(string file)
-        {
-            //UR = _UR;
-            fileName = file;
-
-            //need file
-            //--Path//outDripTray.path
-
-        }
-        public void saveFile()
-        {
-            txt.Flush();
-            txt.Close();
-        }
-
-        public bool add(subactInfo subact)
-        {
-            try
-            {
-                for (int i = 0; i < subact.Count(); i++)
-                    txt.WriteLine(subact.infotxt[i]);
-                return true;
-            }
-            catch //應該是檔案沒被開啟會錯誤(通常是在已經saveFile了
-            {
-                return false;
-            }
-        }
-        public void start(Objects[] cups)
-        {
-            txt = new StreamWriter($"Path//{fileName}", false);
-            foreach (Objects cup in cups)
-            {
-                cup.savePositionToNowPos();
-            }
-        }
-    }
     public class myActionAdder
     {//使用這個 目的是index的編號
         public static myAction Pick()
@@ -116,240 +59,7 @@ namespace myActionBase
             myAction rtn = new myAction(6, ActionName.Stir);
             return rtn;
         }
-
-        //public static subactInfo Pick(Objects cup)
-        //{
-        //    subactInfo rtn = new subactInfo();
-        //    URCoordinates grip = new URCoordinates(cup.gripPos());
-        //    URCoordinates up = new URCoordinates(grip);
-        //    //up.Y -= 0.1f;
-        //    //URCoordinates debug = new URCoordinates(up);
-        //    //debug.Y -= 0.02f;//在高一點以Rxyz有問題
-
-        //    //rtn.infotxt.Add("position");
-        //    //rtn.infotxt.Add(debug.ToPos());
-        //    //rtn.infotxt.Add(up.ToPos());
-
-        //    //rtn.infotxt.Add("gripper");
-        //    //rtn.infotxt.Add("0");
-
-        //    //rtn.infotxt.Add("sleep");
-        //    //rtn.infotxt.Add("1000");
-
-        //    //rtn.infotxt.Add("position");
-        //    //rtn.infotxt.Add(grip.ToPos());
-
-        //    //rtn.infotxt.Add("gripper");
-        //    //rtn.infotxt.Add("31");
-
-        //    //rtn.infotxt.Add("sleep");
-        //    //rtn.infotxt.Add("1000");
-
-        //    //rtn.infotxt.Add("position");
-        //    //rtn.infotxt.Add(up.ToPos());
-        //    return rtn;
-        //}
-        //public static subactInfo Pick(subactInfo.place ThePlace)
-        //{
-        //    subactInfo rtn = new subactInfo();
-        //    rtn.infotxt.Add("gripper");
-        //    rtn.infotxt.Add("0");
-        //    rtn.infotxt.Add("sleep");
-        //    rtn.infotxt.Add("1000");
-        //    if (ThePlace == subactInfo.place.DripTray)
-        //    {
-        //        rtn.AddFile($"Path//outDripTray.path");
-        //    }
-
-        //    return rtn;
-        //}
-        //public static subactInfo Pick(subactInfo.thing TheObject)
-        //{
-        //    subactInfo rtn = new subactInfo();
-        //    rtn.infotxt.Add("gripper");
-        //    rtn.infotxt.Add("0");
-        //    rtn.infotxt.Add("sleep");
-        //    rtn.infotxt.Add("1000");
-        //    if (TheObject == subactInfo.thing.Capsule)
-        //    {
-        //        rtn.AddFile($"Path//moveCapsule.path");
-        //    }
-        //    if (TheObject == subactInfo.thing.Case)
-        //    {
-        //        // rtn.AddFile($"Path//moveCase.path");
-        //    }
-        //    return rtn;
-        //}
-        //public static subactInfo Place(Objects cup, URCoordinates Wpoint)
-        //{
-        //    cup.setNowPos(Wpoint);
-
-        //    subactInfo rtn = new subactInfo();
-        //    URCoordinates grip = new URCoordinates(cup.gripPos());
-        //    URCoordinates up = new URCoordinates(grip);
-        //    //up.Y -= 0.1f;
-        //    //URCoordinates debug = new URCoordinates(up);
-        //    //debug.Y -= 0.02f;//在高一點以Rxyz有問題
-
-        //    //rtn.infotxt.Add("position");
-        //    //rtn.infotxt.Add(debug.ToPos());
-        //    //rtn.infotxt.Add(up.ToPos());
-        //    //rtn.infotxt.Add(grip.ToPos());
-        //    //rtn.infotxt.Add("gripper");
-        //    //rtn.infotxt.Add("0");
-
-        //    //rtn.infotxt.Add("sleep");
-        //    //rtn.infotxt.Add("1000");
-
-        //    //rtn.infotxt.Add("position");
-        //    //rtn.infotxt.Add(up.ToPos());
-        //    return rtn;
-        //}
-        //public static subactInfo Place(subactInfo.place ThePlace)
-        //{
-        //    subactInfo rtn = new subactInfo();
-        //    if (ThePlace == subactInfo.place.DripTray)
-        //    {
-        //        string[] file = System.IO.File.ReadAllLines($"Path//toDripTray.path");
-        //        foreach (string line in file)
-        //            rtn.infotxt.Add(line);
-        //    }
-        //    rtn.infotxt.Add("gripper");
-        //    rtn.infotxt.Add("0");
-        //    rtn.infotxt.Add("sleep");
-        //    rtn.infotxt.Add("1000");
-        //    return rtn;
-        //}
-        //public static subactInfo Pour(Objects toCup)
-        //{
-        //    subactInfo rtn = new subactInfo();
-        //    URCoordinates grip = new URCoordinates(toCup.gripPos());
-        //    URCoordinates up = new URCoordinates(grip);
-        //    //up.Y -= 0.1f;
-        //    //URCoordinates debug = new URCoordinates(up);
-        //    //debug.Y -= 0.02f;//在高一點以Rxyz有問題
-
-        //    //URCoordinates now = new URCoordinates(up);
-
-        //    //rtn.infotxt.Add("position");
-        //    //rtn.infotxt.Add(debug.ToPos());
-        //    //rtn.infotxt.Add(up.ToPos());
-
-        //    //now.X -= 0.08f;
-        //    //rtn.infotxt.Add(now.ToPos());
-
-        //    //rtn.infotxt.Add("Rmovej");
-        //    //rtn.infotxt.Add("[0,0,0,0,0,-2]");
-
-        //    //rtn.infotxt.Add("position");
-        //    //rtn.infotxt.Add(debug.ToPos());
-        //    return rtn;
-        //}
-        //public static subactInfo Trigger()
-        //{
-        //    subactInfo rtn = new subactInfo();
-        //    rtn.AddFile("Path//trigger.path");
-        //    return rtn;
-        //}
-        //public static subactInfo PutBoxIn()
-        //{
-        //    subactInfo rtn = new subactInfo();
-        //    rtn.AddFile("Path//putBoxIn.path");
-        //    return rtn;
-        //}
-        //public static subactInfo Scoop()
-        //{
-        //    subactInfo rtn = new subactInfo();
-        //    rtn.AddFile("Path//Scoop.path");
-        //    return rtn;
-        //}
-        //public static subactInfo Stir(Objects toCup)
-        //{
-        //    subactInfo rtn = new subactInfo();
-        //    URCoordinates up = new URCoordinates(toCup.gripPos());
-        //    //up.X -= 0.015f;
-        //    //up.Z += 0.015f;
-        //    //up.Y -= 0.06f;//上升
-        //    //URCoordinates now = new URCoordinates(up);
-        //    //rtn.infotxt.Add("pmovej");
-        //    //rtn.infotxt.Add(up.ToPos());
-        //    //now.Y += 0.05f;//下去
-
-        //    //now.X -= 0.01f;
-        //    //rtn.infotxt.Add(now.ToPos());
-        //    //now.X += 0.01f;
-        //    //now.Z += 0.01f;
-        //    //rtn.infotxt.Add(now.ToPos());
-        //    //now.X += 0.01f;
-        //    //now.Z -= 0.01f;
-        //    //rtn.infotxt.Add(now.ToPos());
-        //    //now.X -= 0.01f;
-        //    //now.Z -= 0.01f;
-        //    //rtn.infotxt.Add(now.ToPos());
-        //    //now.X -= 0.01f;
-        //    //now.Z += 0.01f;
-        //    //rtn.infotxt.Add(now.ToPos());
-        //    //rtn.infotxt.Add(up.ToPos());
-        //    return rtn;
-        //}
-        //public static subactInfo AddaSpoon(Objects toCup)
-        //{
-        //    subactInfo rtn = new subactInfo();
-        //    URCoordinates up = new URCoordinates(toCup.gripPos());
-        //    //up.Rx = 2.2f;
-        //    //up.Ry = -2.2f;
-        //    //up.Rz = 0;
-        //    //up.X -= 0.09f;
-        //    //up.Z += 0.02f;
-        //    //up.Y += 0.03f;//下降
-
-        //    //URCoordinates upper = new URCoordinates(up);
-        //    //upper.Y -= 0.07f;//上
-        //    //rtn.infotxt.Add("pmovej");
-        //    //rtn.infotxt.Add(upper.ToPos());
-
-
-        //    //URCoordinates add = new URCoordinates(up);
-        //    //add.Rx = 3.14f;
-        //    //add.Ry = 0f;
-        //    //add.Rz = 0f;
-        //    //add.Y -= 0.09f;//上升
-        //    //add.X += 0.05f;
-        //    //rtn.infotxt.Add("pmovej");
-        //    //rtn.infotxt.Add(up.ToPos());
-        //    //rtn.infotxt.Add("pmovej");
-        //    //rtn.infotxt.Add(add.ToPos());
-        //    //rtn.infotxt.Add("pmovej");
-        //    //add.Y -= 0.03f;//上升
-        //    //rtn.infotxt.Add(add.ToPos());
-        //    return rtn;
-        //}
     }
-
-    public class subactInfo
-    {
-        public List<string> infotxt = new List<string>();
-        public void AddFile(string filename)
-        {
-            string[] file = System.IO.File.ReadAllLines(filename);
-            foreach (string line in file)
-                infotxt.Add(line);
-        }
-        public int Count()
-        {
-            return infotxt.Count();
-        }
-        public enum place
-        {
-            DripTray = 0
-        }
-        public enum thing
-        {
-            Capsule = 0,
-            Case = 1
-        }
-    }
-
     public static class ActionName
     {
         public static string Pick = "Pick up";
@@ -359,7 +69,6 @@ namespace myActionBase
         public static string AddaSpoon = "Add into";
         public static string Stir = "Stir";
     }
-
 
     public class myAction
     {
@@ -375,6 +84,7 @@ namespace myActionBase
         private List<string> cmdTxt = new List<string>();
         public List<string> cmdText(Objects target, Objects destination)
         {
+            cmdTxt.Clear();
             if (Name == ActionName.Pick)
                 Pick(target);
             else if (Name == ActionName.Place)
@@ -392,39 +102,143 @@ namespace myActionBase
         }
         private void Pick(Objects target)
         {
-            URCoordinates Pos = target.getPosition();
-            cmdTxt.Add($"movep({Pos.ToString("p[]")})");
-            cmdTxt.Add("rq_move(255)");
+            URCoordinates Pos = target.nowPos;
+            if (target.Name.IndexOf("cup") >= 0)
+            {
+                cmdTxt.Add("movej([1.0322,-2.00041,1.71881,-1.29203,-1.56557,2.60226])");//防止下個點失敗手臂 
+                Pos.Z = 0.2.M();
+                Pos.Rx = 3.14.rad();
+                Pos.Ry = 0.rad();
+                Pos.Rz = 0.rad();
+                cmdTxt.Add($"movep2({Pos.ToString("p[]")})");
+
+                cmdTxt.Add($"function(cup)");
+            }
+            else if (target.Name.IndexOf("Spoon") >= 0)
+            {
+               cmdTxt.Add("movej([1.0322,-2.00041,1.71881,-1.29203,-1.56557,2.60226])");//防止下個點失敗手臂 
+                Pos.Z = 0.2.M();
+                Pos.Rx = 3.14.rad();
+                Pos.Ry = 0.rad();
+                Pos.Rz = 0.rad();
+                cmdTxt.Add($"movep2({Pos.ToString("p[]")})");
+
+                cmdTxt.Add($"function(spoon)");
+            }
+            if (target.Name.IndexOf("pill box") >= 0)
+            {
+                cmdTxt.Add("movej([1.0322,-2.00041,1.71881,-1.29203,-1.56557,2.60226])");//防止下個點失敗手臂 
+                Pos.Z = 0.2.M();
+                Pos.Rx = 3.14.rad();
+                Pos.Ry = 0.rad();
+                Pos.Rz = 0.rad();
+                cmdTxt.Add($"movep2({Pos.ToString("p[]")})");
+
+                cmdTxt.Add($"function(pillBox)");
+            }
         }
         private void Place(Objects target, Objects destination)
         {//需要target   關係到怎麼放
-            URCoordinates Pos = destination.getPosition();
-            cmdTxt.Add($"movep({Pos.ToString("p[]")})");
-            cmdTxt.Add("rq_move(0)");
+
+            //還沒做 更新nowPos!!!!!!!!!!!!!!!!!!
+            URCoordinates Pos = destination.nowPos;
+            if (target.Name.IndexOf("cup") >= 0)
+            {
+                //cmdTxt.Add("movej([1.93528,-1.62399,1.80224,-1.23603,-2.53249,2.20658])");//防止下個點失敗手臂 
+                //Pos.Z = 0.2.M();
+                //Pos.Rx = 2.5.rad();
+                //Pos.Ry = 2.5.rad();
+                //Pos.Rz = -1.5.rad();
+                //cmdTxt.Add($"movep({Pos.ToString("p[]")})");
+                cmdTxt.Add("movej([1.0322,-2.00041,1.71881,-1.29203,-1.56557,2.60226])");//防止下個點失敗手臂 
+                Pos.Z = 0.2.M();
+                Pos.Rx = 3.14.rad();
+                Pos.Ry = 0.rad();
+                Pos.Rz = 0.rad();
+                cmdTxt.Add($"movep2({Pos.ToString("p[]")})");
+
+                URCoordinates down = new URCoordinates();
+                down.Z = -130.mm();
+                cmdTxt.Add($"Rmovep({down.ToString("p[]")})");
+
+                cmdTxt.Add("rq_move(0)");
+
+                URCoordinates up = new URCoordinates();
+                up.Z = 130.mm();
+                cmdTxt.Add($"Rmovep({up.ToString("p[]")})");
+            }
+            else if (target.Name.IndexOf("Spoon") >= 0)
+            {
+                cmdTxt.Add("movej([1.93528,-1.62399,1.80224,-1.23603,-2.53249,2.20658])");//防止下個點失敗手臂 
+                Pos.Z = 0.2.M();
+                Pos.Rx = 2.5.rad();
+                Pos.Ry = 2.5.rad();
+                Pos.Rz = -1.5.rad();
+                cmdTxt.Add($"movep({Pos.ToString("p[]")})");
+
+                URCoordinates down = new URCoordinates();
+                down.Z = -175.mm();
+                cmdTxt.Add($"Rmovep({down.ToString("p[]")})");
+
+                cmdTxt.Add("rq_move(0)");
+
+                URCoordinates up = new URCoordinates();
+                up.Z = 175.mm();
+                cmdTxt.Add($"Rmovep({up.ToString("p[]")})");
+            }
         }
         private void Pour(Objects target, Objects destination)
         {//destination 可能是 pos
-            URCoordinates Pos = destination.getPosition();
-            cmdTxt.Add($"movep({Pos.ToString("p[]")})");
-            cmdTxt.Add("rq_move(0)");
+            URCoordinates desPos = destination.nowPos;
+            if (target.Name.IndexOf("cup") >= 0)
+            {
+                foreach (string str in File.ReadAllLines("Path\\act_pick2pour.path"))
+                    cmdTxt.Add(str);
+
+                //cmdTxt.Add("movej([1.93528,-1.62399,1.80224,-1.23603,-2.53249,2.20658])");//防止下個點失敗手臂 
+                desPos.X += 30.mm();
+                desPos.Y -= 60.mm();
+                desPos.Z = 0.18.M();
+                desPos.Rx = 1.72.rad();
+                desPos.Ry = 2.525.rad();
+                desPos.Rz = -2.525.rad();
+                cmdTxt.Add($"movep({desPos.ToString("p[]")})");
+
+                URCoordinates pour = new URCoordinates();
+                pour.Rz = 50.deg();//注意!!這裡是j6軸
+                cmdTxt.Add($"Rmovej({pour.ToString("[]")})");
+
+                URCoordinates down = new URCoordinates();
+                down.Z = -60.mm();
+                cmdTxt.Add($"Rmovep({down.ToString("[]")})");
+
+                pour.Rz = 50.deg();//注意!!這裡是j6軸
+                cmdTxt.Add($"Rmovej({pour.ToString("[]")})");
+
+                URCoordinates up = new URCoordinates();
+                up.Z = 60.mm();
+                cmdTxt.Add($"Rmovep({up.ToString("[]")})");
+
+                URCoordinates back = new URCoordinates();
+                back.Rz = -100.deg();//注意!!這裡是j6軸
+                cmdTxt.Add($"Rmovej({back.ToString("[]")})");
+
+                foreach (string str in File.ReadAllLines("Path\\act_pour2pick.path"))
+                    cmdTxt.Add(str);
+            }
         }
         private void Scoop(Objects target, Objects destination)
         {//target  一定是湯匙
-            URCoordinates Pos = destination.getPosition();
-            cmdTxt.Add($"movep({Pos.ToString("p[]")})");
-            cmdTxt.Add("rq_move(0)");
+            foreach (string str in File.ReadAllLines("act_scoop.path"))
+                cmdTxt.Add(str);         
         }
         private void AddIn(Objects target, Objects destination)
         {//target  一定是湯匙
-            URCoordinates Pos = destination.getPosition();
-            cmdTxt.Add($"movep({Pos.ToString("p[]")})");
-            cmdTxt.Add("rq_move(0)");
+
         }
         private void Stir(Objects target, Objects destination)
         {//target  一定是湯匙
-            URCoordinates Pos = destination.getPosition();
-            cmdTxt.Add($"movep({Pos.ToString("p[]")})");
-            cmdTxt.Add("rq_move(0)");
+
         }
     }
 
