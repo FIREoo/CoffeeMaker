@@ -1265,7 +1265,7 @@ namespace Wpf_coffeeMaker
         {
 
             URCoordinates.Vector3 rpy =
-                new URCoordinates.Vector3(90.deg(), 90.deg(), 0.deg());
+                new URCoordinates.Vector3(105.deg(), 180.deg(), 60.deg());
             URCoordinates.Vector3 rotation = URCoordinates.ToRotVector(rpy);
 
         }
