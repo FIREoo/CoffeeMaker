@@ -122,6 +122,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="myObjects.cs" />
+    <Compile Include="Picking.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -157,6 +158,9 @@
       <Project>{5c021eb8-70a5-4884-ad9f-c0f6ea75876c}</Project>
       <Name>myEmguLibrary</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="desk.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Alturos.Yolo.2.5.0\build\net461\Alturos.Yolo.targets" Condition="Exists('..\packages\Alturos.Yolo.2.5.0\build\net461\Alturos.Yolo.targets')" />

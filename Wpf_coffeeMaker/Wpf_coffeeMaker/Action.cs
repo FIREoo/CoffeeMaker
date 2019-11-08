@@ -1,4 +1,5 @@
 ﻿using myObjects;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -62,6 +63,27 @@ namespace myActionBase
     }
     public static class ActionName
     {
+      public static string getName(int index)
+        {
+            switch (index)
+            {
+                case 1:
+                    return Pick;
+                case 2:
+                    return Place;
+                case 3:
+                    return Pour;
+                case 4:
+                    return Scoop;
+                case 5:
+                    return AddaSpoon;
+                case 6:
+                    return Stir;
+                default:
+                    return "";
+            }
+
+        }
         public static string Pick = "Pick up";
         public static string Place = "Place";
         public static string Pour = "Pour";
@@ -105,7 +127,9 @@ namespace myActionBase
             URCoordinates Pos = target.nowPos;
             if (target.Name.IndexOf("cup") >= 0)
             {
-                cmdTxt.Add("movej([1.0322,-2.00041,1.71881,-1.29203,-1.56557,2.60226])");//防止下個點失敗手臂 
+                foreach (string str in File.ReadAllLines("Path\\j_top.path"))//防止下個點失敗手臂 
+                    cmdTxt.Add(str);
+
                 Pos.Z = 0.2.M();
                 Pos.Rx = 3.14.rad();
                 Pos.Ry = 0.rad();
@@ -116,7 +140,9 @@ namespace myActionBase
             }
             else if (target.Name.IndexOf("Spoon") >= 0)
             {
-               cmdTxt.Add("movej([1.0322,-2.00041,1.71881,-1.29203,-1.56557,2.60226])");//防止下個點失敗手臂 
+                foreach (string str in File.ReadAllLines("j_top.path"))//防止下個點失敗手臂 
+                    cmdTxt.Add(str);
+
                 Pos.Z = 0.2.M();
                 Pos.Rx = 3.14.rad();
                 Pos.Ry = 0.rad();
@@ -150,12 +176,13 @@ namespace myActionBase
                 //Pos.Ry = 2.5.rad();
                 //Pos.Rz = -1.5.rad();
                 //cmdTxt.Add($"movep({Pos.ToString("p[]")})");
-                cmdTxt.Add("movej([1.0322,-2.00041,1.71881,-1.29203,-1.56557,2.60226])");//防止下個點失敗手臂 
+               // cmdTxt.Add("movej([1.0322,-2.00041,1.71881,-1.29203,-1.56557,2.60226])");//防止下個點失敗手臂 
                 Pos.Z = 0.2.M();
                 Pos.Rx = 3.14.rad();
                 Pos.Ry = 0.rad();
                 Pos.Rz = 0.rad();
-                cmdTxt.Add($"movep2({Pos.ToString("p[]")})");
+                URCoordinates goPos = PickPosition(Pos.X, Pos.Y, Pos.Z, "cup");
+                cmdTxt.Add($"movep2({goPos.ToString("p[]")})");
 
                 URCoordinates down = new URCoordinates();
                 down.Z = -130.mm();
@@ -192,39 +219,29 @@ namespace myActionBase
             URCoordinates desPos = destination.nowPos;
             if (target.Name.IndexOf("cup") >= 0)
             {
-                foreach (string str in File.ReadAllLines("Path\\act_pick2pour.path"))
-                    cmdTxt.Add(str);
 
-                //cmdTxt.Add("movej([1.93528,-1.62399,1.80224,-1.23603,-2.53249,2.20658])");//防止下個點失敗手臂 
-                desPos.X += 30.mm();
-                desPos.Y -= 60.mm();
-                desPos.Z = 0.18.M();
-                desPos.Rx = 1.72.rad();
-                desPos.Ry = 2.525.rad();
-                desPos.Rz = -2.525.rad();
-                cmdTxt.Add($"movep({desPos.ToString("p[]")})");
+                URCoordinates goPos = PickPosition(desPos.X, desPos.Y, 0.2.M(), "cup");
+                PourPos(goPos.X, goPos.Y, out goPos.X, out goPos.Y);
+                cmdTxt.Add($"movep({goPos.ToString("p[]")})");
 
                 URCoordinates pour = new URCoordinates();
-                pour.Rz = 50.deg();//注意!!這裡是j6軸
+                pour.Rz = -50.deg();//注意!!這裡是j6軸
                 cmdTxt.Add($"Rmovej({pour.ToString("[]")})");
 
                 URCoordinates down = new URCoordinates();
-                down.Z = -60.mm();
+                down.Z = -40.mm();
                 cmdTxt.Add($"Rmovep({down.ToString("[]")})");
 
-                pour.Rz = 50.deg();//注意!!這裡是j6軸
+                pour.Rz = -50.deg();//注意!!這裡是j6軸
                 cmdTxt.Add($"Rmovej({pour.ToString("[]")})");
 
                 URCoordinates up = new URCoordinates();
-                up.Z = 60.mm();
+                up.Z = 40.mm();
                 cmdTxt.Add($"Rmovep({up.ToString("[]")})");
 
                 URCoordinates back = new URCoordinates();
-                back.Rz = -100.deg();//注意!!這裡是j6軸
+                back.Rz = 100.deg();//注意!!這裡是j6軸
                 cmdTxt.Add($"Rmovej({back.ToString("[]")})");
-
-                foreach (string str in File.ReadAllLines("Path\\act_pour2pick.path"))
-                    cmdTxt.Add(str);
             }
         }
         private void Scoop(Objects target, Objects destination)
@@ -239,6 +256,49 @@ namespace myActionBase
         private void Stir(Objects target, Objects destination)
         {//target  一定是湯匙
 
+        }
+
+
+        float URyLimitMin = -500;
+        float URyLimitMax = -180;
+        public Angle PickAngle(Unit Tx, Unit Ty)
+        {
+            if (Ty.mm.IsBetween((int)URyLimitMin, (int)URyLimitMax))
+            {
+                int angle = (int)((Ty.mm - (URyLimitMax)) * ((45f - 0f) / ((URyLimitMin) - (URyLimitMax))));
+                return angle.deg();
+            }
+            else
+            {
+                return new Angle();
+            }
+        }
+        public URCoordinates PickPosition(Unit Tx, Unit Ty, Unit Tz, string obj)
+        {
+
+            Angle angle = PickAngle(Tx, Ty);
+            URCoordinates.Vector3 rpy = new URCoordinates.Vector3();// = new URCoordinates.Vector3(-90.deg(), 180.deg(), (-90 - angle).deg());
+            if (obj == "cup")
+            {
+                rpy = new URCoordinates.Vector3(-45.deg(), 180.deg(), (-90 - angle.deg).deg());
+            }
+            else
+            {
+            }
+
+            URCoordinates.Vector3 rotation = URCoordinates.ToRotVector(rpy);
+            return new URCoordinates(Tx, Ty, Tz, rotation.X.rad(), rotation.Y.rad(), rotation.Z.rad());
+        }
+        public void PourPos(Unit Cx, Unit Cy, out Unit PourX, out Unit PourY)
+        {
+            Angle angle = -PickAngle(Cx, Cy);//坐標軸 X向上 Y向左 所以
+            Unit dx = 30.mm();
+            Unit dy = -30.mm();
+            double Px = Math.Cos(angle.rad) * dx.mm - Math.Sin(angle.rad) * dy.mm;
+            double Py = Math.Sin(angle.rad) * dx.mm + Math.Cos(angle.rad) * dy.mm;
+
+            PourX = (Cx.mm + Px).mm();
+            PourY = (Cy.mm + Py).mm();
         }
     }
 

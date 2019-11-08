@@ -39,6 +39,7 @@ using System.IO;
 using myActionBase;
 using myTCP;
 using Emgu.CV.Util;
+using Picking;
 
 namespace Wpf_coffeeMaker
 {
@@ -83,32 +84,7 @@ namespace Wpf_coffeeMaker
         bool setColor = true;
         private void setActiionCircle(string str)
         {
-            cir_pour.Fill = new SolidColorBrush(Colors.LightGray);
-            cir_toggle.Fill = new SolidColorBrush(Colors.LightGray);
-            if (str == "Pour")
-            {
-                cir_back.Fill = new SolidColorBrush(Colors.LightGray);
-                cir_pour.Fill = new SolidColorBrush(Color.FromArgb(255, 140, 90, 200));
-            }
-            else if (str == "Toggle")
-            {
-                cir_back.Fill = new SolidColorBrush(Colors.LightGray);
-                cir_toggle.Fill = new SolidColorBrush(Color.FromArgb(255, 200, 170, 60));
-            }
-            else if (str == "Background")
-            {
-                if (setColor)
-                    cir_back.Fill = new SolidColorBrush(Color.FromArgb(255, 60, 60, 60));
-                else
-                    cir_back.Fill = new SolidColorBrush(Colors.DimGray);
 
-                setColor = !setColor;
-            }
-            else
-            {
-                cir_pour.Fill = new SolidColorBrush(Colors.LightGray);
-                cir_toggle.Fill = new SolidColorBrush(Colors.LightGray);
-            }
         }
 
         private void setRecordRect(int S)
@@ -129,10 +105,75 @@ namespace Wpf_coffeeMaker
         }
         #endregion //---UI---//
 
+        #region //---public value---//
+        //public static Point sVal_gripOffset_cup = new Point(-13, -16);
+        public static int sVal_gripOffset_cup_x = -20;
+        public static int sVal_gripOffset_cup_y = -47;
+        //public static Point sVal_alignment_offset = new Point(0, -80);
+        public static int sVal_alignment_offset_x = 0;
+        public static int sVal_alignment_offset_y = -80;
+        public static int sVal_gripCenter_x = 667;
+        public static int sVal_gripCenter_y = 485;
+
+        public static float sVal_levelX = 0.015f;
+        public static float sVal_levelY = -0.01f;
+
+        public static bool show_thres = true;
+        public static bool show_level = false;
+
+        public static int sVal_bineray_threshold = 26;
+
+        public void SaveData()
+        {
+            StreamWriter txt = new StreamWriter("data.txt", false);
+
+            txt.WriteLine($"int\t{nameof(sVal_gripOffset_cup_x)}\t{sVal_gripOffset_cup_x.ToString()}");
+            txt.WriteLine($"int\t{nameof(sVal_gripOffset_cup_y)}\t{sVal_gripOffset_cup_y.ToString()}");
+            txt.WriteLine($"int\t{nameof(sVal_alignment_offset_x)}\t{sVal_alignment_offset_x.ToString()}");
+            txt.WriteLine($"int\t{nameof(sVal_alignment_offset_y)}\t{sVal_alignment_offset_y.ToString()}");
+            txt.WriteLine($"float\t{nameof(sVal_levelX)}\t{sVal_levelX.ToString()}");
+            txt.WriteLine($"float\t{nameof(sVal_levelY)}\t{sVal_levelY.ToString()}");
+            txt.WriteLine($"int\t{nameof(sVal_gripCenter_x)}\t{sVal_gripCenter_x.ToString()}");
+            txt.WriteLine($"int\t{nameof(sVal_gripCenter_y)}\t{sVal_gripCenter_y.ToString()}");
+            txt.WriteLine($"int\t{nameof(sVal_bineray_threshold)}\t{sVal_bineray_threshold.ToString()}");
+
+
+            txt.Flush();
+            txt.Close();
+
+        }
+
+        public void ReadData()
+        {
+            foreach (string varible in File.ReadAllLines("data.txt"))
+            {
+
+                string type = varible.Split('\t')[0];
+                if (type == "float")
+                {
+                    this.GetType().GetField(varible.Split('\t')[1]).SetValue(this, varible.Split('\t')[2].toFloat());
+                }
+                else if (type == "bool")
+                {
+                    this.GetType().GetField(varible.Split('\t')[1]).SetValue(this, varible.Split('\t')[2].toBool());
+                }
+                else if (type == "int")
+                {
+                    this.GetType().GetField(varible.Split('\t')[1]).SetValue(this, varible.Split('\t')[2].toInt());
+                }
+                else if (type == "dobule")
+                {
+                    this.GetType().GetField(varible.Split('\t')[1]).SetValue(this, varible.Split('\t')[2].toDouble());
+                }
+            }
+        }
+        #endregion ---public value---
+
         public MainWindow()
         {
             InitializeComponent();
-
+            ReadData();
+            SaveData();//if theres new var , will add here. next time oppend app will update
             Size mappingColor = new Size(900, 500);
             PointF[] src = new[] {
                     new PointF(0,0),
@@ -150,32 +191,33 @@ namespace Wpf_coffeeMaker
             creatAction();
             UR.stateChange += OnUrStateChange;
             UR.dynamicGrip = new UrSocketControl.ControlFunction(goDynamicGrip);
+
         }
 
-        public static List<Objects> objects = new List<Objects>();
+        public static List<Objects> objList = new List<Objects>();
         private void creatObject()
         {
-            objects.Add(new Objects(0, "none"));
-            objects.Add(new Objects(1, "Blue cup"));
-            objects.Add(new Objects(2, "Pink cup"));
-            objects.Add(new Objects(3, "Pot"));
-            objects.Add(new Objects(4, "Spoon"));
-            objects.Add(new Objects(5, "Powder box"));
-            objects.Add(new Objects(6, "Red pill box"));
-            objects.Add(new Objects(7, "Green pill box"));
-            objects.Add(new Objects(8, "Blue pill box"));
+            objList.Add(new Objects(0, "none"));
+            objList.Add(new Objects(1, "Blue cup"));
+            objList.Add(new Objects(2, "Pink cup"));
+            objList.Add(new Objects(3, "Pot"));
+            objList.Add(new Objects(4, "Spoon"));
+            objList.Add(new Objects(5, "Powder box"));
+            objList.Add(new Objects(6, "Red pill box"));
+            objList.Add(new Objects(7, "Green pill box"));
+            objList.Add(new Objects(8, "Blue pill box"));
         }
 
-        public static List<myAction> actLv = new List<myAction>();
+        public static List<myAction> actList = new List<myAction>();
         private void creatAction()
         {
-            actLv.Add(new myAction(0, "none"));
-            actLv.Add(myActionAdder.Pick());
-            actLv.Add(myActionAdder.Place());
-            actLv.Add(myActionAdder.Pour());
-            actLv.Add(myActionAdder.Scoop());
-            actLv.Add(myActionAdder.AddIn());
-            actLv.Add(myActionAdder.Stir());
+            actList.Add(new myAction(0, "none"));
+            actList.Add(myActionAdder.Pick());
+            actList.Add(myActionAdder.Place());
+            actList.Add(myActionAdder.Pour());
+            actList.Add(myActionAdder.Scoop());
+            actList.Add(myActionAdder.AddIn());
+            actList.Add(myActionAdder.Stir());
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -192,6 +234,7 @@ namespace Wpf_coffeeMaker
             }
             Rect_actionBaseTopColor.Fill = new SolidColorBrush(Colors.Transparent);
             setRecordRect(0);
+            Cb_rotateDesk_Click(cb_rotateDesk, null);
         }
 
 
@@ -257,6 +300,15 @@ namespace Wpf_coffeeMaker
 
 
 
+        }
+
+        //client 
+        private void CheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            if (((CheckBox)sender).IsChecked == true)
+                UR.creatClient("192.168.1.104");
+            else
+                UR.closeClient();
         }
         #endregion //---UR server---//
 
@@ -351,45 +403,14 @@ namespace Wpf_coffeeMaker
             startDemo = true;
         }
 
-        List<List<ActionLine>> pairAction = new List<List<ActionLine>>();
         private void Button_endDemo_Click(object sender, RoutedEventArgs e)
         {
             if (startDemo == false)
             {
                 MessageBox.Show("已經結束了");
-                //return;
             }
             Rect_actionBaseTopColor.Fill = new SolidColorBrush(Color.FromArgb(200, 210, 80, 40));
             startDemo = false;
-            pairAction.Clear();
-
-
-
-            if (mainAction[0].Action.Name != ActionName.Pick)
-            {
-                MessageBox.Show("一定要pick起手");
-                return;
-            }
-            //處理 pick place成對問題
-            for (int i = 0; i < mainAction.Count(); i++)
-            {
-                if (mainAction[i].Action.Name != ActionName.Pick)
-                {
-                    MessageBox.Show("程式錯了歐~一定會示Pick");
-                    return;
-                }
-                pairAction.Add(new List<ActionLine>());//star a pair
-                pairAction.Last().Add(mainAction[i]);
-                //find pair
-                for (i++; i < mainAction.Count(); i++)//i++ 先，因為要看下一行
-                {
-                    pairAction.Last().Add(mainAction[i]);
-                    if (mainAction[i].Action.Name == ActionName.Place)
-                        break;
-                }
-            }
-
-
         }
         private void Button_createAction_Click(object sender, RoutedEventArgs e)
         {
@@ -404,24 +425,11 @@ namespace Wpf_coffeeMaker
             for (int i = 0; i < mainAction.Count(); i++)
             {
                 if (mainAction[i].target.Name != "pos")//如果不是pos才要更新 //基本上不會發生
-                    mainAction[i].target.nowPos = objects[mainAction[i].target.index].nowPos;
+                    mainAction[i].target.nowPos = objList[mainAction[i].target.index].nowPos;
                 if (mainAction[i].destination.Name != "pos")//如果不是pos才要更新 //也就是像place到某個點
-                    mainAction[i].destination.nowPos = objects[mainAction[i].destination.index].nowPos;
+                    mainAction[i].destination.nowPos = objList[mainAction[i].destination.index].nowPos;
             }
-
-            for (int i = 0; i < pairAction.Count(); i++)
-                for (int j = 0; j < pairAction[i].Count(); j++)
-                {
-                    if (pairAction[i][j].target.Name != "pos")//如果不是pos才要更新 //基本上不會發生
-                        pairAction[i][j].target.nowPos = objects[pairAction[i][j].target.index].nowPos;
-                    if (pairAction[i][j].destination.Name != "pos")//如果不是pos才要更新 //也就是像place到某個點
-                        pairAction[i][j].destination.nowPos = objects[pairAction[i][j].destination.index].nowPos;
-                }
-
-
-            ActionProccess(fileName);
-
-            //ActionBase2Cmd(mainAction, fileName);
+            ActionBase2Cmd(mainAction, fileName);
 
             //執行
             if (UR.isServerRunning == false)
@@ -431,81 +439,8 @@ namespace Wpf_coffeeMaker
             }
             UR.goFile(fileName);
         }
-
-
-        private void ActionProccess(string fileName)
-        {
-            List<string> fullCmd = new List<string>();
-            for (int i = 0; i < pairAction.Count(); i++)
-            {
-                if (pairAction[i].Count == 2)
-                {//就單純pick place
-                    foreach (var s in pairAction[i][0].getCmdText())
-                        fullCmd.Add(s);//pick 部分
-                    foreach (var s in pairAction[i][1].getCmdText())
-                        fullCmd.Add(s);//place 部分
-                }
-                else//不是只有pick place
-                {
-                    //看pick什麼
-                    if (pairAction[i][0].target.Name.IndexOf("cup") >= 0)//如果是杯子的話
-                    {//也只有pour的可能了
-
-                        var act = actLv[1];//pick
-                        var tar = pairAction[i][1].destination;//pour的 destination
-                        var des = objects[0];//none
-                        ActionLine actLine = new ActionLine(act, tar, des);
-                        foreach (var s in actLine.getCmdText())
-                            fullCmd.Add(s);//pick 拿起另一個杯子
-
-                        foreach (string str in File.ReadAllLines("Path\\act_cupToWork.path"))
-                            fullCmd.Add(str);
-
-                        foreach (var s in pairAction[i][0].getCmdText())//pick Cup A
-                            fullCmd.Add(s);
-
-                        foreach (string str in File.ReadAllLines("Path\\act_pour.path"))
-                            fullCmd.Add(str);
-
-                        foreach (var s in pairAction[i][2].getCmdText())//place Cup A
-                            fullCmd.Add(s);
-
-                        foreach (string str in File.ReadAllLines("Path\\act_pickWorkCup.path"))
-                            fullCmd.Add(str);
-
-                        act = actLv[2];//place
-                        tar = pairAction[i][1].destination;//pour的 destination //關係到放的角度
-                        des = pairAction[i][1].destination;//pour的 destination //原本位置
-                        actLine = new ActionLine(act, tar, des);
-                        foreach (var s in actLine.getCmdText())
-                            fullCmd.Add(s);//pick 拿起另一個杯子
-                    }
-                    else
-                    {
-                        MessageBox.Show("not now");
-                    }
-                }
-
-
-
-            }
-
-
-            if (fileName.IndexOf(".path") < 0)
-                fileName += ".path";
-            StreamWriter txt;
-            txt = new StreamWriter($"Path//{fileName}", false);
-
-            foreach (string str in fullCmd)
-                txt.WriteLine(str);
-
-            txt.Flush();
-            txt.Close();
-        }
-
         public void ActionLine2ListView(ActionLine al)
         {
-
             ActionBaseAdder ab;
             if (al.destination.Name == "pos")
                 ab = new ActionBaseAdder(al.Action.Name, al.target.Name, al.destination.nowPos.ToString("(3)"), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black));
@@ -539,101 +474,71 @@ namespace Wpf_coffeeMaker
 
 
         #region //---Connect Python Action recognition---//
-        private void Button_addPour_Click(object sender, RoutedEventArgs e)
-        {
-            //if (startDemo == true)
-            //{
-            //    if (nowAct == "Pour")
-            //        return;
-            //    if (handing == cups[0])
-            //    {
-            //        ActionList.Add(new ActionBaseList(myActionAdder.Name.Pour, cups[0].Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(cups[0].color)));
-            //        LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-            //        ActionList.Add(new ActionBaseList("    to", cups[1].Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(cups[1].color)));
-            //        LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-            //    }
-            //    else if (handing == cups[1])
-            //    {
-            //        ActionList.Add(new ActionBaseList(myActionAdder.Name.Pour, cups[1].Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(cups[1].color)));
-            //        LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-            //        ActionList.Add(new ActionBaseList("    to", cups[0].Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(cups[0].color)));
-            //        LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-            //    }
-            //    nowAct = "Pour";
-            //}
-
-        }
-        bool evil_toggleOnce = false;
-        private void Button_addToggle_Click(object sender, RoutedEventArgs e)
-        {
-            //if (startDemo == true)
-            //{
-            //    if (evil_toggleOnce == true)
-            //        return;
-            //    if (nowAct == "Toggle")
-            //        return;
-            //    ActionList.Add(new ActionBaseList("Place", handing.Name, new SolidColorBrush(Colors.Black), new SolidColorBrush(handing.color)));
-            //    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-            //    //if (handing.Distanse(dripTrayPos) < 0.02)//代表在drip tray上
-            //    //{
-            //    //    ActionList.Add(new ActionBaseList("     to", subactInfo.place.DripTray.ToString(), new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black)));
-            //    //    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-            //    //}
-            //    //else
-            //    //{
-            //    //    ActionList.Add(new ActionBaseList("     to", (handing.getNowPos()).ToString("mm", "3(", "0"), new SolidColorBrush(Colors.Black), new SolidColorBrush(handing.color)));
-            //    //    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-            //    //}
-            //    handing = machine;
-            //    ActionList.Add(new ActionBaseList(myActionAdder.Name.Trigger, "", new SolidColorBrush(Colors.Black), new SolidColorBrush(Colors.Black)));
-            //    LV_actionBase.Items.Add(ActionList[ActionList.Count() - 1]);
-            //    nowAct = "Toggle";
-
-            //    evil_toggleOnce = true;
-            //    cir_toggleOnce.Fill = new SolidColorBrush(Colors.Salmon);
-            //}
-
-        }
-        string nowAct = "Background";
+        ezTCP TCP = new ezTCP();
         private void Button_askActionRecognition_Click(object sender, RoutedEventArgs e)
         {
-            ezTCP TCP = new ezTCP();
-            setActiionCircle("");
+
             Task.Run(() =>
             {
-                if (!TCP.creatClient("192.168.1.102", 777))
+                setActiionCircle("");
+                if (!TCP.creatClient("192.168.1.107", 777))
                     return;
-
                 this.Dispatcher.Invoke((Action)(() => { cir_connectAct.Fill = new SolidColorBrush(Colors.DarkSeaGreen); }));
-                while (true)
-                {
-                    try
-                    {
-                        TCP.client_SendData("hey");
-                        string msg = TCP.client_ReadData();
-                        if (msg == "")
-                            break;
-
-                        if (msg == "Pour")
-                            this.Dispatcher.Invoke((Action)(() => { Button_addPour_Click(null, null); setActiionCircle("Pour"); }));
-                        else if (msg == "Toggle")
-                            this.Dispatcher.Invoke((Action)(() => { Button_addToggle_Click(null, null); setActiionCircle("Toggle"); }));
-                        else if (msg == "Background")
-                            this.Dispatcher.Invoke((Action)(() => { nowAct = "Background"; setActiionCircle("Background"); }));
-
-                        Thread.Sleep(0);
-                    }
-                    catch
-                    {
-                        break;
-                    }
-
-                }
-                Console.WriteLine("client 中斷");
-                this.Dispatcher.Invoke((Action)(() => { cir_connectAct.Fill = new SolidColorBrush(Colors.Salmon); setActiionCircle(""); }));
             });
 
         }
+
+        private void Button_startAR_Click(object sender, RoutedEventArgs e)
+        {
+            TCP.client_SendData("start_demo");
+            string msg = TCP.client_ReadData();
+            Console.WriteLine(msg);
+        }
+
+        private void Button_endAR_Click(object sender, RoutedEventArgs e)
+        {
+            TCP.client_SendData("end_demo");
+            string msg = TCP.client_ReadData();
+            //"71,1,1,-0.00867,-0.21019,0,-0.001,-0.001;83,3,1,0.06899,-0.24355,3,-0.13042,-0.03562;96,2,1,-0.07257,-0.41176,0,-0.001,-0.001"
+            Console.WriteLine(msg);
+            //string msg = "35,1,2,0.0079,-0.19952,0,-0.001,-0.001;48,3,2,0.09142,-0.24673,1,0.08751,-0.35133;59,2,2,-0.0767,-0.41837,0,-0.001,-0.001;68,1,1,0.07609,-0.34578,0,-0.001,-0.001;77,3,1,-0.08773,-0.32993,2,-0.07449,-0.42459;89,2,1,0.0015,-0.19447,0,-0.001,-0.001;91,1,8,0.17031,-0.2567,0,-0.001,-0.001;92,2,8,0.16127,-0.24134,0,-0.001,-0.001;94,1,8,0.16524,-0.24719,0,-0.001,-0.001;111,6,8,0.02053,-0.18653,3,0.04068,-0.12663;134,2,8,0.15161,-0.30327,0,-0.001,-0.001";
+            //"35,1,2,0.0079,-0.19952,0,-0.001,-0.001;48,3,2,0.09142,-0.24673,1,0.08751,-0.35133;59,2,2,-0.0767,-0.41837,0,-0.001,-0.001;68,1,1,0.07609,-0.34578,0,-0.001,-0.001;77,3,1,-0.08773,-0.32993,2,-0.07449,-0.42459;89,2,1,0.0015,-0.19447,0,-0.001,-0.001;91,1,8,0.17031,-0.2567,0,-0.001,-0.001;92,2,8,0.16127,-0.24134,0,-0.001,-0.001;94,1,8,0.16524,-0.24719,0,-0.001,-0.001;111,6,8,0.02053,-0.18653,3,0.04068,-0.12663;134,2,8,0.15161,-0.30327,0,-0.001,-0.001"
+            string[] oneAction = msg.Split(';');
+            for (int i = 0; i < oneAction.Length; i++)
+            {
+                string[] actInfo = oneAction[i].Split(',');
+                myAction act = new myAction(actInfo[1].toInt(), actList[actInfo[1].toInt()].Name);
+
+                Objects tar = new Objects(actInfo[2].toInt(), objList[actInfo[2].toInt()].Name);
+                Objects des;
+                if (actList[actInfo[1].toInt()].Name == ActionName.Place)
+                {
+                    //如果是place，就放入target的位置
+                    des = new Objects(9, "pos");
+                    Unit x = actInfo[3].toFloat().M();
+                    Unit y = actInfo[4].toFloat().M();
+
+                    des.nowPos = new URCoordinates(x, y, 0.M());
+                }
+                else
+                {
+                    des = new Objects(actInfo[5].toInt(), objList[actInfo[5].toInt()].Name);
+                }
+                ActionLine al = new ActionLine(act, tar, des);
+                mainAction.Add(al);                
+                ActionLine2ListView(al);
+            }
+        }
+
+        private void Button_getAR_Click(object sender, RoutedEventArgs e)
+        {
+            TCP.client_SendData("get_obj_pos");
+            string msg = TCP.client_ReadData();
+            //"5,-1,-1;,3,-189.1027119345294,-540.4202861686027;,3,-1,-1;,2,143.33660559739894,-279.61526760880236;,1,82.4412088908121,-463.4023999918194;,8,-1,-1;,6,-1,-1;,7,-1,-1;,4,-1,-1;,1001,-1,-1;,1010,-1,-1;,11,-1,-1;"
+            Console.WriteLine(msg);
+          
+        }
+
         #endregion //---Connect Python Action recognition---//
 
 
@@ -842,14 +747,7 @@ namespace Wpf_coffeeMaker
             }, token);
         }
 
-        public static bool show_thres = true;
-        public static bool show_level = false;
 
-        public static Point val_gripOffset_cup = new Point(-13, -16);
-        public static Point alignment_offset = new Point(0, -80);
-
-        float levelX = 0.015f;
-        float levelY = -0.01f;
 
         private void Process_depth(CustomProcessingBlock processingBlock, PipelineProfile pp, Action<VideoFrame> updateColor, Pipeline pipeline)
         {
@@ -906,12 +804,7 @@ namespace Wpf_coffeeMaker
                         }
 
                         //value
-                        int thres = 80;
                         int thresVal = 128;
-                        Dispatcher.Invoke(DispatcherPriority.Normal, (Action)(() => { thres = tb_value_depthThres.Text.toInt(); }));
-
-
-
                         unsafe
                         {
                             byte* pixelPtr_byte = (byte*)img_depth.DataPointer;
@@ -927,8 +820,8 @@ namespace Wpf_coffeeMaker
                                     if (show_level == false)//如果要顯示就不要校正了
                                     {
                                         //水平校正
-                                        value += (int)(j * levelX);//depth img 下面多 要增加
-                                        value += (int)(i * levelY);//depth img 右邊多 要增加
+                                        value += (int)(j * sVal_levelX);//depth img 下面多 要增加
+                                        value += (int)(i * sVal_levelY);//depth img 右邊多 要增加
                                     }
 
                                     value = 255 - value;//反向 讓越高越白
@@ -940,9 +833,9 @@ namespace Wpf_coffeeMaker
 
                                     if (show_thres)
                                     {
-                                        if (value > thres)
+                                        if (value > sVal_bineray_threshold)
                                             value = thresVal;
-                                        if (value < thres)
+                                        if (value < sVal_bineray_threshold)
                                             value = 0;
                                     }
 
@@ -968,9 +861,7 @@ namespace Wpf_coffeeMaker
 
                         //影像處理開始--抓物件
                         //{X = 666.838562 Y = 484.8097}
-                        Point grip_center = new Point(667, 485);//夾爪中心，如果我找到..則旋轉會不影響中心點
-
-
+                        Point grip_center = new Point(sVal_gripCenter_x, sVal_gripCenter_y);//夾爪中心，如果我找到..則旋轉會不影響中心點
 
                         Mat mat_img_show = new Mat(RS_depthSize, DepthType.Cv8U, 3);
                         Mat img_depth_ch3 = new Mat(RS_depthSize, DepthType.Cv8U, 3);
@@ -984,15 +875,15 @@ namespace Wpf_coffeeMaker
 
                         //畫線條 有碰到的地方就會被填滿，不然只會有一點，離開那一點就找不到物件了
                         int size = 90;
-                        CvInvoke.Line(mat_img_show, new Point(grip_center.X + alignment_offset.X + size, grip_center.Y + alignment_offset.Y), new Point(grip_center.X + alignment_offset.X - size, grip_center.Y + alignment_offset.Y), new MCvScalar(thresVal, thresVal, thresVal));
-                        CvInvoke.Line(mat_img_show, new Point(grip_center.X + alignment_offset.X, grip_center.Y + alignment_offset.Y + size), new Point(grip_center.X + alignment_offset.X, grip_center.Y + alignment_offset.Y - size), new MCvScalar(thresVal, thresVal, thresVal));
-                        CvInvoke.Rectangle(mat_img_show, new Rectangle(grip_center.X + alignment_offset.X - size, grip_center.Y + alignment_offset.Y - size, size * 2, size * 2), new MCvScalar(thresVal, thresVal, thresVal));
+                        CvInvoke.Line(mat_img_show, new Point(grip_center.X + sVal_alignment_offset_x + size, grip_center.Y + sVal_alignment_offset_y), new Point(grip_center.X + sVal_alignment_offset_x - size, grip_center.Y + sVal_alignment_offset_y), new MCvScalar(thresVal, thresVal, thresVal));
+                        CvInvoke.Line(mat_img_show, new Point(grip_center.X + sVal_alignment_offset_x, grip_center.Y + sVal_alignment_offset_y + size), new Point(grip_center.X + sVal_alignment_offset_x, grip_center.Y + sVal_alignment_offset_y - size), new MCvScalar(thresVal, thresVal, thresVal));
+                        CvInvoke.Rectangle(mat_img_show, new Rectangle(grip_center.X + sVal_alignment_offset_x - size, grip_center.Y + sVal_alignment_offset_y - size, size * 2, size * 2), new MCvScalar(thresVal, thresVal, thresVal));
 
                         //fill 找到的物件
                         MCvScalar fillColor = new MCvScalar(90, 110, 177);
                         Mat filling_mask = new Mat(RS_depthSize.Height + 2, RS_depthSize.Width + 2, DepthType.Cv8U, 1);
                         filling_mask.SetTo(new MCvScalar(0, 0, 0));
-                        CvInvoke.FloodFill(mat_img_show, filling_mask, grip_center, fillColor, out Rectangle rect, new MCvScalar(1, 1, 1), new MCvScalar(1, 1, 1));
+                        CvInvoke.FloodFill(mat_img_show, filling_mask, new Point(grip_center.X + sVal_alignment_offset_x, grip_center.Y + sVal_alignment_offset_y), fillColor, out Rectangle rect, new MCvScalar(1, 1, 1), new MCvScalar(1, 1, 1));
 
                         //去掉中間畫的框框
                         element = CvInvoke.GetStructuringElement(ElementShape.Cross, new Size(3, 3), new Point(-1, -1));
@@ -1028,9 +919,8 @@ namespace Wpf_coffeeMaker
                                     {
                                         var a = grip_center.X - center_obj.X;
                                         var b = grip_center.Y - center_obj.Y;
-                                        val_gripOffset_cup = new Point(-5, -48);
-                                        center_obj.Y += val_gripOffset_cup.Y;//辨識到cup就要位移 (因為高度問題 會有錯誤)
-                                        center_obj.X += val_gripOffset_cup.X;
+                                        center_obj.Y += sVal_gripOffset_cup_x;//辨識到cup就要位移 (因為高度問題 會有錯誤)
+                                        center_obj.X += sVal_gripOffset_cup_y;
                                         CvInvoke.PutText(mat_img_show, "Cup", new Point((int)center_obj.X - 20, (int)center_obj.Y - 20), FontFace.HersheyDuplex, 2, new MCvScalar(200, 200, 250), 2);
                                         CvInvoke.Circle(mat_img_show, new Point((int)center_obj.X, (int)center_obj.Y), 10, new MCvScalar(100, 50, 200), -1);
                                         CvInvoke.Circle(mat_img_show, new Point((int)BoundingBox.Center.X, (int)BoundingBox.Center.Y), (int)size_obj.Height / 2, new MCvScalar(50, 180, 200), 3);
@@ -1061,9 +951,9 @@ namespace Wpf_coffeeMaker
                         }
 
                         //畫出容許線
-                        CvInvoke.Line(mat_img_show, new Point(grip_center.X + alignment_offset.X + size, grip_center.Y + alignment_offset.Y), new Point(grip_center.X + alignment_offset.X - size, grip_center.Y + alignment_offset.Y), new MCvScalar(thresVal, thresVal, thresVal));
-                        CvInvoke.Line(mat_img_show, new Point(grip_center.X + alignment_offset.X, grip_center.Y + alignment_offset.Y + size), new Point(grip_center.X + alignment_offset.X, grip_center.Y + alignment_offset.Y - size), new MCvScalar(thresVal, thresVal, thresVal));
-                        CvInvoke.Rectangle(mat_img_show, new Rectangle(grip_center.X + alignment_offset.X - size, grip_center.Y + alignment_offset.Y - size, size * 2, size * 2), new MCvScalar(thresVal, thresVal, thresVal));
+                        CvInvoke.Line(mat_img_show, new Point(grip_center.X + sVal_alignment_offset_x + size, grip_center.Y + sVal_alignment_offset_y), new Point(grip_center.X + sVal_alignment_offset_x - size, grip_center.Y + sVal_alignment_offset_y), new MCvScalar(thresVal, thresVal, thresVal));
+                        CvInvoke.Line(mat_img_show, new Point(grip_center.X + sVal_alignment_offset_x, grip_center.Y + sVal_alignment_offset_y + size), new Point(grip_center.X + sVal_alignment_offset_x, grip_center.Y + sVal_alignment_offset_y - size), new MCvScalar(thresVal, thresVal, thresVal));
+                        CvInvoke.Rectangle(mat_img_show, new Rectangle(grip_center.X + sVal_alignment_offset_x - size, grip_center.Y + sVal_alignment_offset_y - size, size * 2, size * 2), new MCvScalar(thresVal, thresVal, thresVal));
                         //畫出夾爪中心
                         CvInvoke.Circle(mat_img_show, grip_center, 10, new MCvScalar(192, 167, 100), 5);
                         MyInvoke.drawCross(ref mat_img_show, grip_center, 15, new MCvScalar(192, 167, 100), 3);
@@ -1074,13 +964,15 @@ namespace Wpf_coffeeMaker
                             CvInvoke.Circle(mat_img_show, new Point(640, 630), 10, new MCvScalar(150, 255, 100), 5);
                             byte x0 = MyInvoke.GetValue<byte>(img_depth, 30, 640);
                             byte x1 = MyInvoke.GetValue<byte>(img_depth, 630, 640);
-                            levelX = (float)(x1 - x0) / 600f;
+                            sVal_levelX = (float)(x1 - x0) / 600f;
 
                             CvInvoke.Circle(mat_img_show, new Point(260, 360), 10, new MCvScalar(150, 255, 100), 5);
                             CvInvoke.Circle(mat_img_show, new Point(1060, 360), 10, new MCvScalar(150, 255, 100), 5);
                             byte y0 = MyInvoke.GetValue<byte>(img_depth, 360, 260);
                             byte y1 = MyInvoke.GetValue<byte>(img_depth, 360, 1060);
-                            levelY = (float)(y1 - y0) / 800;
+                            sVal_levelY = (float)(y1 - y0) / 800;
+
+                            SaveData();
                         }
 
                         armMoveX = (grip_center.X - center_obj.X);
@@ -1132,6 +1024,7 @@ namespace Wpf_coffeeMaker
         private bool goDynamicGrip(string msg)
         {
             UR.goRelativePosition(0.M(), 20.mm(), 0.M());
+
             for (int i = 0; i < 100; i++)
             {
                 Action action = delegate { };
@@ -1147,12 +1040,19 @@ namespace Wpf_coffeeMaker
             {
                 URCoordinates nowPos = new URCoordinates();
                 UR.getPosition(ref nowPos);
-                //URCoordinates goPos = new URCoordinates(nowPos.X + armMoveX.mm(), nowPos.Y + armMoveY.mm(), 0.2.M(), 3.14.rad(), 0.rad(), (0).rad());
-                //URCoordinates goPos2 = new URCoordinates(nowPos.X + armMoveX.mm(), nowPos.Y + armMoveY.mm(), 0.2.M(), 2.5.rad(), 2.5.rad(), (-1.5).rad());
 
-                URCoordinates goPos = new URCoordinates(nowPos.X + armMoveX.mm(), nowPos.Y + armMoveY.mm(), 0.2.M(), 3.14.rad(), 0.rad(), (0).rad());
-                UR.goPosition2(goPos);
-                //UR.goPosition2(goPos2);
+
+                Unit x = nowPos.X + armMoveX.mm();
+                Unit y = nowPos.Y + armMoveY.mm();
+                Unit z = 0.2.M();
+                Angle Rx = 3.14.rad();
+                Angle Ry = 0.rad();
+                Angle Rz = 0.rad();
+                URCoordinates goPos = new URCoordinates(x, y, z, Rx, Ry, Rz);
+                UR.goPosition2(goPos); //到夾爪正中心
+
+                URCoordinates goPos2 = PickingPos.PickPose(goPos.X, goPos.Y, goPos.Z, msg);
+                UR.goPosition2(goPos2);
 
                 UR.goRelativePosition(0.M(), 0.M(), (-130).mm());//向下
                 UR.goGripper(70);
@@ -1194,28 +1094,94 @@ namespace Wpf_coffeeMaker
             //Console.WriteLine($"mouse at({x},{y})");
             //Console.WriteLine($"Z({posMap[x * 2, y * 2, 2]})");
         }
+
         #endregion //---Grip mode---//
 
 
 
         #region //---desk control---//
+
+        private void Tool2Img(Unit Tx, Unit Ty, out int Ix, out int Iy)
+        {
+            Ix = (int)Ty.mm + 600;
+            Iy = (int)Tx.mm + 250;
+
+        }
+        private void Img2Tool(int Ix, int Iy, out Unit Tx, out Unit Ty)
+        {
+            Tx = (Iy - 250).mm();
+            Ty = (Ix - 600).mm();
+        }
+        private void ToolRotate(ref Unit Tx, ref Unit Ty)
+        {
+            //newX = (W+X0)-(newX-X0)
+            Tx.mm = 500 + (-250) - (Tx.mm - (-250));
+            Ty.mm = 700 + (-600) - (Ty.mm - (-600));
+        }
+        private void ImgRotate(ref int Ix, ref int Iy)
+        {
+            //newX = (W+X0)-(newX-X0)
+            Ix = 500 + (-250) - (Ix - (-250));
+            Iy = 700 + (-600) - (Iy - (-600));
+        }
+
         private void Grid_dask_MouseMove(object sender, MouseEventArgs e)
         {
             int x = (int)e.GetPosition((Grid)sender).X;
             int y = (int)e.GetPosition((Grid)sender).Y;
-            int Tx = y - 250;
-            int Ty = x - 600;
-            tb_desk_xy.Text = $"({Tx},{Ty})";
+            Img2Tool(x, y, out Unit Tx, out Unit Ty);
+
+
+            if (rotateDesk)
+            {
+                ToolRotate(ref Tx, ref Ty);
+
+                if (Ty.mm.IsBetween((int)PickingPos.URyLimitMin, (int)PickingPos.URyLimitMax))
+                {
+                    rect_urWrist.Margin = new Thickness(x - 5, y, 0, 0);
+                    float angle = PickingPos.PickAngle(Tx, Ty).deg;
+                    System.Windows.Media.RotateTransform rotateTransform1 = new System.Windows.Media.RotateTransform(angle, 5, 0);
+                    rect_urWrist.RenderTransform = rotateTransform1;
+
+                    PickingPos.PourPos(Tx, Ty, out Unit Px, out Unit Py);
+                    ToolRotate(ref Px, ref Py);
+                    Tool2Img(Px, Py, out int showx, out int showy);
+                    // ImgRotate(ref showx, ref showy);
+                    circle_pourPos.Margin = new Thickness(showx - 10, showy - 10, 0, 0);
+                }
+            }
+
+            tb_desk_xy.Text = $"({Tx.mm},{Ty.mm})";
             tb_desk_xy.Margin = new Thickness(x, y - 20, 0, 0);
         }
         int clickTx = 0;
         int clickTy = 0;
+        int clickAngle = 0;
         private void Grid_desk_MouseDown(object sender, MouseButtonEventArgs e)
         {
             int x = (int)e.GetPosition((Grid)sender).X;
             int y = (int)e.GetPosition((Grid)sender).Y;
-            clickTx = y - 250;
-            clickTy = x - 600;
+            Img2Tool(x, y, out Unit Tx, out Unit Ty);
+
+            if (rotateDesk)
+            {
+                ToolRotate(ref Tx, ref Ty);
+
+                if ((Ty.mm).IsBetween((int)PickingPos.URyLimitMin, (int)PickingPos.URyLimitMax))
+                {
+                    rect_urWrist.Margin = new Thickness(x - 5, y, 0, 0);
+                    clickAngle = (int)PickingPos.PickAngle(Tx, Ty).deg;
+                    System.Windows.Media.RotateTransform rotateTransform1 = new System.Windows.Media.RotateTransform(clickAngle, 5, 0);
+                    rect_urWrist.RenderTransform = rotateTransform1;
+                }
+                else
+                {
+                    MessageBox.Show("超出工作區");
+                    return;
+                }
+            }
+            clickTx = (int)Tx.mm;
+            clickTy = (int)Ty.mm;
             tb_desk_xy.Text = $"({clickTx},{clickTy})";
             tb_desk_xy.Margin = new Thickness(x, y - 20, 0, 0);
         }
@@ -1223,7 +1189,9 @@ namespace Wpf_coffeeMaker
         {
             Task.Run(() =>
             {
-                URCoordinates goPos = new URCoordinates(clickTx.mm(), clickTy.mm(), 0.2.M(), 3.14.rad(), 0.rad(), (0).rad());
+                URCoordinates.Vector3 rpy = new URCoordinates.Vector3(-90.deg(), 180.deg(), (-90 - clickAngle).deg());
+                URCoordinates.Vector3 rotation = URCoordinates.ToRotVector(rpy);
+                URCoordinates goPos = new URCoordinates(clickTx.mm(), clickTy.mm(), 0.2.M(), rotation.X.rad(), rotation.Y.rad(), rotation.Z.rad());
                 UR.goPosition2(goPos);
             });
 
@@ -1250,15 +1218,100 @@ namespace Wpf_coffeeMaker
             int Ty = (int)nowPos.Y.mm;
             int x = Ty + 600;
             int y = Tx + 250;
+            if (rotateDesk)
+            {
+                //int Tx = y - 250;
+                //int Ty = x - 600;
+                //newX = (W+X0)-(newX-X0)
+                //Tx = 500 + (-250) - (Tx - (-250));
+                //Ty = 700 + (-600) - (Ty - (-600));
+                //500 + (-250) - (Tx - (-250)) = y - 250;
+                //700 + (-600) - (Ty - (-600)) = x - 600;
+
+                x = 700 + (-600) - (Ty - (-600)) + 600;
+                y = 500 + (-250) - (Tx - (-250)) + 250;
+            }
             circle_gripPos.Margin = new Thickness(x - (circle_gripPos.Width / 2), y - (circle_gripPos.Height / 2), 0, 0);
+        }
+
+        bool rotateDesk = true;
+        private void Cb_rotateDesk_Click(object sender, RoutedEventArgs e)
+        {
+            rotateDesk = (bool)((CheckBox)sender).IsChecked;
+            if (rotateDesk)
+                cirle_URonDesk.Margin = new Thickness(40, 190, 0, 0);
+            else
+                cirle_URonDesk.Margin = new Thickness(540, 190, 0, 0);
+        }
+
+        //client control
+        private void Button_desk_goPos_V(object sender, RoutedEventArgs e)
+        {
+            Task.Run(() =>
+            {
+                URCoordinates goPos = new URCoordinates(clickTx.mm(), clickTy.mm(), 0.2.M(), 3.14.rad(), 0.rad(), (0).rad());
+                UR.goPosition2(goPos);
+            });
+        }
+        private void Button_desk_goPos_H(object sender, RoutedEventArgs e)
+        {
+            Task.Run(() =>
+            {
+                URCoordinates goPos = PickingPos.PickPose(clickTx.mm(), clickTy.mm(), 0.2.M(), "H");
+                PickingPos.PourPos(goPos.X, goPos.Y, out goPos.X, out goPos.Y);
+                UR.goPosition2(goPos);
+            });
+        }
+        private void Button_desk_goPos_cupPour(object sender, RoutedEventArgs e)
+        {
+            Task.Run(() =>
+            {
+                URCoordinates goPos = PickingPos.PickPose(clickTx.mm(), clickTy.mm(), 0.2.M(), "cup");
+                PickingPos.PourPos(goPos.X, goPos.Y, out goPos.X, out goPos.Y);
+                UR.goPosition2(goPos);
+            });
+        }
+        private void Button_desk_goPos_addIn(object sender, RoutedEventArgs e)
+        {
+            Task.Run(() =>
+            {
+                URCoordinates goPos = PickingPos.PickPose(clickTx.mm(), clickTy.mm(), 0.2.M(), "cup");
+                PickingPos.AddInPos(goPos.X, goPos.Y, out goPos.X, out goPos.Y);
+                UR.goPosition2(goPos);
+            });
+        }
+        private void Button_desk_goPos_cup(object sender, RoutedEventArgs e)
+        {
+            Task.Run(() =>
+            {
+                URCoordinates goPos = PickingPos.PickPose(clickTx.mm(), clickTy.mm(), 0.2.M(), "cup");
+                UR.goPosition2(goPos);
+            });
+        }
+        private void Button_desk_client_goPos(object sender, RoutedEventArgs e)
+        {
+
         }
         #endregion //---desk control---//
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            UR.creatClient("192.168.1.108");
-            string str = "movep(p[0.0,-0.22,0.2,3.14,0,0])\n";
+            UR.creatClient("192.168.1.105");
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    var msg = UR.client_readData();
+                    if (msg != "")
+                        Console.WriteLine("get" + msg);
+                }
+            });
+        }
+        private void Button_Click_11(object sender, RoutedEventArgs e)
+        {
+            string str = "actual_TCP_pose\n";
             UR.client_SendData(str);
+
         }
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
@@ -1278,6 +1331,8 @@ namespace Wpf_coffeeMaker
 
         public void Btn_addSimAction_Click(object sender, RoutedEventArgs e)
         {
+            PickingPos.PourPos(new Unit(), new Unit(-0.5), out Unit Px, out Unit Py);
+
         }
 
         private void Button_UR_V_Click(object sender, RoutedEventArgs e)

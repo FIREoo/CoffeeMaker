@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Wpf_coffeeMaker"
         mc:Ignorable="d"
-        Title="adminWindow" Height="450" Width="600.533" Left="-1920" Topmost="True">
+        Title="adminWindow" Height="450" Width="600.533" Left="-1920" Topmost="True" Loaded="Window_Loaded">
     <Grid>
         <Button x:Name="btn_addSimAction" Content="Add action" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="105" Height="51" Click="Btn_addSimAction_Click"/>
         <ComboBox x:Name="cb_action" HorizontalAlignment="Left" Margin="10,66,0,0" VerticalAlignment="Top" Width="105"/>
@@ -15,18 +15,38 @@
         <TextBox x:Name="tb_pos_y" HorizontalAlignment="Left" Height="23" Margin="287,94,0,0" TextWrapping="Wrap" Text="-0.350" VerticalAlignment="Top" Width="42" TextAlignment="Center" VerticalContentAlignment="Center"/>
         <TextBox x:Name="tb_pos_z" HorizontalAlignment="Left" Height="23" Margin="329,94,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="42" TextAlignment="Center" VerticalContentAlignment="Center"/>
         <ComboBox x:Name="cb_simTemplate" HorizontalAlignment="Left" Margin="120,22,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="Cb_simTemplate_SelectionChanged"/>
-        <CheckBox Content="thres" HorizontalAlignment="Left" Margin="396,11,0,0" VerticalAlignment="Top" IsChecked="True" Click="CheckBox_thres_Checked"/>
         <Button x:Name="button_fake_blueCup" Content="Fake blue cup" HorizontalAlignment="Left" Margin="18,174,0,0" VerticalAlignment="Top" Width="97" Click="Button_fake_blueCup_Click" Height="40"/>
         <Button x:Name="button_fake_spoon" Content="Fake spoon" HorizontalAlignment="Left" Margin="18,226,0,0" VerticalAlignment="Top" Width="97" Click="Button_fake_spoon_Click" Height="30"/>
         <Button x:Name="button_fake_pinkCup" Content="Fake pink cup" HorizontalAlignment="Left" Margin="129,174,0,0" VerticalAlignment="Top" Width="97" Click="Button_fake_pinkCup_Click" Height="40"/>
         <Button x:Name="button_fake_RedPillBox" Content="Fake red pill box" HorizontalAlignment="Left" Margin="18,269,0,0" VerticalAlignment="Top" Width="97" Click="Button_fake_redPillBox_Click" Height="30"/>
-        <Rectangle Fill="#FFB16D5A" HorizontalAlignment="Left" Height="100" Margin="470,210,0,0" Stroke="Black" VerticalAlignment="Top" Width="100"/>
-        <TextBox HorizontalAlignment="Left" VerticalContentAlignment="Center" Height="23" Margin="336,141,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="91"/>
-        <TextBox x:Name="val_gripOffset_cup_x" Text="-20" HorizontalAlignment="Left" VerticalContentAlignment="Center" Height="23" Margin="401,59,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="42"/>
-        <TextBox x:Name="val_gripOffset_cup_y" Text="-30" HorizontalAlignment="Left" VerticalContentAlignment="Center" Height="23" Margin="448,59,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="42"/>
-        <TextBlock HorizontalAlignment="Left" Margin="401,38,0,0" TextWrapping="Wrap" Text="Cup girp offset" VerticalAlignment="Top"/>
+        <Rectangle Fill="#FFB16D5A" HorizontalAlignment="Left" Height="100" Margin="466,269,0,0" Stroke="Black" VerticalAlignment="Top" Width="100"/>
+        <!--value seting-->
         <Button Content="set" HorizontalAlignment="Left" Margin="495,59,0,0" VerticalAlignment="Top" Width="36" Height="23" Click="Button_set_gripOffset"/>
-        <CheckBox Content="level" HorizontalAlignment="Left" Margin="396,94,0,0" VerticalAlignment="Top" IsChecked="True" Click="CheckBox_level_Checked"/>
+        <TextBlock HorizontalAlignment="Left" Margin="401,38,0,0" TextWrapping="Wrap" Text="Cup girp offset" VerticalAlignment="Top"/>
+        <TextBox x:Name="val_gripOffset_cup_x" Text="-20" HorizontalAlignment="Left" VerticalContentAlignment="Center" Height="23" Margin="401,59,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="42" />
+        <TextBox x:Name="val_gripOffset_cup_y" Text="-30" HorizontalAlignment="Left" VerticalContentAlignment="Center" Height="23" Margin="448,59,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="42" />
+        <CheckBox Content="level" HorizontalAlignment="Left" Margin="493,11,0,0" VerticalAlignment="Top" IsChecked="True" Click="CheckBox_level_Checked">
+            <CheckBox.LayoutTransform>
+                <ScaleTransform  ScaleX="1.5" ScaleY="1.5" />
+            </CheckBox.LayoutTransform>
+        </CheckBox>
+        <CheckBox Content="binary" HorizontalAlignment="Left" Margin="396,11,0,0" VerticalAlignment="Top" IsChecked="True" Click="CheckBox_thres_Checked">
+            <CheckBox.LayoutTransform>
+                <ScaleTransform  ScaleX="1.5" ScaleY="1.5" />
+            </CheckBox.LayoutTransform>
+        </CheckBox>
+        <TextBlock HorizontalAlignment="Left" Margin="401,94,0,0" TextWrapping="Wrap" Text="Bineray Threshold" VerticalAlignment="Top"/>
+        <TextBox x:Name="tb_bineray_threshold" HorizontalAlignment="Left" VerticalContentAlignment="Center" Height="23" Margin="401,114,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="34" />
+        <Button Content="set" HorizontalAlignment="Left" Margin="440,114,0,0" VerticalAlignment="Top" Width="36" Height="23" Click="Button_set_bineray_threshold"/>
+        <!--transfer-->
+        <Button Content="Trans" HorizontalAlignment="Left" Margin="292,174,0,0" VerticalAlignment="Top" Width="37" Height="79" Click="Button_toRotateVector_Click"/>
+        <TextBox x:Name="tb_degX" HorizontalAlignment="Left" VerticalContentAlignment="Center" Height="23" Margin="245,174,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="42" TextAlignment="Center"/>
+        <TextBox x:Name="tb_degY" HorizontalAlignment="Left" VerticalContentAlignment="Center" Height="23" Margin="245,202,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="42" TextAlignment="Center"/>
+        <TextBox x:Name="tb_degZ" HorizontalAlignment="Left" VerticalContentAlignment="Center" Height="23" Margin="245,230,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="42" TextAlignment="Center"/>
+        <TextBox x:Name="tb_RvX" IsReadOnly="True" HorizontalAlignment="Left" VerticalContentAlignment="Center" Height="23" Margin="334,174,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="42" TextAlignment="Center"/>
+        <TextBox x:Name="tb_RvY" IsReadOnly="True" HorizontalAlignment="Left" VerticalContentAlignment="Center" Height="23" Margin="334,202,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="42" TextAlignment="Center"/>
+        <TextBox x:Name="tb_RvZ" IsReadOnly="True" HorizontalAlignment="Left" VerticalContentAlignment="Center" Height="23" Margin="334,230,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="42" TextAlignment="Center"/>
+
 
     </Grid>
 </Window>

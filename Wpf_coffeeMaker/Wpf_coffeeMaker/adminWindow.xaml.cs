@@ -41,14 +41,14 @@ namespace Wpf_coffeeMaker
         private List<string> ActionList()
         {
             List<string> list = new List<string>();
-            foreach (var act in MainWindow.actLv)
+            foreach (var act in MainWindow.actList)
                 list.Add(act.Name);
             return list;
         }
         private List<string> TargetList()
         {
             List<string> list = new List<string>();
-            foreach (var obj in MainWindow.objects)
+            foreach (var obj in MainWindow.objList)
                 list.Add(obj.Name);
             return list;
         }
@@ -56,7 +56,7 @@ namespace Wpf_coffeeMaker
         {
             List<string> list = new List<string>();
 
-            foreach (var obj in MainWindow.objects)
+            foreach (var obj in MainWindow.objList)
                 list.Add(obj.Name);
 
             list.Add("pos");
@@ -109,14 +109,14 @@ namespace Wpf_coffeeMaker
                     cb_target.SelectedIndex = 1;//blue cup
                     cb_destination.SelectedIndex = 2;//pink
                     Btn_addSimAction_Click(null, null);
-     
+
 
                     cb_action.SelectedIndex = 2;//place
                     cb_target.SelectedIndex = 1;//blue cup
                     cb_destination.SelectedIndex = 9;//pos
                     tb_pos_x.Text = "-0.1"; tb_pos_y.Text = "-0.35";
                     Btn_addSimAction_Click(null, null);
-   
+
 
                     cb_action.SelectedIndex = 1;//pick
                     cb_target.SelectedIndex = 2;//pink cup
@@ -153,17 +153,17 @@ namespace Wpf_coffeeMaker
         private void Btn_addSimAction_Click(object sender, RoutedEventArgs e)
         {
             ActionLine actLine;
-            if (cb_destination.SelectedIndex >= MainWindow.objects.Count)//代表選到pos
+            if (cb_destination.SelectedIndex >= MainWindow.objList.Count)//代表選到pos
             {
                 myObjects.Objects pos = new myObjects.Objects(100, "pos");
                 pos.nowPos = new URCoordinates(tb_pos_x.Text.toFloat(), tb_pos_y.Text.toFloat(), tb_pos_z.Text.toFloat(), 0, 0, 0);
-                actLine = new ActionLine(MainWindow.actLv[cb_action.SelectedIndex], MainWindow.objects[cb_target.SelectedIndex], pos);
+                actLine = new ActionLine(MainWindow.actList[cb_action.SelectedIndex], MainWindow.objList[cb_target.SelectedIndex], pos);
             }
             else
             {
                 try
                 {
-                    actLine = new ActionLine(MainWindow.actLv[cb_action.SelectedIndex], MainWindow.objects[cb_target.SelectedIndex], MainWindow.objects[cb_destination.SelectedIndex]);
+                    actLine = new ActionLine(MainWindow.actList[cb_action.SelectedIndex], MainWindow.objList[cb_target.SelectedIndex], MainWindow.objList[cb_destination.SelectedIndex]);
                 }
                 catch
                 {
@@ -177,7 +177,31 @@ namespace Wpf_coffeeMaker
         }
 
 
+        private void Button_fake_blueCup_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindow.objList[1].nowPos = new URCoordinates(0.mm(), -220.mm(), 200.mm());
+        }
+        private void Button_fake_spoon_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindow.objList[4].nowPos = new URCoordinates(150.mm(), -220.mm(), 200.mm());
+        }
+        private void Button_fake_pinkCup_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindow.objList[2].nowPos = new URCoordinates(80.mm(), -350.mm(), 200.mm());
+        }
+        private void Button_fake_redPillBox_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindow.objList[6].nowPos = new URCoordinates(-100.mm(), -350.mm(), 200.mm());
+        }
 
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            val_gripOffset_cup_x.Text = MainWindow.sVal_gripOffset_cup_x.ToString();
+            val_gripOffset_cup_y.Text = MainWindow.sVal_gripOffset_cup_y.ToString();
+            tb_bineray_threshold.Text = MainWindow.sVal_bineray_threshold.ToString();
+        }
+
+        //settings
         private void CheckBox_thres_Checked(object sender, RoutedEventArgs e)
         {
             MainWindow.show_thres = (bool)((CheckBox)sender).IsChecked;
@@ -186,29 +210,28 @@ namespace Wpf_coffeeMaker
         {
             MainWindow.show_level = (bool)((CheckBox)sender).IsChecked;
         }
-        
-
-        private void Button_fake_blueCup_Click(object sender, RoutedEventArgs e)
-        {
-            MainWindow.objects[1].nowPos = new URCoordinates(0.mm(), -220.mm(), 200.mm());
-        }
-        private void Button_fake_spoon_Click(object sender, RoutedEventArgs e)
-        {
-            MainWindow.objects[4].nowPos = new URCoordinates(150.mm(), -220.mm(), 200.mm());
-        }
-        private void Button_fake_pinkCup_Click(object sender, RoutedEventArgs e)
-        {
-            MainWindow.objects[2].nowPos = new URCoordinates(80.mm(), -350.mm(), 200.mm());
-        }
-        private void Button_fake_redPillBox_Click(object sender, RoutedEventArgs e)
-        {
-            MainWindow.objects[6].nowPos = new URCoordinates(-100.mm(), -350.mm(), 200.mm());
-        }
-
         private void Button_set_gripOffset(object sender, RoutedEventArgs e)
         {
-            MainWindow.val_gripOffset_cup.X = val_gripOffset_cup_x.Text.toInt();
-            MainWindow.val_gripOffset_cup.Y = val_gripOffset_cup_y.Text.toInt();
+            MainWindow.sVal_gripOffset_cup_x = val_gripOffset_cup_x.Text.toInt();
+            MainWindow.sVal_gripOffset_cup_y = val_gripOffset_cup_y.Text.toInt();
+            mw.SaveData();
+        }
+
+        private void Button_set_bineray_threshold(object sender, RoutedEventArgs e)
+        {
+            MainWindow.sVal_bineray_threshold = tb_bineray_threshold.Text.toInt();
+            mw.SaveData();
+        }
+
+        private void Button_toRotateVector_Click(object sender, RoutedEventArgs e)
+        {
+            URCoordinates.Vector3 rpy =  new URCoordinates.Vector3(tb_degX.Text.toInt().deg(), tb_degY.Text.toInt().deg(), tb_degZ.Text.toInt().deg());
+            URCoordinates.Vector3 rotation = URCoordinates.ToRotVector(rpy);
+            tb_RvX.Text = rotation.X.ToString("0.000");
+            tb_RvY.Text = rotation.Y.ToString("0.000");
+            tb_RvZ.Text = rotation.Z.ToString("0.000");
+
+
         }
     }
 

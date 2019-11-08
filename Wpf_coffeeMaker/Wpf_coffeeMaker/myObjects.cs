@@ -13,7 +13,7 @@ namespace myObjects
         {
             this.index = index;
             Name = name;
-            //nowPos = new URCoordinates();
+            nowPos = new URCoordinates();
         }
         public Objects(URCoordinates pos)
         {
