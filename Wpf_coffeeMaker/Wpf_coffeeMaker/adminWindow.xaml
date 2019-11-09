@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Wpf_coffeeMaker"
         mc:Ignorable="d"
-        Title="adminWindow" Height="450" Width="600.533" Left="-1920" Topmost="True" Loaded="Window_Loaded">
+        Title="adminWindow" Height="559" Width="681.033" Left="-1920" Topmost="True" Loaded="Window_Loaded">
     <Grid>
         <Button x:Name="btn_addSimAction" Content="Add action" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="105" Height="51" Click="Btn_addSimAction_Click"/>
         <ComboBox x:Name="cb_action" HorizontalAlignment="Left" Margin="10,66,0,0" VerticalAlignment="Top" Width="105"/>
@@ -19,7 +19,7 @@
         <Button x:Name="button_fake_spoon" Content="Fake spoon" HorizontalAlignment="Left" Margin="18,226,0,0" VerticalAlignment="Top" Width="97" Click="Button_fake_spoon_Click" Height="30"/>
         <Button x:Name="button_fake_pinkCup" Content="Fake pink cup" HorizontalAlignment="Left" Margin="129,174,0,0" VerticalAlignment="Top" Width="97" Click="Button_fake_pinkCup_Click" Height="40"/>
         <Button x:Name="button_fake_RedPillBox" Content="Fake red pill box" HorizontalAlignment="Left" Margin="18,269,0,0" VerticalAlignment="Top" Width="97" Click="Button_fake_redPillBox_Click" Height="30"/>
-        <Rectangle Fill="#FFB16D5A" HorizontalAlignment="Left" Height="100" Margin="466,269,0,0" Stroke="Black" VerticalAlignment="Top" Width="100"/>
+        <Rectangle Fill="#FFB16D5A" HorizontalAlignment="Left" Height="100" Margin="18,323,0,0" Stroke="Black" VerticalAlignment="Top" Width="100"/>
         <!--value seting-->
         <Button Content="set" HorizontalAlignment="Left" Margin="495,59,0,0" VerticalAlignment="Top" Width="36" Height="23" Click="Button_set_gripOffset"/>
         <TextBlock HorizontalAlignment="Left" Margin="401,38,0,0" TextWrapping="Wrap" Text="Cup girp offset" VerticalAlignment="Top"/>
@@ -46,6 +46,10 @@
         <TextBox x:Name="tb_RvX" IsReadOnly="True" HorizontalAlignment="Left" VerticalContentAlignment="Center" Height="23" Margin="334,174,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="42" TextAlignment="Center"/>
         <TextBox x:Name="tb_RvY" IsReadOnly="True" HorizontalAlignment="Left" VerticalContentAlignment="Center" Height="23" Margin="334,202,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="42" TextAlignment="Center"/>
         <TextBox x:Name="tb_RvZ" IsReadOnly="True" HorizontalAlignment="Left" VerticalContentAlignment="Center" Height="23" Margin="334,230,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="42" TextAlignment="Center"/>
+        <Button Content="Connect" HorizontalAlignment="Left" Margin="584,36,0,0" VerticalAlignment="Top" Width="74" Click="Button_Click"/>
+        <Button Content="read" HorizontalAlignment="Left" Margin="584,59,0,0" VerticalAlignment="Top" Width="75" Click="Button_read_Click"/>
+        <TextBox x:Name="tb_URmsg" HorizontalAlignment="Left" VerticalContentAlignment="Center" Height="23" Margin="584,86,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="60"/>
+        <TextBlock x:Name="text_ur" HorizontalAlignment="Left" Margin="404,172,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" FontSize="18"/>
 
 
     </Grid>

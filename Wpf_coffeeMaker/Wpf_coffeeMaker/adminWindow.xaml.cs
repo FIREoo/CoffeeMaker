@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -225,7 +226,7 @@ namespace Wpf_coffeeMaker
 
         private void Button_toRotateVector_Click(object sender, RoutedEventArgs e)
         {
-            URCoordinates.Vector3 rpy =  new URCoordinates.Vector3(tb_degX.Text.toInt().deg(), tb_degY.Text.toInt().deg(), tb_degZ.Text.toInt().deg());
+            URCoordinates.Vector3 rpy = new URCoordinates.Vector3(tb_degX.Text.toInt().deg(), tb_degY.Text.toInt().deg(), tb_degZ.Text.toInt().deg());
             URCoordinates.Vector3 rotation = URCoordinates.ToRotVector(rpy);
             tb_RvX.Text = rotation.X.ToString("0.000");
             tb_RvY.Text = rotation.Y.ToString("0.000");
@@ -233,6 +234,159 @@ namespace Wpf_coffeeMaker
 
 
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            //connect 30002
+            ClientConnect("192.168.1.101", 30002);
+        }
+        private void Button_read_Click(object sender, RoutedEventArgs e)
+        {
+
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    int bufferSize = myTcpClient.ReceiveBufferSize;
+                    byte[] myBufferBytes = new byte[bufferSize];
+                    int dataLength = clientSocket.Receive(myBufferBytes);
+
+                    this.Dispatcher.Invoke((Action)(() => { tb_URmsg.Text = dataLength.ToString(); }));
+                    string str = "";
+                    str = UrDecode(myBufferBytes);
+                    //int s = 300;
+                    //for (int L = 0; L < 10; L++)
+                    //{
+                    //    for (int i = 0; i < 10; i++)
+                    //    {
+                    //        int _int = myBufferBytes[L * 10 + i + s];
+                    //        str += _int.ToString();
+                    //        str += "\t";
+                    //    }
+                    //    str += "\n";
+                    //}
+
+
+
+
+                    /*
+               
+                    int j1 = 57;
+                    int index = j1;
+                    byte[] b = new byte[8];
+                    b[7] = myBufferBytes[index];
+                    b[6] = myBufferBytes[index + 1];
+                    b[5] = myBufferBytes[index + 2];
+                    b[4] = myBufferBytes[index + 3];
+                    double rad = BitConverter.ToDouble(b, 0);
+                    str += (rad*180/Math.PI).ToString("0.00000");
+
+                    str += "\n";
+                    int j2 = j1 + 41;
+                    index = j2;
+                     b = new byte[8];
+                    b[7] = myBufferBytes[index];
+                    b[6] = myBufferBytes[index + 1];
+                    b[5] = myBufferBytes[index + 2];
+                    b[4] = myBufferBytes[index + 3];
+                     rad = BitConverter.ToDouble(b, 0);
+                    str += (rad * 180 / Math.PI).ToString("0.00000");
+                    str += "\n";
+
+                    int j3 = j2 + 41;
+                    index = j3;
+                    b = new byte[8];
+                    b[7] = myBufferBytes[index];
+                    b[6] = myBufferBytes[index + 1];
+                    b[5] = myBufferBytes[index + 2];
+                    b[4] = myBufferBytes[index + 3];
+                    rad = BitConverter.ToDouble(b, 0);
+                    str += (rad * 180 / Math.PI).ToString("0.00000");
+                    str += "\n";
+
+                    int j4 = j3 + 41;
+                    index = j4;
+                    b = new byte[8];
+                    b[7] = myBufferBytes[index];
+                    b[6] = myBufferBytes[index + 1];
+                    b[5] = myBufferBytes[index + 2];
+                    b[4] = myBufferBytes[index + 3];
+                    rad = BitConverter.ToDouble(b, 0);
+                    str += (rad * 180 / Math.PI).ToString("0.00000");
+                    str += "\n";
+
+                    int j5 = j4 + 41;
+                    index = j5;
+                    b = new byte[8];
+                    b[7] = myBufferBytes[index];
+                    b[6] = myBufferBytes[index + 1];
+                    b[5] = myBufferBytes[index + 2];
+                    b[4] = myBufferBytes[index + 3];
+                    rad = BitConverter.ToDouble(b, 0);
+                    str += (rad * 180 / Math.PI).ToString("0.00000");
+                    str += "\n";
+
+                    int j6 = j5 + 41;
+                    index = j6;
+                    b = new byte[8];
+                    b[7] = myBufferBytes[index];
+                    b[6] = myBufferBytes[index + 1];
+                    b[5] = myBufferBytes[index + 2];
+                    b[4] = myBufferBytes[index + 3];
+                    rad = BitConverter.ToDouble(b, 0);
+                    str += (rad * 180 / Math.PI).ToString("0.00000");
+                    */
+                    this.Dispatcher.Invoke((Action)(() => { text_ur.Text = str; }));
+                }
+            });
+
+
+
+        }
+
+        private string UrDecode(byte[] buffer)
+        {
+            string rtn = "";
+            int index = 308;
+            for (int j = 0; j < 6; j++)
+            {
+                byte[] b = new byte[8];
+                for (int i = 0; i < 8; i++)
+                {
+                    b[7-i] = buffer[j * 8 + i + index];
+                }
+                    double v = BitConverter.ToDouble(b, 0);
+                rtn += v.ToString("0.0000") + "\n";
+            }
+            return  rtn;
+        }
+
+        TcpClient myTcpClient;
+        Socket clientSocket;
+        private bool isConect = false;
+        public void ClientConnect(string IP, int port)
+        {
+            string hostName = IP;
+            int connectPort = port;
+            myTcpClient = new TcpClient();
+            try
+            {
+                myTcpClient.Connect(hostName, connectPort);
+                clientSocket = myTcpClient.Client;
+                Console.WriteLine("連線成功 !!");
+                isConect = true;
+
+
+
+            }
+            catch
+            {
+                Console.WriteLine
+                           ("主機 {0} 通訊埠 {1} 無法連接  !!", hostName, connectPort);
+                return;
+            }
+        }
+
     }
 
 

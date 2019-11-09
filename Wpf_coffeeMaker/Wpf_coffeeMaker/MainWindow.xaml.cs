@@ -239,20 +239,14 @@ namespace Wpf_coffeeMaker
 
 
         #region //---griping mode---//
-        private void Button_startCamera_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                CameraStart();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
+
 
         #endregion ---griping mode---
-
+        private void Btn_adminWindow_Click(object sender, RoutedEventArgs e)
+        {
+            adminWindow adminWindow = new adminWindow();
+            adminWindow.Show();
+        }
         //UR
         #region  //---UR server---//
         static UrSocketControl UR = new UrSocketControl();
@@ -280,17 +274,6 @@ namespace Wpf_coffeeMaker
                         setConnectCircle(2);
                     else
                         setConnectCircle(1);
-
-                    if (S == tcpState.Connect)
-                    {
-                        cb_UpdatePos.IsChecked = true;
-                        Cb_UpdatePos_Click(cb_UpdatePos, null);
-                    }
-                    else
-                    {
-                        cb_UpdatePos.IsChecked = false;
-                        Cb_UpdatePos_Click(cb_UpdatePos, null);
-                    }
                 }));
             }
             catch
@@ -310,7 +293,7 @@ namespace Wpf_coffeeMaker
             else
                 UR.closeClient();
         }
-        #endregion //---UR server---//
+        #endregion ---UR server---
 
         #region //---Record---//
         private void Button_recordMode_Click(object sender, RoutedEventArgs e)
@@ -351,8 +334,7 @@ namespace Wpf_coffeeMaker
         {
             UR.Record_sleep(Tb_sleepVal.Text.toInt());
         }
-
-        #endregion //---Record---//
+        #endregion ---Record---
 
         #region //---Play path---//
         private void Button_goPosHome_Click(object sender, RoutedEventArgs e)
@@ -390,7 +372,7 @@ namespace Wpf_coffeeMaker
 
 
         }
-        #endregion //---Play path---//
+        #endregion ---Play path---
 
         //action base
         #region //--- Action base Control---//
@@ -419,6 +401,12 @@ namespace Wpf_coffeeMaker
                 MessageBox.Show("尚未結束示範，請按下[End Demo]按鈕");
                 return;
             }
+            if (RS_Task ==null)
+            {
+                MessageBox.Show("Real Sense 沒開");
+                return;
+            }
+
             string fileName = "Reproduction";
 
             //必須放新的物件座標!! 才能計算
@@ -470,7 +458,7 @@ namespace Wpf_coffeeMaker
             txt.Close();
         }
 
-        #endregion //--- Action base Control---//
+        #endregion --- Action base Control---
 
 
         #region //---Connect Python Action recognition---//
@@ -525,7 +513,7 @@ namespace Wpf_coffeeMaker
                     des = new Objects(actInfo[5].toInt(), objList[actInfo[5].toInt()].Name);
                 }
                 ActionLine al = new ActionLine(act, tar, des);
-                mainAction.Add(al);                
+                mainAction.Add(al);
                 ActionLine2ListView(al);
             }
         }
@@ -536,13 +524,24 @@ namespace Wpf_coffeeMaker
             string msg = TCP.client_ReadData();
             //"5,-1,-1;,3,-189.1027119345294,-540.4202861686027;,3,-1,-1;,2,143.33660559739894,-279.61526760880236;,1,82.4412088908121,-463.4023999918194;,8,-1,-1;,6,-1,-1;,7,-1,-1;,4,-1,-1;,1001,-1,-1;,1010,-1,-1;,11,-1,-1;"
             Console.WriteLine(msg);
-          
+
         }
 
-        #endregion //---Connect Python Action recognition---//
+        #endregion ---Connect Python Action recognition---
 
 
         #region //---RealSense---//
+        private void Button_startCamera_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                CameraStart();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
         private void CameraStart()
         {
             // Setup config settings
@@ -631,31 +630,25 @@ namespace Wpf_coffeeMaker
 
         //偵測到的物件資訊
         PointF center_obj = new PointF();
-        float angel_obj = 0;
         SizeF size_obj = new Size();
+        float angel_obj = 0;
         float armMoveX;
         float armMoveY;
-        //顯示的參數
 
         private void StartProcessingBlock(CustomProcessingBlock processingBlock, PipelineProfile pp, Action<VideoFrame> updateColor, Pipeline pipeline)
         {
             showType = imgType.depth;
 
             if (showType == imgType.color_full)
-            {
                 Process_color(processingBlock, pp, updateColor, pipeline);
-            }
             else if (showType == imgType.mix)
-            {
                 Process_mix(processingBlock, pp, updateColor, pipeline);
-            }
             else if (showType == imgType.depth)
-            {
                 Process_depth(processingBlock, pp, updateColor, pipeline);
-            }//if type == depth
         }
 
         private CancellationTokenSource _tokenSource = new CancellationTokenSource();//token 可用來關閉task factory
+        private Task RS_Task = null;
         private void Process_color(CustomProcessingBlock processingBlock, PipelineProfile pp, Action<VideoFrame> updateColor, Pipeline pipeline)
         {
             processingBlock.Start(f =>
@@ -685,7 +678,7 @@ namespace Wpf_coffeeMaker
             });
 
             var token = _tokenSource.Token;
-            var t = Task.Factory.StartNew(() =>
+            RS_Task = Task.Factory.StartNew(() =>
             {
                 while (!token.IsCancellationRequested)
                 {
@@ -746,9 +739,6 @@ namespace Wpf_coffeeMaker
                 }
             }, token);
         }
-
-
-
         private void Process_depth(CustomProcessingBlock processingBlock, PipelineProfile pp, Action<VideoFrame> updateColor, Pipeline pipeline)
         {
             Size RS_depthSize = new Size(1280, 720);
@@ -778,7 +768,7 @@ namespace Wpf_coffeeMaker
             });
 
             var token = _tokenSource.Token;
-            var t = Task.Factory.StartNew(() =>//執行續  ， 裡面執行 processing block
+            RS_Task = Task.Factory.StartNew(() =>//執行續  ， 裡面執行 processing block
             {
                 while (!token.IsCancellationRequested)
                 {
@@ -1005,10 +995,10 @@ namespace Wpf_coffeeMaker
                 }
             });
         }
-        #endregion //---RealSense---//
+        #endregion \\---RealSense---//
 
 
-        #region //---Grip mode---//
+        #region //---Grip mode---\\
         private void Button_goDynamicGrip_box(object sender, RoutedEventArgs e)
         {
             goDynamicGrip("box");
@@ -1041,7 +1031,6 @@ namespace Wpf_coffeeMaker
                 URCoordinates nowPos = new URCoordinates();
                 UR.getPosition(ref nowPos);
 
-
                 Unit x = nowPos.X + armMoveX.mm();
                 Unit y = nowPos.Y + armMoveY.mm();
                 Unit z = 0.2.M();
@@ -1060,16 +1049,7 @@ namespace Wpf_coffeeMaker
             }
             else if (msg == "spoon")
             {
-                URCoordinates nowPos = new URCoordinates();
-                UR.getPosition(ref nowPos);
-                URCoordinates goPos = new URCoordinates(nowPos.X + armMoveX.mm() + 35.mm(), nowPos.Y + armMoveY.mm(), 0.2.M(), 3.14.rad(), 0.rad(), (0).rad());//spoon 要拿下面所以有個位移
-                URCoordinates goPos2 = new URCoordinates(nowPos.X + armMoveX.mm() + 35.mm(), nowPos.Y + armMoveY.mm(), 0.2.M(), 2.5.rad(), 2.5.rad(), (-1.5).rad());
-                UR.goPosition2(goPos);
-                UR.goPosition2(goPos2);
 
-                UR.goRelativePosition(0.M(), 0.M(), (-172).mm());//向下
-                UR.goGripper(190);
-                UR.goRelativePosition(0.M(), 0.M(), (172).mm());//向上
             }
             else if (msg == "pillBox")
             {
@@ -1095,11 +1075,11 @@ namespace Wpf_coffeeMaker
             //Console.WriteLine($"Z({posMap[x * 2, y * 2, 2]})");
         }
 
-        #endregion //---Grip mode---//
+        #endregion \\---Grip mode---//
 
 
 
-        #region //---desk control---//
+        #region //---desk control---\\
 
         private void Tool2Img(Unit Tx, Unit Ty, out int Ix, out int Iy)
         {
@@ -1121,8 +1101,8 @@ namespace Wpf_coffeeMaker
         private void ImgRotate(ref int Ix, ref int Iy)
         {
             //newX = (W+X0)-(newX-X0)
-            Ix = 500 + (-250) - (Ix - (-250));
-            Iy = 700 + (-600) - (Iy - (-600));
+            Ix = 700 - Ix;
+            Iy = 500 - Iy;
         }
 
         private void Grid_dask_MouseMove(object sender, MouseEventArgs e)
@@ -1131,12 +1111,11 @@ namespace Wpf_coffeeMaker
             int y = (int)e.GetPosition((Grid)sender).Y;
             Img2Tool(x, y, out Unit Tx, out Unit Ty);
 
-
             if (rotateDesk)
             {
                 ToolRotate(ref Tx, ref Ty);
 
-                if (Ty.mm.IsBetween((int)PickingPos.URyLimitMin, (int)PickingPos.URyLimitMax))
+                if (PickingPos.PickCheck(Tx, Ty))
                 {
                     rect_urWrist.Margin = new Thickness(x - 5, y, 0, 0);
                     float angle = PickingPos.PickAngle(Tx, Ty).deg;
@@ -1146,8 +1125,12 @@ namespace Wpf_coffeeMaker
                     PickingPos.PourPos(Tx, Ty, out Unit Px, out Unit Py);
                     ToolRotate(ref Px, ref Py);
                     Tool2Img(Px, Py, out int showx, out int showy);
-                    // ImgRotate(ref showx, ref showy);
-                    circle_pourPos.Margin = new Thickness(showx - 10, showy - 10, 0, 0);
+                    circle_pourPos.Margin = new Thickness(showx - circle_pourPos.Width / 2, showy - circle_pourPos.Height / 2, 0, 0);
+
+                    PickingPos.AddInPos(Tx, Ty, out Unit Ax, out Unit Ay);
+                    ToolRotate(ref Ax, ref Ay);
+                    Tool2Img(Ax, Ay, out int showAx, out int showAy);
+                    circle_addPos.Margin = new Thickness(showAx - circle_pourPos.Width / 2, showAy - circle_pourPos.Height / 2, 0, 0);
                 }
             }
 
@@ -1167,7 +1150,7 @@ namespace Wpf_coffeeMaker
             {
                 ToolRotate(ref Tx, ref Ty);
 
-                if ((Ty.mm).IsBetween((int)PickingPos.URyLimitMin, (int)PickingPos.URyLimitMax))
+                if (PickingPos.PickCheck(Tx, Ty))
                 {
                     rect_urWrist.Margin = new Thickness(x - 5, y, 0, 0);
                     clickAngle = (int)PickingPos.PickAngle(Tx, Ty).deg;
@@ -1196,42 +1179,41 @@ namespace Wpf_coffeeMaker
             });
 
         }
+
+
         DispatcherTimer posUdate = new DispatcherTimer();
+        string ClientIP = "192.168.1.101";
         private void Cb_UpdatePos_Click(object sender, RoutedEventArgs e)
         {
             if ((bool)((CheckBox)sender).IsChecked)
             {
-                posUdate.Interval = TimeSpan.FromMilliseconds(500);
+                UR.creatClient(ClientIP);
+                UR.client_StartGetRobotInfo();
+                posUdate.Interval = TimeSpan.FromMilliseconds(100);
                 posUdate.Tick += posUdate_Tick;
                 posUdate.Start();
             }
-            else
+            else//結束
             {
                 posUdate.Stop();
             }
         }
         void posUdate_Tick(object sender, EventArgs e)
         {
-            URCoordinates nowPos = new URCoordinates();
-            UR.getPosition(ref nowPos);
-            int Tx = (int)nowPos.X.mm;
-            int Ty = (int)nowPos.Y.mm;
-            int x = Ty + 600;
-            int y = Tx + 250;
+            URCoordinates nowPos = UR.ClientPos;
+            tb_urPos.Text = nowPos.ToString("(3)", "0.000");
+            Unit Tx = nowPos.X;
+            Unit Ty = nowPos.Y;
+
+            Tool2Img(Tx, Ty, out int x, out int y);
+
             if (rotateDesk)
             {
-                //int Tx = y - 250;
-                //int Ty = x - 600;
-                //newX = (W+X0)-(newX-X0)
-                //Tx = 500 + (-250) - (Tx - (-250));
-                //Ty = 700 + (-600) - (Ty - (-600));
-                //500 + (-250) - (Tx - (-250)) = y - 250;
-                //700 + (-600) - (Ty - (-600)) = x - 600;
-
-                x = 700 + (-600) - (Ty - (-600)) + 600;
-                y = 500 + (-250) - (Tx - (-250)) + 250;
+                ImgRotate(ref x, ref y);
             }
             circle_gripPos.Margin = new Thickness(x - (circle_gripPos.Width / 2), y - (circle_gripPos.Height / 2), 0, 0);
+
+            //   Dispatcher.Invoke(DispatcherPriority.Normal, (Action)(() => { tb_object_msg.Text = $"distanse:({armMoveX.ToString("0.00")},{armMoveY.ToString("0.00")})mm,\n degree:{angel_obj.ToString("0.0")},\n size:{size_obj.Width.ToString("0.0")},{size_obj.Height.ToString("0.0")}"; }));
         }
 
         bool rotateDesk = true;
@@ -1244,12 +1226,11 @@ namespace Wpf_coffeeMaker
                 cirle_URonDesk.Margin = new Thickness(540, 190, 0, 0);
         }
 
-        //client control
         private void Button_desk_goPos_V(object sender, RoutedEventArgs e)
         {
             Task.Run(() =>
             {
-                URCoordinates goPos = new URCoordinates(clickTx.mm(), clickTy.mm(), 0.2.M(), 3.14.rad(), 0.rad(), (0).rad());
+                URCoordinates goPos = PickingPos.PickPose(clickTx.mm(), clickTy.mm(), 0.2.M(), "V");
                 UR.goPosition2(goPos);
             });
         }
@@ -1275,7 +1256,7 @@ namespace Wpf_coffeeMaker
         {
             Task.Run(() =>
             {
-                URCoordinates goPos = PickingPos.PickPose(clickTx.mm(), clickTy.mm(), 0.2.M(), "cup");
+                URCoordinates goPos = PickingPos.PickPose(clickTx.mm(), clickTy.mm(), 0.2.M(), "add");
                 PickingPos.AddInPos(goPos.X, goPos.Y, out goPos.X, out goPos.Y);
                 UR.goPosition2(goPos);
             });
@@ -1288,11 +1269,13 @@ namespace Wpf_coffeeMaker
                 UR.goPosition2(goPos);
             });
         }
+        //client control
         private void Button_desk_client_goPos(object sender, RoutedEventArgs e)
         {
-
+            UR.creatClient(ClientIP);
+            UR.client_SendData("movej([1.03176,-1.99993,1.71905,-1.29134,-1.56545,-3.68115])\n");
         }
-        #endregion //---desk control---//
+        #endregion \\---desk control---//
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
@@ -1321,12 +1304,6 @@ namespace Wpf_coffeeMaker
                 new URCoordinates.Vector3(105.deg(), 180.deg(), 60.deg());
             URCoordinates.Vector3 rotation = URCoordinates.ToRotVector(rpy);
 
-        }
-
-        private void Btn_adminWindow_Click(object sender, RoutedEventArgs e)
-        {
-            adminWindow adminWindow = new adminWindow();
-            adminWindow.Show();
         }
 
         public void Btn_addSimAction_Click(object sender, RoutedEventArgs e)
