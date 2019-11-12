@@ -11,10 +11,12 @@ namespace Picking
     {
        static  float URyLimitMin = -500;
         static float URyLimitMax = -180;
+        static float URxLimitMin = -120;
+        static float URxLimitMax = 250;
         /// <summary>確認有沒有超出工作區，不然算出來也到不了/// </summary>
         public static bool PickCheck(Unit Tx, Unit Ty)
         {
-            if (Ty.mm.IsBetween((int)URyLimitMin, (int)URyLimitMax))
+            if (Ty.mm.IsBetween((int)URyLimitMin, (int)URyLimitMax)&& Tx.mm.IsBetween((int)URxLimitMin, (int)URxLimitMax))
                 return true;
             return false;
         }
@@ -29,13 +31,14 @@ namespace Picking
             else
             {
                 Console.WriteLine("超出工作區");
-                return new Angle();
+                return 999.deg();
             }
         }
         /// <summary>夾取的6D座標/// </summary>
         public static URCoordinates PickPose(Unit Tx, Unit Ty, Unit Tz, string obj)
         {
             Angle angle = PickAngle(Tx, Ty);
+
             URCoordinates.Vector3 rpy = new URCoordinates.Vector3();// = new URCoordinates.Vector3(-90.deg(), 180.deg(), (-90 - angle).deg());
             if(obj == "level"|| obj == "H" )
             {

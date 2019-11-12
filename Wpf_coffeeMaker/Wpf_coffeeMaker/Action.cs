@@ -9,6 +9,7 @@ namespace myActionBase
 {
     public class ActionLine
     {
+        public int frame = 0;
         public myAction Action;
         public Objects target;
         public Objects destination;
@@ -139,6 +140,13 @@ namespace myActionBase
             {
                 AddFile("Path\\j_top.path");//防止下個點失敗手臂 
 
+                Pos.Z = 0.2.M();
+                Pos.Rx = 3.14.rad();
+                Pos.Ry = 0.rad();
+                Pos.Rz = 0.rad();
+                URCoordinates goPos = PickingPos.PickPose(Pos.X, Pos.Y, Pos.Z, "V");
+                cmdTxt.Add($"movep2({goPos.ToString("p[]")})");
+
                 cmdTxt.Add($"function(cup)");
             }
             else if (target.Name.IndexOf("Spoon") >= 0)
@@ -148,6 +156,14 @@ namespace myActionBase
             if (target.Name.IndexOf("pill box") >= 0)
             {
                 AddFile("Path\\j_top.path");//防止下個點失敗手臂 
+
+                Pos.Z = 0.2.M();
+                Pos.Rx = 3.14.rad();
+                Pos.Ry = 0.rad();
+                Pos.Rz = 0.rad();
+                URCoordinates goPos = PickingPos.PickPose(Pos.X, Pos.Y, Pos.Z, "V");
+                cmdTxt.Add($"movep2({goPos.ToString("p[]")})");
+
                 cmdTxt.Add($"function(pillBox)");
             }
         }
@@ -177,18 +193,18 @@ namespace myActionBase
             }
             else if (target.Name.IndexOf("Spoon") >= 0)
             {
-                AddFile("act_pickSpoon.path");
+                AddFile("act_placeSpoon.path");
             }
         }
         private void Pour(Objects target, Objects destination)
         {//destination 可能是 pos
             URCoordinates desPos = destination.nowPos;
-            if (target.Name.IndexOf("cup") >= 0)
+            if (destination.Name.IndexOf("cup") >= 0)
             {
 
                 URCoordinates goPos = PickingPos.PickPose(desPos.X, desPos.Y, 0.2.M(), "cup");
                 PickingPos.PourPos(goPos.X, goPos.Y, out goPos.X, out goPos.Y);
-                cmdTxt.Add($"movep({goPos.ToString("p[]")})");
+                cmdTxt.Add($"movep2({goPos.ToString("p[]")})");
 
                 URCoordinates pour = new URCoordinates();
                 pour.Rz = -50.deg();//注意!!這裡是j6軸
@@ -249,7 +265,12 @@ namespace myActionBase
         }
         private void Stir(Objects target, Objects destination)
         {//target  一定是湯匙
+            URCoordinates desPos = destination.nowPos;
+            URCoordinates goPos = PickingPos.PickPose(desPos.X, desPos.Y, 0.25.M(), "H");//高度高一點，水平即可
+            PickingPos.AddInPos(goPos.X, goPos.Y, out goPos.X, out goPos.Y);
+            cmdTxt.Add($"movep2({goPos.ToString("p[]")})");
 
+            AddFile("Path\\act_stir1.path"); 
         }
 
     }

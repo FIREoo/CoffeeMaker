@@ -8,22 +8,23 @@
         Title="MainWindow" Height="930" Width="1800" Loaded="Window_Loaded" Left="-1920" Top="0" Margin="0">
     <Grid Margin="0,0,4,0">
         <!--中央-->
-        <Grid HorizontalAlignment="Left" Height="879" Margin="435,10,0,0" VerticalAlignment="Top" Width="870" Background="#FFBDBDBD">
+        <Grid HorizontalAlignment="Left" Height="879" Margin="530,15,0,0" VerticalAlignment="Top" Width="870" Background="#FFBDBDBD">
             <Grid x:Name="grid_img_grip" Margin="10,515,0,-30" Background="Black" MouseMove="Grid_MouseMove" VerticalAlignment="Top" HorizontalAlignment="Left">
                 <Image x:Name="Img_main" HorizontalAlignment="Left" Height="360" VerticalAlignment="Top" Width="640" Margin="0,0,0,0"/>
                 <Grid.ContextMenu >
                     <ContextMenu x:Name="cm" StaysOpen="true">
                         <MenuItem Header="Open" Click="Button_startCamera_Click"/>
                         <MenuItem Header="UR control">
+                            <MenuItem Header="Go Center" Click="Button_goCenter"/>
                             <MenuItem Header="Grip box" Click="Button_goDynamicGrip_box"/>
                             <MenuItem Header="Grip cup" Click="Button_goDynamicGrip_cup"/>
                             <MenuItem Header="Grip spoon" Click="Button_goDynamicGrip_spoon"/>
+                            <MenuItem x:Name="mItem_dynamicTrack" Header="track" IsCheckable="True" IsChecked="False"  Click="Button_goDynamic_Tracking"/>
                         </MenuItem>
                     </ContextMenu>
                 </Grid.ContextMenu>
             </Grid>
-            <Button Content="Connect Action" HorizontalAlignment="Left" Margin="723,36,0,0" VerticalAlignment="Top" Width="100" Height="30" Click="Button_askActionRecognition_Click"/>
-            <Ellipse x:Name="cir_connectAct" Fill="Salmon" HorizontalAlignment="Left" Height="21" Margin="809,29,0,0" Stroke="Black" VerticalAlignment="Top" Width="21" RenderTransformOrigin="0.5,0.5"/>
+            <!--Desk-->
             <Grid HorizontalAlignment="Left" Height="500" Margin="10,10,0,0" VerticalAlignment="Top" Width="700" Background="#19321400"  MouseMove="Grid_dask_MouseMove" MouseDown="Grid_desk_MouseDown">
                 <Grid.ContextMenu >
                     <ContextMenu x:Name="cm_desk" StaysOpen="true">
@@ -40,42 +41,71 @@
                         <MenuItem Header="UR Client">
                             <MenuItem Header="Go pos" Click="Button_desk_client_goPos"/>
                         </MenuItem>
+                        <MenuItem Header="Settings">
+                            <MenuItem x:Name="mItem_rotateDesk" Header="Rotate Desk" IsCheckable="True" IsChecked="True"  Click="Cb_rotateDesk_Click"/>
+                            <MenuItem x:Name="mItem_showPourPos" Header="Show Pour/Add pos" IsCheckable="True" IsChecked="False"  Click="Cb_showPourPos_Click"/>
+                        </MenuItem>
                     </ContextMenu>
                 </Grid.ContextMenu>
-                <Image HorizontalAlignment="Left" Height="500" VerticalAlignment="Top" Width="700" OpacityMask="Black" Source="desk.png"/>
-                <Ellipse x:Name="cirle_URonDesk" Fill="#FF85BEE0" HorizontalAlignment="Left" Height="120" Margin="540,190,0,0" Stroke="Black" VerticalAlignment="Top" Width="120"/>
-                <Ellipse x:Name="circle_gripPos" Fill="#FF85BEE0" HorizontalAlignment="Left" Height="30" Margin="44,0,0,0" Stroke="White" VerticalAlignment="Top" Width="30"/>
-                <Rectangle x:Name="rect_urWrist" Fill="#FF85BEE0" HorizontalAlignment="Left" Height="50" Margin="10,34,0,0" Stroke="Black" VerticalAlignment="Top" Width="10"/>
-                <Ellipse x:Name="circle_pourPos" Fill="#FFDAF7D7" HorizontalAlignment="Left" Height="8" Margin="79,10,0,0" Stroke="Black" VerticalAlignment="Top" Width="8"/>
+                <Image x:Name="img_deskBackground" HorizontalAlignment="Left" Height="500" VerticalAlignment="Top" Width="700" OpacityMask="Black" Source="Picture/desk_back.png" Cursor="Cross" />
+                <Ellipse x:Name="cirle_URonDesk" HorizontalAlignment="Left" Height="120" Margin="540,190,0,0" Stroke="#FF3F79A0" StrokeThickness="5" VerticalAlignment="Top" Width="120">
+                    <Ellipse.Fill>
+                        <ImageBrush ImageSource="Picture/URicon.png"/>
+                    </Ellipse.Fill>
+                </Ellipse>
+                <Ellipse x:Name="circle_gripPos" HorizontalAlignment="Left" Height="30" Stroke="#FF3F79A0" VerticalAlignment="Top" Width="30" StrokeThickness="3" Fill="#FF9CBACF"/>
+                <Ellipse x:Name="circle_pourPos" Fill="#FFDAF7D7" HorizontalAlignment="Left" Height="8" Margin="35,5,0,0" Stroke="Black" VerticalAlignment="Top" Width="8"/>
                 <TextBlock x:Name="tb_urPos" HorizontalAlignment="Left" Margin="10,475,0,0" TextWrapping="Wrap" Text="(0,0,0)" VerticalAlignment="Top" FontWeight="Bold" FontSize="16"/>
-                <Ellipse x:Name="circle_addPos" Fill="#FFF5E4BD" HorizontalAlignment="Left" Height="8" Margin="79,21,0,0" Stroke="Black" VerticalAlignment="Top" Width="8"/>
+                <Ellipse x:Name="circle_addPos" Fill="#FFF5E4BD" HorizontalAlignment="Left" Height="8" Margin="35,16,0,0" Stroke="Black" VerticalAlignment="Top" Width="8"/>
+                <Image x:Name="img_object_Pcup" HorizontalAlignment="Left" Height="67" Margin="623,433,0,0" VerticalAlignment="Top" Width="67" Source="Picture/pink cup.png"/>
+                <Image x:Name="img_object_Bcup" HorizontalAlignment="Left" Height="67" Margin="593,433,0,0" VerticalAlignment="Top" Width="67" Source="Picture/blue cup.png"/>
+                <Image x:Name="img_object_GpillBox" HorizontalAlignment="Left" Height="25" Margin="523,446,0,0" VerticalAlignment="Top" Width="100" Source="Picture/GreenPillBox.png" Stretch="Fill"/>
+                <Image x:Name="img_object_RpillBox" HorizontalAlignment="Left" Height="25" Margin="523,471,0,0" VerticalAlignment="Top" Width="100" Source="Picture/RedPillBox.png" Stretch="Fill"/>
+                <TextBlock x:Name="tb_desk_xy" HorizontalAlignment="Left" Margin="10,35,0,0" TextWrapping="Wrap" Text="(0,0)" VerticalAlignment="Top" Foreground="White" FontSize="18" Cursor="Cross"/>
+                <Rectangle x:Name="rect_urWrist" HorizontalAlignment="Left" Height="170" Margin="98,190,0,0" VerticalAlignment="Top" Width="150" Cursor="Cross">
+                    <Rectangle.Fill>
+                        <ImageBrush ImageSource="Picture/Gripper.png" Opacity="0.5"/>
+                    </Rectangle.Fill>
+                </Rectangle>
             </Grid>
             <TextBlock x:Name="tb_object_msg" x:FieldModifier="public" HorizontalAlignment="Left" Margin="655,515,0,0" TextWrapping="Wrap" Text="Object detial" VerticalAlignment="Top" FontSize="18"/>
-            <TextBlock x:Name="tb_desk_xy" HorizontalAlignment="Left" Margin="12,12,0,0" TextWrapping="Wrap" Text="(0,0)" VerticalAlignment="Top" Foreground="White" FontSize="18"/>
-            <CheckBox x:Name="cb_UpdatePos" Content="Pos update" HorizontalAlignment="Left" Margin="721,182,0,0" VerticalAlignment="Top" Click="Cb_UpdatePos_Click" FontSize="14">
+            <CheckBox x:Name="cb_UpdatePos" Content="Pos update" HorizontalAlignment="Left" Margin="716,146,0,0" VerticalAlignment="Top" Click="Cb_UpdatePos_Click" FontSize="14">
                 <CheckBox.LayoutTransform>
                     <ScaleTransform  ScaleX="1.5" ScaleY="1.5" />
                 </CheckBox.LayoutTransform>
             </CheckBox>
-            <CheckBox x:Name="cb_rotateDesk" Content="Rotate Desk" HorizontalAlignment="Left" Margin="714,13,0,0" VerticalAlignment="Top" Click="Cb_rotateDesk_Click" IsChecked="True">
-                <CheckBox.LayoutTransform>
-                    <ScaleTransform  ScaleX="1.2" ScaleY="1.2" />
-                </CheckBox.LayoutTransform>
-            </CheckBox>
-            <Button Content="Button" HorizontalAlignment="Left" Margin="723,71,0,0" VerticalAlignment="Top" Width="100" Height="31" Click="Button_startAR_Click"/>
-            <Button Content="Button" HorizontalAlignment="Left" Margin="723,107,0,0" VerticalAlignment="Top" Width="100" Height="31"  Click="Button_endAR_Click"/>
-            <Button Content="Button" HorizontalAlignment="Left" Margin="723,143,0,0" VerticalAlignment="Top" Width="100" Height="31" Click="Button_getAR_Click"/>
+            <Button Content="get obj" HorizontalAlignment="Left" Margin="723,357,0,0" VerticalAlignment="Top" Width="100" Height="31" Click="Button_getAR_Click"/>
+            <Button Content="test a list" HorizontalAlignment="Left" Margin="723,402,0,0" VerticalAlignment="Top" Width="100" Height="38" Click="Button_testGetting_Click"/>
         </Grid>
         <!--data base-->
-        <ListView x:Name="LV_actionBase" x:FieldModifier="public" HorizontalAlignment="Left" Height="631" Margin="10,64,0,0" VerticalAlignment="Top" Width="407" FontSize="22">
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <ListView x:Name="LV_actionBase" x:FieldModifier="public" HorizontalAlignment="Left" Height="631" Margin="8,112,0,0" VerticalAlignment="Top" Width="515" FontSize="22">
+            <ListView.Style>
+                <Style TargetType="{x:Type ListView}">
+                    <Setter Property="BorderBrush" Value="#FFAAAAAA"/>
+                    <Setter Property="BorderThickness" Value="2"/>
+                    <Setter Property="Margin" Value="0"/>
                 </Style>
-            </ListView.ItemContainerStyle>
+            </ListView.Style>
+
+            <ListView.Resources>
+                <Style TargetType="ListViewItem">
+                    <Style.Triggers>
+                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                            <Setter Property="IsSelected" Value="True"/>
+                        </Trigger>
+                    </Style.Triggers>
+                    <EventSetter Event="PreviewGotKeyboardFocus" Handler="SelectCurrentItem"/>
+                    <Setter Property="Height" Value="30" />
+                    <Setter Property="BorderBrush" Value="Transparent"/>
+                    <Setter Property="BorderThickness" Value="1"/>
+                    <Setter Property="Background" Value="Transparent"/>
+                </Style>
+
+            </ListView.Resources>
+
             <ListView.View>
                 <GridView>
-                    <GridViewColumn  Header="Action" Width="100" >
+                    <GridViewColumn  Header="Action" Width="120" >
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <Grid Background="Transparent">
@@ -85,7 +115,7 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn Header="Target" Width="120">
+                    <GridViewColumn Header="Target" Width="160">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <Grid Background="Transparent">
@@ -95,7 +125,7 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn  Header="Destination" Width="180" >
+                    <GridViewColumn  Header="Destination" Width="190" >
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <Grid Background="Transparent">
@@ -104,15 +134,24 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
+
+                    <!--<GridViewColumn  Header="x" Width="30" >
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="X" Width="18" Click="Delete_Item_In_Cart_Click" Name="btn_Delete_Item_In_Cart"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>-->
+
                 </GridView>
             </ListView.View>
         </ListView>
-        <Button Content="Start Reproduction" HorizontalAlignment="Left" Margin="10,727,0,0" VerticalAlignment="Top" Width="407" Height="54" Click="Button_createAction_Click" FontSize="16"/>
-        <Button Content="Start Demonstration" HorizontalAlignment="Left" Margin="10,15,0,0" VerticalAlignment="Top" Width="407" Height="39" FontSize="16" Click="Button_startRecord_Click" Background="#FFCCDCC0"/>
-        <Button Content="Stop Demonstration" HorizontalAlignment="Left" Margin="10,695,0,0" VerticalAlignment="Top" Width="407" Height="32" FontSize="16" Click="Button_endDemo_Click" Background="#FFD7BFB7"/>
-        <Rectangle x:Name="Rect_actionBaseTopColor" Fill="#00F4F4F5" HorizontalAlignment="Left" Height="10" Margin="10,54,0,0" Stroke="Black" VerticalAlignment="Top" Width="407" RadiusY="2.917" RadiusX="2.917"/>
+        <Button Content="Start Reproduction" HorizontalAlignment="Left" Margin="8,775,0,0" VerticalAlignment="Top" Width="515" Height="54" Click="Button_createAction_Click" FontSize="20" FontWeight="Bold"/>
+        <Button Content="Start Demonstration" HorizontalAlignment="Left" Margin="8,63,0,0" VerticalAlignment="Top" Width="515" Height="39" FontSize="22" Click="Button_startRecord_Click" Background="#FFCCDCC0"/>
+        <Button Content="Stop Demonstration" HorizontalAlignment="Left" Margin="8,743,0,0" VerticalAlignment="Top" Width="515" Height="32" FontSize="20" Click="Button_endDemo_Click" Background="#FFD7BFB7"/>
+        <Rectangle x:Name="Rect_actionBaseTopColor" Fill="#00F4F4F5" HorizontalAlignment="Left" Height="10" Margin="8,102,0,0" Stroke="Black" VerticalAlignment="Top" Width="515" RadiusY="2.917" RadiusX="2.917"/>
         <!--UR control-->
-        <Grid HorizontalAlignment="Left" Height="476" Margin="1310,15,0,0" VerticalAlignment="Top" Width="395" Background="#FFC1D9ED">
+        <Grid HorizontalAlignment="Left" Height="476" Margin="1405,20,0,0" VerticalAlignment="Top" Width="302" Background="#FFC1D9ED">
             <Button x:Name="Btn_UrConnect" Content="Start Server" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="106" FontSize="16" Height="45" Click="Button_startServer_Click"/>
             <Button Content="dis" HorizontalAlignment="Left" Margin="121,10,0,0" VerticalAlignment="Top" Width="32" Height="45" Click="Button_disconnect_Click"/>
             <Ellipse x:Name="cir_UrState_off" Fill="#FFE63232" HorizontalAlignment="Left" Height="15" Margin="21,60,0,0" Stroke="Black" VerticalAlignment="Top" Width="15"/>
@@ -155,7 +194,12 @@
             </CheckBox>
         </Grid>
 
-        <Button x:Name="btn_adminWindow" Content="Admin Window" HorizontalAlignment="Left" Margin="1310,496,0,0" VerticalAlignment="Top" Width="133" Height="46" Click="Btn_adminWindow_Click" Background="#FFE0B9B9"/>
+        <Button x:Name="btn_adminWindow" Content="Admin Window" HorizontalAlignment="Left" Margin="1405,501,0,0" VerticalAlignment="Top" Width="133" Height="46" Click="Btn_adminWindow_Click" Background="#FFE0B9B9"/>
+        <Button Content="▼" HorizontalAlignment="Left" Margin="218,834,0,0" VerticalAlignment="Top" Width="75" Height="25" FontSize="20"/>
+        <Button Content="Connect Action Recognition Server" HorizontalAlignment="Left" Margin="10,15,0,0" VerticalAlignment="Top" Width="513" Height="43" FontSize="14" Click="Button_connectArServer_Click"/>
+        <Button Content="delete" HorizontalAlignment="Left" Margin="16,866,0,0" VerticalAlignment="Top" Width="76" Click="Button_deleteActionBase_Click"/>
+        <Rectangle x:Name="rect_ARconnect_con" HorizontalAlignment="Left" Height="30" Margin="494,21,0,0" VerticalAlignment="Top" Width="16" Fill="#FF73B147" RadiusY="5" RadiusX="5" Stroke="Black"/>
+        <Rectangle x:Name="rect_ARconnect_dis" HorizontalAlignment="Left" Height="30" Margin="473,21,0,0" VerticalAlignment="Top" Width="16" Fill="#FFCD6471" RadiusY="5" RadiusX="5" Stroke="Black"/>
 
     </Grid>
 </Window>

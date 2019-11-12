@@ -173,7 +173,7 @@ namespace Wpf_coffeeMaker
                 }
             }
 
-            MainWindow.mainAction.Add(actLine);
+            MainWindow.mainActionList.Add(actLine);
             mw.ActionLine2ListView(actLine);
         }
 
@@ -199,7 +199,14 @@ namespace Wpf_coffeeMaker
         {
             val_gripOffset_cup_x.Text = MainWindow.sVal_gripOffset_cup_x.ToString();
             val_gripOffset_cup_y.Text = MainWindow.sVal_gripOffset_cup_y.ToString();
+
             tb_bineray_threshold.Text = MainWindow.sVal_bineray_threshold.ToString();
+
+            val_gripCenter_x.Text = MainWindow.sVal_gripCenter_x.ToString();
+            val_gripCenter_y.Text = MainWindow.sVal_gripCenter_y.ToString();
+
+            val_pixel2mm_x.Text = MainWindow.sVal_pixel2mmX.ToString();
+            val_pixel2mm_y.Text = MainWindow.sVal_pixel2mmY.ToString();
         }
 
         //settings
@@ -217,10 +224,21 @@ namespace Wpf_coffeeMaker
             MainWindow.sVal_gripOffset_cup_y = val_gripOffset_cup_y.Text.toInt();
             mw.SaveData();
         }
-
+        private void Button_set_gripCenter(object sender, RoutedEventArgs e)
+        {
+            MainWindow.sVal_gripCenter_x = val_gripCenter_x.Text.toInt();
+            MainWindow.sVal_gripCenter_y = val_gripCenter_y.Text.toInt();
+            mw.SaveData();
+        }
         private void Button_set_bineray_threshold(object sender, RoutedEventArgs e)
         {
             MainWindow.sVal_bineray_threshold = tb_bineray_threshold.Text.toInt();
+            mw.SaveData();
+        }
+        private void Button_set_Pixel2mm(object sender, RoutedEventArgs e)
+        {
+            MainWindow.sVal_pixel2mmX = val_pixel2mm_x.Text.toFloat();
+            MainWindow.sVal_pixel2mmY = val_pixel2mm_y.Text.toFloat();
             mw.SaveData();
         }
 
@@ -238,7 +256,7 @@ namespace Wpf_coffeeMaker
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             //connect 30002
-            ClientConnect("192.168.1.101", 30002);
+            ClientConnect("192.168.1.104", 30002);
         }
         private void Button_read_Click(object sender, RoutedEventArgs e)
         {
@@ -353,12 +371,12 @@ namespace Wpf_coffeeMaker
                 byte[] b = new byte[8];
                 for (int i = 0; i < 8; i++)
                 {
-                    b[7-i] = buffer[j * 8 + i + index];
+                    b[7 - i] = buffer[j * 8 + i + index];
                 }
-                    double v = BitConverter.ToDouble(b, 0);
+                double v = BitConverter.ToDouble(b, 0);
                 rtn += v.ToString("0.0000") + "\n";
             }
-            return  rtn;
+            return rtn;
         }
 
         TcpClient myTcpClient;
@@ -375,9 +393,6 @@ namespace Wpf_coffeeMaker
                 clientSocket = myTcpClient.Client;
                 Console.WriteLine("連線成功 !!");
                 isConect = true;
-
-
-
             }
             catch
             {
@@ -387,6 +402,16 @@ namespace Wpf_coffeeMaker
             }
         }
 
+        private void Button_msgToActionLine_Click(object sender, RoutedEventArgs e)
+        {
+            string msg = tb_actionMsg.Text;
+            Console.WriteLine(msg);
+            MainWindow.mainActionList.Clear();
+            MainWindow.mainActionList = mw.msg2ActionLineList(msg);
+
+            foreach (ActionLine al in MainWindow.mainActionList)
+                mw.ActionLine2ListView(al);
+        }
     }
 
 

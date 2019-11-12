@@ -19,7 +19,7 @@
         <Button x:Name="button_fake_spoon" Content="Fake spoon" HorizontalAlignment="Left" Margin="18,226,0,0" VerticalAlignment="Top" Width="97" Click="Button_fake_spoon_Click" Height="30"/>
         <Button x:Name="button_fake_pinkCup" Content="Fake pink cup" HorizontalAlignment="Left" Margin="129,174,0,0" VerticalAlignment="Top" Width="97" Click="Button_fake_pinkCup_Click" Height="40"/>
         <Button x:Name="button_fake_RedPillBox" Content="Fake red pill box" HorizontalAlignment="Left" Margin="18,269,0,0" VerticalAlignment="Top" Width="97" Click="Button_fake_redPillBox_Click" Height="30"/>
-        <Rectangle Fill="#FFB16D5A" HorizontalAlignment="Left" Height="100" Margin="18,323,0,0" Stroke="Black" VerticalAlignment="Top" Width="100"/>
+        <Rectangle Fill="#FFB16D5A" HorizontalAlignment="Left" Height="100" Margin="505,363,0,0" Stroke="Black" VerticalAlignment="Top" Width="100"/>
         <!--value seting-->
         <Button Content="set" HorizontalAlignment="Left" Margin="495,59,0,0" VerticalAlignment="Top" Width="36" Height="23" Click="Button_set_gripOffset"/>
         <TextBlock HorizontalAlignment="Left" Margin="401,38,0,0" TextWrapping="Wrap" Text="Cup girp offset" VerticalAlignment="Top"/>
@@ -49,7 +49,19 @@
         <Button Content="Connect" HorizontalAlignment="Left" Margin="584,36,0,0" VerticalAlignment="Top" Width="74" Click="Button_Click"/>
         <Button Content="read" HorizontalAlignment="Left" Margin="584,59,0,0" VerticalAlignment="Top" Width="75" Click="Button_read_Click"/>
         <TextBox x:Name="tb_URmsg" HorizontalAlignment="Left" VerticalContentAlignment="Center" Height="23" Margin="584,86,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="60"/>
-        <TextBlock x:Name="text_ur" HorizontalAlignment="Left" Margin="404,172,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" FontSize="18"/>
+        <TextBlock x:Name="text_ur" HorizontalAlignment="Left" Margin="404,238,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" FontSize="18"/>
+        <TextBox x:Name="tb_actionMsg" HorizontalAlignment="Left" VerticalContentAlignment="Center" Height="23" Margin="10,317,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="475"/>
+        <Button Content="msg to actionLine" HorizontalAlignment="Left" Margin="10,340,0,0" VerticalAlignment="Top" Width="105" Height="26" Click="Button_msgToActionLine_Click"/>
+
+        <TextBlock HorizontalAlignment="Left" Margin="401,142,0,0" TextWrapping="Wrap" Text="Grip center" VerticalAlignment="Top"/>
+        <TextBox x:Name="val_gripCenter_x" Text="000" HorizontalAlignment="Left" VerticalContentAlignment="Center" Height="23" Margin="401,158,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="42" />
+        <TextBox x:Name="val_gripCenter_y" Text="000" HorizontalAlignment="Left" VerticalContentAlignment="Center" Height="23" Margin="448,158,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="42" />
+        <Button Content="set" HorizontalAlignment="Left" Margin="495,158,0,0" VerticalAlignment="Top" Width="36" Height="23" Click="Button_set_gripCenter"/>
+
+        <TextBlock HorizontalAlignment="Left" Margin="401,186,0,0" TextWrapping="Wrap" Text="Pixel to mm" VerticalAlignment="Top"/>
+        <TextBox x:Name="val_pixel2mm_x" Text="000" HorizontalAlignment="Left" VerticalContentAlignment="Center" Height="23" Margin="401,202,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="68" />
+        <TextBox x:Name="val_pixel2mm_y" Text="000" HorizontalAlignment="Left" VerticalContentAlignment="Center" Height="23" Margin="475,202,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="68" />
+        <Button Content="set" HorizontalAlignment="Left" Margin="548,202,0,0" VerticalAlignment="Top" Width="36" Height="23" Click="Button_set_Pixel2mm"/>
 
 
     </Grid>

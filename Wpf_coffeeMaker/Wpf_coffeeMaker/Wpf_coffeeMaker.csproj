@@ -102,6 +102,7 @@
       <DependentUpon>adminWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ezTCP.cs" />
+    <Compile Include="SocketTool.cs" />
     <Page Include="adminWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -160,7 +161,25 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="desk.png" />
+    <Resource Include="Picture\blue cup.png" />
+    <Resource Include="Picture\pink cup.png" />
+    <Resource Include="Picture\RedPillBox.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Picture\GreenPillBox.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Picture\URicon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Picture\Gripper.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Picture\Gripper2.png" />
+    <Resource Include="Picture\Gripper3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Picture\desk_back.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Alturos.Yolo.2.5.0\build\net461\Alturos.Yolo.targets" Condition="Exists('..\packages\Alturos.Yolo.2.5.0\build\net461\Alturos.Yolo.targets')" />
